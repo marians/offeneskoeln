@@ -1,0 +1,50 @@
+# Synonym-Datei für die Schlagworte
+#
+# Mit dieser Datei werden verschiedene Schreibweisen des selben Begriffs
+# normalisiert. Der Pfeil => zeigt auf die gültige Schreibweise.
+#
+# Details unter https://github.com/marians/offeneskoeln/wiki/Schlagworte/
+#
+bebauungsplanes => bebauungsplan
+beschlussvorschlages => beschlussvorschlag
+die grünen => grüne
+die linke => dielinke
+die linke.köln => dielinke
+eigentums => eigentum
+graffittifrei => graffitti
+graffittifreie => graffitti
+grundstück => grundstücke
+grünanlage => grünanlagen
+grünen => grüne
+grünfläche => grünflächen
+grünstreifens => grünstreifen
+kalker => kalk
+kindern => kinder
+kinderspielplätzen => spielplätze
+linke.köln => dielinke
+planungen => planung
+pro köln => proköln
+schule => schulen
+spielplatz => spielplätze
+stadtbezirkes => stadtbezirk
+stellen => stelle
+stellungnahmen
+str => straßen
+straße => straßen
+zuschusses => zuschuss
+zuschussfähige => zuschussfähig
+flächen => fläche
+unfall => unfälle
+informationsfreiheitsrechts => informationsfreiheitsrecht
+informations => information
+skateparks => skatepark
+jugendlichen => jugendliche
+plangebietes => plangebiet
+verfahrens => verfahren
+festsetzungen => festsetzung
+nutzungen => nutzung
+masterplans => masterplan
+masterplanes => masterplan
+hartz-iv => hartz4
+hartz iv => hartz4
+dienstleistung => dienstleistungen
