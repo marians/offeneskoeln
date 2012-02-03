@@ -1,0 +1,86 @@
+$def with (content)
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>$content.title - Offenes Köln</title>
+    $if content.description:
+        <meta name="description" content="$content.description" />
+    <meta name="publisher" content="Marian Steinbach" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="icon" href="/static/img/logo/favicon_16x16.png" />
+    <meta property="og:title" content="Offenes Köln"/>
+    <link rel="shortcut icon" href="/static/img/logo/favicon_16x16.png" />
+    <link rel="stylesheet" href="/static/css/style.css"/>
+    <meta property="og:image" content="http://offeneskoeln.de/static/img/logo/logo_header_86x71.png" />
+    <script>
+    var L_ROOT_URL = '/static/img/';
+    $if context.position:
+    // context.position aus session
+    var position = {};
+    $if 'lat' in context.position:
+        position.lat = $context.position['lat'];
+    $if 'lon' in context.position:
+        position.lon = $context.position['lon'];
+    $if 'street' in context.position:
+        position.street = '$context.position["street"]';
+    $if 'plz' in context.position:
+        position.plz = $context.position["plz"];
+</script>
+<script type="text/javascript" src="/static/js/modernizr-2.0.6.min.js"></script>
+</head>
+<body>
+  <div id="container">
+    <header>
+      <div><a id="name" href="/">Offenes K&ouml;ln</a></div>
+      <div id="tagline">Kölner Lokalpolitik, so zugänglich wie die Menschen hier. <a href="/ueber/">Mehr erfahren</a></div>
+    </header>
+    <div id="main" role="main">
+      $:content
+    </div>
+    <footer>
+      <div id="footer">
+      	<ul class="column">
+        	<li><a href="/">Startseite</a></li>
+        	<li><a href="/ueber/">Über uns</a></li>
+        	<!--<li><a href="/faq/">Fragen und Antworten</a></li>-->
+        </ul>
+        <ul class="column">
+        	<li><a href="/feedback/">Feedback</a></li>
+        	<li><a href="/kontakt/">Kontakt</a></li>
+        </ul>
+        <ul class="column">
+        	<li><a href="http://blog.offeneskoeln.de/" target="_blank">Blog</a></li>
+        	<li><a href="/links/">Links</a></li>
+        </ul>
+        <ul class="column">
+        	<li><a href="/daten/">Daten</a></li>
+        	<li><a href="/api/">API</a></li>
+        </ul>
+        <ul class="column">
+        	<li><a href="/disclaimer/" class="warn">Datenqualität/Haftungsausschluss</a></li>
+        </ul>
+      </div>
+    </footer>
+  </div> <!--! end of #container -->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <!--
+    <script type="text/javascript" src="/static/js/leaflet_0.3.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.ajaxq.js"></script>
+    <script type="text/javascript" src="/static/js/script.js"></script>
+  -->
+    <script type="text/javascript" src="/static/js/compact_201201302117.js"></script>
+    $if content.additional_scripts:
+        <script type="text/javascript" src="$content.additional_scripts"></script>
+
+  <!--[if lt IE 7 ]>
+    <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+    <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+  <![endif]-->
+  
+</body>
+</html>

@@ -1,0 +1,31 @@
+$def with (search_settings)
+$var title: Suche
+$var description: Hier findest Du alle amtlichen Dokumente im Bestand
+$var additional_scripts: /static/js/search.js
+
+<script type="text/javascript">
+var ok_search_settings = {
+	q: '$search_settings["q"]'.replace(/&quot;/g, "\""), // query string
+	fq: '$search_settings["fq"]'.replace(/&quot;/g, "\""), // filter query
+	num: parseInt("$search_settings['num']"), // docs per page
+	start: parseInt("$search_settings['start']"), // page offset
+	sort: "$search_settings['sort']", // sorting
+	date: "$search_settings['date']" // date range
+};
+</script>
+
+<div id="search">
+	<div class="content top">
+		<h1 style="margin-bottom: 0">Suche</h1>
+	</div>
+	<div class="content middle">
+		<form action="/suche/" method="get" id="searchform" accept-charset="utf-8">
+			<label class="qlabel" for="qinput">Suche:</label>
+			<input type="text" id="qinput" name="q" value="$search_settings['q']" autocomplete="off" />
+			<input type="submit" id="submit" value="Suchen" />
+		</form>
+	</div>
+	<div class="result content bottom">
+		<div class="loading big outer"><div class="loading big inner">Suche...</div></div>
+	</div>
+</div>
