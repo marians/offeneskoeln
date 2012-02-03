@@ -75,14 +75,25 @@ body {
 }
 
 header {
-	padding: 0.3em 0.7em 0.3em 116px;
-	background-image: url(/static/img/logo/logo_header_86x71.png);
-	background-repeat: no-repeat;
-	min-height: 92px;
+	padding: 0.3em 0.7em 0.3em 0;
+	min-height: 68px;
 	margin-left: 16px;
+	overflow: auto;
+}
+#logo {
+    float: left;
+    width: 60px
+}
+#logo img {
+    width: 43px;
+    height: 35px;
+}
+#nametagline {
+    float: left;
+    width: 250px;
 }
 #name {
-	font-size: 200%;
+	font-size: 170%;
 	color: #97c66b;
 }
 #name, #name:link, #name:visited {
@@ -121,7 +132,7 @@ footer a.warn {
 	background-image: linear-gradient(top, #a03030, #851515);
 }
 footer .column {
-	width: 19%;
+	width: 18%;
 	float: left;
 	list-style-type: none;
 	margin: 0;
@@ -184,7 +195,9 @@ footer .column {
 	margin-bottom: 3px;
 }
 
-
+noscript {
+    background-color: yellow;
+}
 
 h1 {
 	margin: 0 0 10px 0;
@@ -250,6 +263,12 @@ blockquote.nice {
 	margin: 0 auto;
 }
 
+/** a block element on mobile, but inline on larger screens **/
+.mobilerow {
+    display: block;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
 
 /*********** page-specific styles *********/
 
@@ -427,12 +446,12 @@ a:hover .del {
 	line-height: 110%;
 }
 #home #qinput {
-	width: 22em;
+	width: 11em;
 }
 #home #submit {
 	line-height: 128%;
-	padding-left: 2em;
-	padding-right: 2em;
+	padding-left: 1em;
+	padding-right: 1em;
 }
 #position-prompt {
 	font-size: 125%;
@@ -441,9 +460,10 @@ a:hover .del {
 #position-prompt .question {
 	color: #777777;
 	text-shadow: rgba(255, 255, 255, 0.5) -1px -1px 1px, rgba(50, 50, 50, 0.2) 1px 1px 1px;
+	white-space: nowrap;
 }
 #position-prompt form, #location-prompt-resultchoice,  #position-prompt .error {
-	margin-top: 1em;
+	margin-top: 0.2em;
 }
 #location-prompt-resultchoice {
 	line-height: 160%;
@@ -524,19 +544,34 @@ a:hover .del {
 	color: #000;
 }
 
-
+/** Alle @media query styles ab hier sind für tablets, iPad und größer (Desktop Browser) 
+ * und überschreiben vorige Styles wo nötig */
 
 @media only screen and (min-width: 480px) {
   /* Gilt auch fuer iPad im vertikalen Modus */
   body { margin: 10px 20px; font-size: 14px;}
+  header { min-height: 92px; }
+  #logo { width: 116px; }
+  #logo img { width: 86px; height: 71px; }
+  #nametagline { width: 300px; }
+  #name { font-size: 200%; }
   #map { height: 500px; }
   .text { width: 80%;}
   label {display: inline;}
+  #home #qinput { width: 18em; }
+  #home #submit { padding-left: 1em; padding-right: 1em;}
   /* input, select, textarea { width: 24em; } */
 }
 
 @media only screen and (min-width: 800px) {
   body { margin: 10px 50px; font-size: 14px; }
+  #nametagline { width: 600px; }
+  #home #qinput { width: 22em; }
+  #home #submit { padding-left: 2em; padding-right: 2em;}
+  .mobilerow { display: inline;  margin-top: 0; margin-bottom: 0; margin-left: 10px; margin-right: 10px;}
+  #position-prompt form, #location-prompt-resultchoice,  #position-prompt .error {
+	margin-top: 0.3em;
+  }
   /*input, select, textarea { width: 30em; } */
 }
 @media only screen and (min-width: 1000px) {
