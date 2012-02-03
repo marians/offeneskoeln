@@ -10,9 +10,9 @@ Hier gibt es:
 
 Der Bereich **Quellcode** enthält erst wenige Dateien:
 
-- solr-conf: Konfigurationsdateien für den Solr Such-Dienst
 - db: Datenbankschema
-- webapp: Die Web-Appliaktion offeneskoeln.de (noch sehr unvollständig!)
+- webapp: Die Web-Applikation offeneskoeln.de (noch sehr unvollständig!)
+- solr-conf: Konfigurationsdateien für den Solr Such-Dienst
 - build: Build-Werkzeug
 
 Weiter hinzu kommen werden:
