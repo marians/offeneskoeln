@@ -227,7 +227,7 @@ $(document).ready(function(){
         settings = OffenesKoeln.processSearchParams(settings);
         var parts = []
         for (var item in settings) {
-            parts.push(item + '=' + settings[item]);
+            parts.push(item + '=' + escape(settings[item]));
         }
         return parts.join('&');
     }
