@@ -62,7 +62,6 @@ $(document).ready(function(){
 	}
 	
     function displaySearchResultFacets(facets, query, targetSelector) {
-        console.log(query.fq);
         if (typeof facets != 'undefined') {
             // typ facet
             typ_facet = createSearchResultFacet('typ', facets.typ, 'Typ', 'value', query.fq);
@@ -92,7 +91,7 @@ $(document).ready(function(){
         var list = $(document.createElement('ul')).attr('class', 'facet');
         if (fq.indexOf(name) != -1) {
             // currently filtered by this facet
-            var re = new RegExp(name + ':"([^"]+)"');
+            var re = new RegExp(name + ':"*([^"]+)"*');
             var find = fq.match(re);
             if (find) {
                 var label = find[1];
@@ -108,7 +107,7 @@ $(document).ready(function(){
                 if (filterIds == true) {
                     label = label.replace(/^[0-9]+\s+/, '');
                 }
-                list.append('<li><a href="/suche/?'+ (searchQueryString({fq: name + ':&quot;' + facet_data[i].key +'&quot;' })) +'"><span class="label">'+ label +'</span> <span class="num">'+ facet_data[i].value +'</span></a></li>');
+                list.append('<li><a href="/suche/?'+ (searchQueryString({fq: name + ':' + quoteFacetValue(facet_data[i].key) })) +'"><span class="label">'+ label +'</span> <span class="num">'+ facet_data[i].value +'</span></a></li>');
             }
         }
         facet.append('<div class="header">'+ headline +'</div>');
@@ -116,8 +115,18 @@ $(document).ready(function(){
         return facet;
     }
     
+    /**
+     * Packt Facetten-Werte in Anführungszeichen, wenn sie ein Leerzeichen enthalten
+     */
+    function quoteFacetValue(str) {
+        if (str.indexOf(' ') != -1) {
+            str = '"' + str + '"';
+        }
+        return str;
+    }
+    
     function displaySearchErrorMessage(){
-        $('#search .result').append('<p>Fehler bei der Suche.</p><p>TODO: Diese Fehlermeldung aufhübschen.</p>');
+        $('#search .result').append('<h2>Fehler bei der Suche</h2><p>Es ist ein unerwarteter Fehler aufgetreten. Bitte probier es noch einmal.</p><p>Wenn das Problem weiterhin besteht, bitte kopiere den Inhalt der Adresszeile in eine E-Mail und sende sie an <a href="mailto:kontakt@offeneskoeln.de">kontakt@offeneskoeln.de</a>. Vielen Dank!</p>');
     }
     
     function displaySearchResult(data) {
@@ -125,10 +134,11 @@ $(document).ready(function(){
         
         // headline
         $('h1').text(data.result.numhits + ' gefundene Dokumente');
-        var subheadline = $(document.createElement('h3'));
-        //console.log(data.start, ok_search_settings.num);
-        subheadline.text('Seite ' + (Math.floor(data.result.start / ok_search_settings.num)+1) + ' von ' + (Math.floor(data.result.numhits / ok_search_settings.num)+1));
-        result.append(subheadline);
+        if (data.result.numhits > 0) {
+            var subheadline = $(document.createElement('h3'));
+            subheadline.text('Seite ' + (Math.floor(data.result.start / ok_search_settings.num)+1) + ' von ' + (Math.floor(data.result.numhits / ok_search_settings.num)+1));
+            result.append(subheadline);
+        }
         
         // results ol
         var resultlist = $(document.createElement('ol'));
@@ -227,7 +237,7 @@ $(document).ready(function(){
         settings = OffenesKoeln.processSearchParams(settings);
         var parts = []
         for (var item in settings) {
-            parts.push(item + '=' + escape(settings[item]));
+            parts.push(item + '=' + encodeURI(settings[item]));
         }
         return parts.join('&');
     }
