@@ -109,7 +109,7 @@
             <str name="hl.usePhraseHighlighter">true</str>
             <str name="hl.highlightMultiTerm">true</str>
             <str name="qf">
-                betreff^5.0 inhalt^0.2 text^0.1
+              text
             </str>
         </lst>
     </requestHandler>
