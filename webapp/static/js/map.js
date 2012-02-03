@@ -2,7 +2,6 @@
 $(document).ready(function(){
     var map = new L.Map('map');
     var maplayers = [];
-    var PLACEFINDER_APP_ID = '8GR2G14c'
     
     var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/f838de29c9284d329bf4bcfbbcff32e3/52932/256/{z}/{x}/{y}.png',
         cloudmadeAttribution = 'Geodaten &copy; OpenStreetMap Mitwirkende, Darstellung &copy; 2011 CloudMade',
@@ -35,6 +34,7 @@ $(document).ready(function(){
         
     // handle user data input
     $('#position-prompt-submit').click(function(evt){
+        console.log("#position-prompt-submit click", evt);
         evt.preventDefault();
         $('#position-prompt .error').remove();
         $('#location-prompt-resultchoice').remove();
@@ -42,30 +42,25 @@ $(document).ready(function(){
         var zip = $('#zip').val();
         // check if street is available
         if (street != '') {
+            console.log("2. street is nicht leer", evt);
             data = {
-                flags: 'J',
-                appid: PLACEFINDER_APP_ID,
-                locale: 'de_DE',
                 street: street,
-                city: 'Cologne',
-                postal: zip,
-                country: 'DE'
+                postal: zip
             }
-            //console.log('Querying Placefinder:', data);
-            $.getJSON('http://where.yahooapis.com/geocode', data, function(response){
-                console.log('Placefinder response: ', response);
-                if (response.ResultSet.Error != 0) {
+            $.getJSON('/api/geocode-proxy', data, function(places){
+                console.log('Placefinder response: ', places);
+                if (places.ResultSet.Error != 0) {
                     handleLocationLookupError('SYSTEM');
-                } else if (response.ResultSet.Found == 0) {
+                } else if (places.ResultSet.Found == 0) {
                     handleLocationLookupError('NOT_FOUND');
-                } else if (response.ResultSet.Found == 1 && response.ResultSet.Results[0].radius > 1000) {
+                } else if (places.ResultSet.Found == 1 && places.ResultSet.Results[0].radius > 1000) {
                     handleLocationLookupError('NEED_DETAILS');
-                } else if (response.ResultSet.Found > 1) {
+                } else if (places.ResultSet.Found > 1) {
                     var choice = $(document.createElement('div')).attr('id', 'location-prompt-resultchoice');
                     choice.append('<span>Bitte wähle einen der folgenden Orte:</span><br />');
-                    for (var n in response.ResultSet.Results) {
+                    for (var n in places.ResultSet.Results) {
                         var choicelink = $(document.createElement('a')).attr('href', '#');
-                        var resultObject = response.ResultSet.Results[n];
+                        var resultObject = places.ResultSet.Results[n];
                         var choicetext = resultObject.street;
                         if (resultObject.neighborhood != '') {
                             choicetext += ' in ' + resultObject.neighborhood
@@ -128,12 +123,12 @@ $(document).ready(function(){
             }
             OffenesKoeln.positionsForNamesQueued(streetnames, function(data){
                 if (data.average) {
-                    $.getJSON('/api/query', {'fq': 'strasse:"'+ data.name +'"', 'docs': 0}, function(search){
+                    $.getJSON('/api/query', {'fq': 'strasse:"'+ data.name +'"', 'docs': 1, 'sort': 'datum desc'}, function(search){
                         if (search.result.numhits > 0) {
                             var markerLocation = new L.LatLng(data.average[0], data.average[1]);
                             var marker = new L.Marker(markerLocation);
                             maplayers.push(map.addLayer(marker));
-                            marker.bindPopup('<a href="/suche/?q=' + data.name + '">' + data.name + ': ' + search.result.numhits + ' Treffer');
+                            marker.bindPopup('<p><b><a href="/suche/?q=' + data.name + '">' + data.name + ': ' + search.result.numhits + ' Treffer</a></b><br/>Der jüngste vom ' + OffenesKoeln.formatIsoDate(search.result.docs[0].datum) + '</p>');
                         }
                     });
                 }
