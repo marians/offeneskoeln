@@ -4,6 +4,22 @@
  */
 var disqus_shortname = 'offeneskoeln';
 var OffenesKoeln = {
+    
+    monthstr: {
+            '01': 'Januar',
+            '02': 'Februar',
+            '03': 'März',
+            '04': 'April',
+            '05': 'Mai',
+            '06': 'Juni',
+            '07': 'Juli',
+            '08': 'August',
+            '09': 'September',
+            '10': 'Oktober',
+            '11': 'November',
+            '12': 'Dezember'
+        },
+        
     /**
      * returns a list of streets for a given position
      * which are in a given rdius
@@ -45,10 +61,16 @@ var OffenesKoeln = {
         $.getJSON('/api/document', {'id': id}, callback);
     },
     
+    /**
+     * Formatiert ein ISO-Datum zum gebräuchlichen deutschen Format DD.MM.YYYY
+     * @param   String   ISO-Datum (YYYY-MM-DD)
+     * @return  String   Deutsches Datum
+     */
     formatIsoDate: function(datestr){
-        date = new Date();
-        date.setTime(Date.parse(datestr))
-        return date.getDate() + '.' + (date.getMonth()+1) + '.' + date.getFullYear();
+        var year = datestr.substr(0,4);
+        var month = datestr.substr(5,2);
+        var day = datestr.substr(8,2);
+        return parseInt(day, 10) + '. ' + this.monthstr[month] + ' ' + year;
     },
     
     truncateText: function(text, size){
@@ -104,7 +126,12 @@ var OffenesKoeln = {
             || params['sort'] == '') {
             delete params['sort'];
         }
-        return params;
+         if (typeof params['date'] == 'undefined'
+            || params['date'] == null
+            || params['date'] == '') {
+            delete params['date'];
+        }
+       return params;
     },
     
     deepCopy: function(obj) {
