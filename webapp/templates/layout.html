@@ -36,10 +36,16 @@ $def with (content)
 <body>
   <div id="container">
     <header>
-      <div><a id="name" href="/">Offenes K&ouml;ln</a></div>
-      <div id="tagline">Kölner Lokalpolitik, so zugänglich wie die Menschen hier. <a href="/ueber/">Mehr erfahren</a></div>
+      <div id="logo"><a href="/"><img src="/static/img/logo/logo_header_86x71.png" width="86" height="71" alt="" /></a></div>
+      <div id="nametagline">
+        <div><a id="name" href="/">Offenes K&ouml;ln</a></div>
+        <div id="tagline">Kölner Lokalpolitik, so zugänglich wie die Menschen hier. <a href="/ueber/">Mehr erfahren</a></div>
+      </div>
     </header>
     <div id="main" role="main">
+        <noscript>
+            <p>Du musst JavaScript aktivieren, um diese Site nutzen zu können.</p>
+        </noscript>
       $:content
     </div>
     <footer>
@@ -68,12 +74,12 @@ $def with (content)
     </footer>
   </div> <!--! end of #container -->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <!--
     <script type="text/javascript" src="/static/js/leaflet_0.3.min.js"></script>
     <script type="text/javascript" src="/static/js/jquery.ajaxq.js"></script>
     <script type="text/javascript" src="/static/js/script.js"></script>
-  -->
+    <!--
     <script type="text/javascript" src="/static/js/compact_201201302117.js"></script>
+    -->
     $if content.additional_scripts:
         <script type="text/javascript" src="$content.additional_scripts"></script>
 

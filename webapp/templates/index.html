@@ -5,17 +5,17 @@ $var additional_scripts: /static/js/map.js
 <div id="home">
 	<div class="content top">
 		<div id="position-prompt">
-			<form action="/">
+			<form action="/" method="GET">
 				<span class="question">Wo in Köln bist Du?</span>
-				<label for="street">Straße</label>: <input id="street" type="text" title="Straße in der Du wohnst oder für die Du Dich interessierst"/>
-				<label for="zip">PLZ (optional)</label>: <input id="zip" type="text" size="6" maxlength="5" title="Optional die Postleitzahl zu dieser Straße"/>
-				<button id="position-prompt-submit">Anzeigen</button>
+				<span class="mobilerow"><label for="street">Straße</label>: <input id="street" type="text" title="Straße in der Du wohnst oder für die Du Dich interessierst"/></span>
+				<span class="mobilerow"><label for="zip">PLZ (optional)</label>: <input id="zip" type="text" size="6" maxlength="5" title="Optional die Postleitzahl zu dieser Straße"/></span>
+				<button id="position-prompt-submit" type="button">Anzeigen</button>
 			</form>
 		</div>
 	</div>
 	<div id="map" style="margin-top: 3px;"></div>
 	<div class="content bottom searchform">
-		<div class="header">&hellip; oder Suche nach Themen, die Dich interessieren:</div>
+		<div class="header">&hellip; oder suche nach Themen, die Dich interessieren:</div>
 		<form method="get" action="/suche/" accept-charset="utf-8">
 			<input type="text" id="qinput" name="q" value="" /> <input type="submit" id="submit" value="Suchen" />
 		</form>
