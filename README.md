@@ -18,3 +18,6 @@ Weiter hinzu kommen werden:
 - scripts: Unterstützende Werkzeuge und Helferlein
 - web-root: Die Web-Appliaktion offeneskoeln.de
 
+Der **Scraper**, mit dem die Daten aus dem Ratsinformationssystem der Stadt Köln ausgelesen werden, ist ein eigenes Projekt auf Github:
+
+[https://github.com/marians/cologne-ris-scraper](https://github.com/marians/cologne-ris-scraper)
