@@ -5,7 +5,7 @@ Herzlich willkommen! Das ist das github-Repository für [Offenes Köln](http://o
 Hier gibt es:
 
 - Dokumentation (im [Wiki](https://github.com/marians/offeneskoeln/wiki))
-- [Issue-Tracking](https://github.com/marians/offeneskoeln/issues), also die Erfassung und Zuweisugn von Fehlern
+- [Issue-Tracking](https://github.com/marians/offeneskoeln/issues), also die Erfassung und Zuweisung von Fehlern
 - Quellcode
 
 Der Bereich **Quellcode** enthält erst wenige Dateien:
