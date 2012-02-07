@@ -27,22 +27,12 @@
     entstanden.
 """
 
-# Datenbank-Konfiguration
-DBHOST = 'localhost'
-DBUSER = 'offeneskoeln'
-DBPASS = ''
-DBNAME = 'offeneskoeln'
-
-# Straßenverzeichnis
-STREETS_FILE = '../data/strassen.txt'
-
-# Ende der Konfiguration
-
 import sys
 import os
 import re
 from datastore import DataStore
 import solr
+import config
 
 def unique(list): 
     """
@@ -174,9 +164,9 @@ def positions_for_streetnames(names):
 
 if __name__ == '__main__':
     s = solr.SolrConnection('http://127.0.0.1:8983/solr')
-    db = DataStore(DBNAME, DBHOST, DBUSER, DBPASS)
+    db = DataStore(config.DBNAME, config.DBHOST, config.DBUSER, config.DBPASS)
     
-    streets = load_streets(STREETS_FILE)
+    streets = load_streets(config.STREETS_FILE)
     
     num_docs = 0
     

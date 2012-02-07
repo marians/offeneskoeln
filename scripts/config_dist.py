@@ -46,3 +46,6 @@ DB_NAME = 'offeneskoeln'
 
 # Tabelle für Thumbnail-Informationen
 DB_THUMBS_TABLE = 'attachment_thumbnails'
+
+# Straßenverzeichnis (Liste aller bekannten Straßennamen)
+STREETS_FILE = '../data/strassen.txt'
