@@ -94,7 +94,6 @@ def normalize_doctype(dtype):
         - Dringlichkeitsvorlage
         - Dringlichkeitsantrag
         - Mitteilung
-        - Mitteilungsvorlage
     """
     mapping = {
         'Stellungnahme zu e. Antrag (Ausschuss)': 'Mitteilung',
@@ -129,7 +128,10 @@ def normalize_doctype(dtype):
         'Mitteilung/Beantwortung - Ausschuss': 'Mitteilung',
         'Gem. Anfrage nach § 4 (SPD)': 'Anfrage',
         'Gem. Änderungsantrag (SPD)': 'Antrag',
-        'SPD Anfrage nach § 4': 'Anfrage'
+        'SPD Anfrage nach § 4': 'Anfrage',
+        'Mitteilungsvorlage': 'Mitteilung',
+        'Beschlussvorlage': 'Beschlussvorlage',
+        'Dringlichkeitsvorlage': 'Dringlichkeitsvorlage',
     }
     if dtype in mapping:
         return mapping[dtype]
