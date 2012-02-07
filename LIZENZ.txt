@@ -16,5 +16,5 @@ vorgesehenen oder einen bestimmten Zweck sowie jeglicher Rechtsverletzung,
 jedoch nicht darauf beschränkt. In keinem Fall sind die Autoren oder 
 Copyrightinhaber für jeglichen Schaden oder sonstige Ansprüche haftbar zu 
 machen, ob infolge der Erfüllung eines Vertrages, eines Delikts oder anders 
-im Zusammenhang mit der Softwae oder sonstiger Verwendung der Software 
+im Zusammenhang mit der Software oder sonstiger Verwendung der Software 
 entstanden.
