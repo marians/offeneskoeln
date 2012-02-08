@@ -26,6 +26,9 @@
     entstanden.
 """
 
+# Basis-URL für Solr Webservice
+SOLR_URL = 'http://127.0.0.1:8983/solr'
+
 # Root-Verzeichnis der Webapp
 WWW_PATH = '/var/www/offeneskoeln.de'
 
