@@ -165,8 +165,13 @@ def positions_for_streetnames(names):
         return None
 
 if __name__ == '__main__':
-    s = solr.SolrConnection('http://127.0.0.1:8983/solr')
-    db = DataStore(config.DBNAME, config.DBHOST, config.DBUSER, config.DBPASS)
+    try:
+        s = solr.SolrConnection(config.SOLR_URL)
+    except:
+        print >> sys.stderr, "Fehler beim Verbindungsaufbau zum Solr Server"
+        print >> sys.stderr, "URL:", config.SOLR_URL
+        sys.exit(1)
+    db = DataStore(config.DB_NAME, config.DB_HOST, config.DB_USER, config.DB_PASS)
     
     streets = load_streets(config.STREETS_FILE)
     
@@ -259,7 +264,8 @@ if __name__ == '__main__':
                   strasse=unique(solr_streets.keys()),
                   person=solr_people.values(),
                   inhalt=solr_body,
-                  position=positions_for_streetnames(unique(solr_streets.keys())))
+                  #position=positions_for_streetnames(unique(solr_streets.keys()))
+                  )
         except UnicodeDecodeError as err:
             print >> sys.stderr, (
                 "UnicodeDecodeError beim Import von request_id", 
@@ -275,7 +281,8 @@ if __name__ == '__main__':
                 'strasse': unique(solr_streets.keys()),
                 'person': solr_people.values(),
                 'inhalt': solr_body,
-                'position': positions_for_streetnames(unique(solr_streets.keys()))}
+                #'position': positions_for_streetnames(unique(solr_streets.keys()))
+                }
             
         
     for submission in submissions:
@@ -350,7 +357,8 @@ if __name__ == '__main__':
                   datum=submission['submission_date'],
                   inhalt=solr_body,
                   typ=normalize_doctype(submission['submission_type']),
-                  position=positions_for_streetnames(unique(solr_streets.keys())))
+                  #position=positions_for_streetnames(unique(solr_streets.keys()))
+                  )
         except UnicodeDecodeError as err:
             print >> sys.stderr, (
                 "UnicodeDecodeError beim Import von submission_id", 
@@ -367,7 +375,8 @@ if __name__ == '__main__':
                 'person': solr_people.values(),
                 'inhalt': solr_body,
                 'typ': normalize_doctype(submission['submission_type']),
-                'position': positions_for_streetnames(unique(solr_streets.keys()))}
+                #'position': positions_for_streetnames(unique(solr_streets.keys()))
+                }
             
         
     s.commit(wait_flush=True, wait_searcher=False)
