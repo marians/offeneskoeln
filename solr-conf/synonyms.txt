@@ -30,7 +30,7 @@ bv, bezirksvertretung
 top, tagesordnungspunkt
 einschl, einschließlich
 inkl, inklusive
-lsa, lichtsignalanlage
+lsa, lichtsignalanlage, ampel
 fgü, fußgängerüberweg
 kvb, Kölner Verkehrsbetriebe
 spielplatzpaten, spielplatzpatin, spielplatzpatinnen
