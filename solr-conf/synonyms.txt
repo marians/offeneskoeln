@@ -31,7 +31,7 @@ top, tagesordnungspunkt
 einschl, einschließlich
 inkl, inklusive
 lsa, lichtsignalanlage, ampel
-fgü, fußgängerüberweg
+fgü, fußgängerüberweg, zebrastreifen
 kvb, Kölner Verkehrsbetriebe
 spielplatzpaten, spielplatzpatin, spielplatzpatinnen
 planung, planungen, pläne, plan
