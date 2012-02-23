@@ -24,6 +24,15 @@
 # im Zusammenhang mit der Software oder sonstiger Verwendung der Software 
 # entstanden.
 
+# Köln-spezifische Synonyme
+
+militärring, militärringstraße
+domplatte, roncalliplatz
+kvb, Kölner Verkehrsbetriebe
+spielplatzpaten, spielplatzpatin, spielplatzpatinnen
+
+# Allgemeine Synonyme
+
 str, straße
 go, gemeindeordnung
 bv, bezirksvertretung
@@ -32,9 +41,6 @@ einschl, einschließlich
 inkl, inklusive
 lsa, lichtsignalanlage, ampel
 fgü, fußgängerüberweg, zebrastreifen
-kvb, Kölner Verkehrsbetriebe
-spielplatzpaten, spielplatzpatin, spielplatzpatinnen
 planung, planungen, pläne, plan
 fnp, flächennutzungsplan
-militärring, militärringstraße
-domplatte, roncalliplatz
+areal, gelände
