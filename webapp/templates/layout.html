@@ -15,23 +15,12 @@ $def with (content)
     <link rel="icon" href="/static/img/logo/favicon_16x16.png" />
     <meta property="og:title" content="Offenes Köln"/>
     <link rel="shortcut icon" href="/static/img/logo/favicon_16x16.png" />
-    <link rel="stylesheet" href="/static/css/style.css"/>
+    <link rel="stylesheet" href="/static/css/style_20120308.css"/>
     <meta property="og:image" content="http://offeneskoeln.de/static/img/logo/logo_header_86x71.png" />
     <script>
-    var L_ROOT_URL = '/static/img/';
-    $if context.position:
-    // context.position aus session
-    var position = {};
-    $if 'lat' in context.position:
-        position.lat = $context.position['lat'];
-    $if 'lon' in context.position:
-        position.lon = $context.position['lon'];
-    $if 'street' in context.position:
-        position.street = '$context.position["street"]';
-    $if 'plz' in context.position:
-        position.plz = $context.position["plz"];
+    var L_ROOT_URL = '/static/img/leaflet/';
 </script>
-<script type="text/javascript" src="/static/js/modernizr-2.0.6.min.js"></script>
+<script type="text/javascript" src="http://a.ok.mycdn.de/js/modernizr-2.0.6.min.js"></script>
 </head>
 <body>
   <div id="container">
@@ -52,20 +41,18 @@ $def with (content)
       <div id="footer">
       	<ul class="column">
         	<li><a href="/">Startseite</a></li>
-        	<li><a href="/ueber/">Über uns</a></li>
-        	<!--<li><a href="/faq/">Fragen und Antworten</a></li>-->
         </ul>
         <ul class="column">
-        	<li><a href="/feedback/">Feedback</a></li>
-        	<li><a href="/kontakt/">Kontakt</a></li>
+            <li><a href="/ueber/">Über uns</a></li>
+        </ul>
+        <ul class="column">
+            <li><a href="/daten/">Daten</a></li>
+        </ul>
+        <ul class="column">
+            <li><a href="/api/">API</a></li>
         </ul>
         <ul class="column">
         	<li><a href="http://blog.offeneskoeln.de/" target="_blank">Blog</a></li>
-        	<li><a href="/links/">Links</a></li>
-        </ul>
-        <ul class="column">
-        	<li><a href="/daten/">Daten</a></li>
-        	<li><a href="/api/">API</a></li>
         </ul>
         <ul class="column">
         	<li><a href="/disclaimer/" class="warn">Datenqualität/Haftungsausschluss</a></li>
@@ -73,13 +60,10 @@ $def with (content)
       </div>
     </footer>
   </div> <!--! end of #container -->
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script type="text/javascript" src="/static/js/leaflet_0.3.min.js"></script>
-    <script type="text/javascript" src="/static/js/jquery.ajaxq.js"></script>
-    <script type="text/javascript" src="/static/js/script.js"></script>
-    <!--
-    <script type="text/javascript" src="/static/js/compact_201201302117.js"></script>
-    -->
+    <script type="text/javascript" src="http://b.ok.mycdn.de/js/jquery.min.js"></script>
+    <script type="text/javascript" src="http://c.ok.mycdn.de/js/leaflet_0.3.1.min.js"></script>
+    <script type="text/javascript" src="http://a.ok.mycdn.de/js/jquery.ajaxq.js"></script>
+    <script type="text/javascript" src="/static/js/script_20120308.js"></script>
     $if content.additional_scripts:
         <script type="text/javascript" src="$content.additional_scripts"></script>
 
