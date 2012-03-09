@@ -1,15 +1,17 @@
 $var title: Startseite
 $var description: Informationen aus der Kölner Lokalpolitik, zugänglich dargestellt, durchsuchbar und geografisch zugeordnet.
-$var additional_scripts: /static/js/map.js
+$var additional_scripts: /static/js/map_20120308.js
 
 <div id="home">
-	<div class="content top">
+	<div id="position-form-container" class="content top">
 		<div id="position-prompt">
-			<form action="/" method="GET">
-				<span class="question">Wo in Köln bist Du?</span>
-				<span class="mobilerow"><label for="street">Straße</label>: <input id="street" type="text" title="Straße in der Du wohnst oder für die Du Dich interessierst"/></span>
-				<span class="mobilerow"><label for="zip">PLZ (optional)</label>: <input id="zip" type="text" size="6" maxlength="5" title="Optional die Postleitzahl zu dieser Straße"/></span>
-				<button id="position-prompt-submit" type="button">Anzeigen</button>
+			<form id="position-prompt-form" action="/" method="GET">
+				<div class="question">Sieh Dir an, was die Politik in Deiner Umgebung macht:</div>
+				<div>
+					<span class="mobilerow"><label for="street">Straße:</label> <input id="street" type="text" title="Straße in der Du wohnst oder für die Du Dich interessierst"/></span>
+					<a href="#" id="position-prompt-submit" class="awesome extrawide">Anzeigen</a>
+					<span class="spinner placeholder"></span>
+				</div>
 			</form>
 		</div>
 	</div>
@@ -17,14 +19,15 @@ $var additional_scripts: /static/js/map.js
 	<div class="content bottom searchform">
 		<div class="header">&hellip; oder suche nach Themen, die Dich interessieren:</div>
 		<form method="get" action="/suche/" accept-charset="utf-8">
-			<input type="text" id="qinput" name="q" value="" /> <input type="submit" id="submit" value="Suchen" />
+			<input type="text" id="qinput" name="q" value="" />
+			<a href="#" id="submit" class="awesome extrawide">Suchen</a>
 		</form>
 		<div class="examples">Beispiele: 
 			<a href="/suche/?q=b%C3%BCrgerhaushalt">bürgerhaushalt</a>,
+			<a href="/suche/?q=kalkberg">kalkberg</a>,
+			<a href="/suche/?q=waldbadviertel">waldbadviertel</a>,
 			<a href="/suche/?q=sanierung+schauspielhaus">sanierung schauspielhaus</a>,
-			<a href="/suche/?q=nord+s%C3%BCd+stadtbahn">nord süd stadtbahn</a>,
-			<a href="/suche/?q=shared+space">shared space</a>,
-			<a href="/suche/?q=baumf%C3%A4llungen">baumfällung</a>
+			<a href="/suche/?q=nord+s%C3%BCd+stadtbahn">nord süd stadtbahn</a>
 		</div>
 	</div>
 </div>
