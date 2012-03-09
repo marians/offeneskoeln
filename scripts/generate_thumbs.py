@@ -49,6 +49,7 @@ VALID_TYPES = ['jpg', 'pdf', 'tif', 'bmp', 'png', 'gif']
 
 # Diese Größen (Höhe) werden generiert:
 SIZES = [300, 600, 150]
+SIZES = [300, 800, 150]
 
 THUMB_SUFFIX = 'jpg'
 
