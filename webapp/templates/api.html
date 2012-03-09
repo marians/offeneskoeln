@@ -3,232 +3,318 @@ $var description: Für echte Offenheit braucht es offene Schnittstellen. Hier gi
 $var additional_scripts: /static/js/map.js
 
 <div class="content top">
-	<h1>Die Offenes Köln API</h1>
-	
-	<div class="text">
-		
-		<p>API = engl. <em>Application Program Interface</em>: Eine Programmierschnittstelle für den Zugriff auf ein System.</p>
-		
-		<p>Das Ziel von Offenes Köln ist es, Daten und Informationen zur Kölner Lokalpolitik so weit wie möglich für jede denkbare Nutzung zu öffnen. Dazu gehört auch die Öffnung für den Zugriff mit Hilfe von Programmen und Systemen.</p>
-	
-		<p>offeneskoeln.de bietet einige Zugriffsmöglichkeiten auf den Datenbestand als Webservice-API. Genau wie die Plattform selbst ist die API noch in einem sehr, sehr frühen Reifestadium und wird mit großer Wahrscheinlichkeit noch vielen Änderungen unterworfen sein.</p>
-		
-	</div>
+    <h1>Die Offenes Köln API</h1>
+    
+    <div class="text">
+        
+        <p>API = engl. <em>Application Program Interface</em>: Eine Programmierschnittstelle für den Zugriff auf ein System.</p>
+        
+        <p>Das Ziel von Offenes Köln ist es, Daten und Informationen zur Kölner Lokalpolitik so weit wie möglich für jede denkbare Nutzung zu öffnen. Dazu gehört auch die Öffnung für den Zugriff mit Hilfe von Programmen und Systemen.</p>
+    
+        <p>offeneskoeln.de bietet einige Zugriffsmöglichkeiten auf den Datenbestand als Webservice-API. Genau wie die Plattform selbst ist die API noch in einem sehr, sehr frühen Reifestadium und wird mit großer Wahrscheinlichkeit noch vielen Änderungen unterworfen sein.</p>
+        
+    </div>
 </div>
 <div class="content middle">
-	<div class="text">
-		<h2>Limitierung der API-Zugriffe</h2>
-		
-		<p>Jeder, der einen Client ausführt, der auf unsere API zugreift, ist aufgerufen, maximal <b>1 Zugriff pro Sekunde</b> auszuführen. Ein Client wird anhand der zugreifenden IP-Adresse erkannt.</p>
-		
-		<p>Diese Limitierung wird aktuell noch nicht erzwungen. Es kann jedoch jederzeit und ohne Vorankündigung dazu kommen. Wenn der Bedarf es erfordert, kann dieses Limit sich jederzeit ändern.</p>
-		
-		<p>Wir behalten uns außerdem vor, jederzeit den API-Zugriff für einzelne IP-Adressen zu sperren. Wenn Du von einer Sperre betroffen bist, nimm bitte <a href="/kontakt/">Kontakt</a> mit uns auf, um die Sperre zu entfernen.</p>
+    <div class="text">
+        <h2>Limitierung der API-Zugriffe</h2>
+        
+        <p>Jeder, der einen Client ausführt, der auf unsere API zugreift, ist aufgerufen, maximal <b>1 Zugriff pro Sekunde</b> auszuführen. Ein Client wird anhand der zugreifenden IP-Adresse erkannt.</p>
+        
+        <p>Diese Limitierung wird aktuell noch nicht erzwungen. Es kann jedoch jederzeit und ohne Vorankündigung dazu kommen. Wenn der Bedarf es erfordert, kann dieses Limit sich jederzeit ändern.</p>
+        
+        <p>Wir behalten uns außerdem vor, jederzeit den API-Zugriff für einzelne IP-Adressen zu sperren. Wenn Du von einer Sperre betroffen bist, nimm bitte <a href="/kontakt/">Kontakt</a> mit uns auf, um die Sperre zu entfernen.</p>
 
-	</div>
+    </div>
 </div>
 <div class="content middle">
-	<div class="text">
+    <div class="text">
 
-	<h2>Dokumentation</h2>
-		
-		<p>Wir bitten um Verständnis, dass die Dokumentation zum atkuellen Zeitpunkt noch sehr roh ausfällt.</p>
-		
-		<p>Die Ausgabe der Webservice-API erfolgt aktuell ausschließlich in <b>JSON</b>.</p>
-		
-		<p>Der Server Unterstützt <b>GZip-Kompression</b> der Antwort. Dafür muss der Client den String <code>gzip</code> im Request-Header <code>Accept-Encoding</code> senden.</p>
-		
-		<p>Sämtliche Anfragen an die API erfolgen mit der HTTP-Methode <b>GET</b>.</p>
-		
-		<p>Alle URL-Parameter müssen mit Zeichensatz <b>UTF-8</b> sowie URL-kodiert (<a href="http://www.apps.ietf.org/rfc/rfc3986.html">RFC 3986</a>) übergeben werden. Beispiel: Der Straßenname <code>Merkensstra<b>ß</b>e</code> wird zu <code>Merkensstra<b>%C3%9F</b>e</code>, wobei das Zeichen <code>ß</code> durch die zwei aufeinander folgenden hexadezimal-Zeichen <code>%C3</code> und <code>%9F</code> kodiert wird.</p>
-		
-		<p>Wenn von <b>Geo-Positionen oder Geo-Koordinaten</b> die Rede ist, ist eine Kombination aus Längen- und Breitengradangabe gemeint. Der Breitengrad wird als <code>latitude</code> oder <code>lat</code> benannt, der Längengrad als <code>longitude</code> oder <code>lon</code>. Wenn eine Webservice-Methode ein Koordinatenpaar ausgibt, ohne die beiden Werte einzeln zu benennen, steht immer als erstes der Breitengrad. Allerdings ist kaum eine Verwechselung möglich, da sich alle Koordinaten im Raum Köln befinden.</p>
-		
-		<p>Nachfolgend werden die einzelnen Methoden/Endpunkte beschrieben.</p>
+    <h2>Dokumentation</h2>
+        
+        <p>Die Ausgabe der Webservice-API erfolgt aktuell ausschließlich in <b>JSON</b>.</p>
+        
+        <p>Der Server unterstützt <b>GZip-Kompression</b> der Antwort. Dafür muss der Client den String <code>gzip</code> im Request-Header <code>Accept-Encoding</code> senden.</p>
+        
+        <p>Sämtliche Anfragen an die API erfolgen mit der HTTP-Methode <b>GET</b>.</p>
+        
+        <p>Alle URL-Parameter müssen mit Zeichensatz <b>UTF-8</b> sowie URL-kodiert (<a href="http://www.apps.ietf.org/rfc/rfc3986.html">RFC 3986</a>) übergeben werden. Beispiel: Der Straßenname <code>Merkensstra<b>ß</b>e</code> wird in einer URL zu <code>Merkensstra<b>%C3%9F</b>e</code>, wobei das Zeichen <code>ß</code> durch die zwei aufeinander folgenden hexadezimal-Zeichen <code>%C3</code> und <code>%9F</code> kodiert wird.</p>
+        
+        <p>Wenn von <b>Geo-Positionen oder Geo-Koordinaten</b> die Rede ist, ist eine Kombination aus Längen- und Breitengradangabe gemeint. Der Breitengrad wird als <code>latitude</code> oder <code>lat</code> benannt, der Längengrad als <code>longitude</code> oder <code>lon</code>. Wenn eine Webservice-Methode ein Koordinatenpaar ausgibt, ohne die beiden Werte einzeln zu benennen, steht immer als erstes der Breitengrad (lat bzw. latitude) und als zweites der Längengrad. Allerdings ist kaum eine Verwechselung möglich, da sich alle Koordinaten im Raum Köln befinden.</p>
 
-	</div>
+        <p>Nachfolgend werden die einzelnen Methoden/Endpunkte beschrieben. Hier der Überblick:</p>
+        <ul>
+            <li><a href="#documents">/api/documents</a> - Abruf von Dokumenten einschl. Suche</li>
+            <li><a href="#locations">/api/locations</a> - Ausgabe von Geo-Positionen zu Straßen</li>
+            <li><a href="#streets">/api/streets</a> - Ausgabe von Straßen zu Geo-Positionen</li>
+            <li><a href="#session">/api/session</a> - Lesen und Schreiben von Session-Daten</li>
+            <li><a href="#terms">/api/terms</a> - Auslesen von Dokumenteneigenschaften nach Feldern</li>
+            <li><a href="#proxy-geocode">/api/proxy/geocode</a> - Nichtöffentliche Proxy-Methode</li>
+        </ul>
+
+    </div>
 </div>
-<div class="content middle">
-	<div class="text">
+<div class="content middle" id="documents">
+    <div class="text">
 
-		<h3 style="font-weight: bold">streets-by-position</h3>
-		
-		<p>Dient zum Auffinden von Straßen in Nähe einer Geo-Position (Parameter lat und lon). Die maximale Entfernung kann mit dem Parameter radius gesetzt werden (default: 500), Einheit ist Meter. Die Ausgabe enthält Straßennamen und die Entfernung von der angegebenen Position in Metern.</p>
-		
-		<p><code>http://offeneskoeln.de/api/streets-by-position?lat=50.9564529&amp;lon=6.9074915&amp;radius=500</code></p>
-		
-		<p>Die ausgegebenen Straßennamen stammen vom OpenStreetMap Projekt und unterliegen entsprechend der Lizenz CC-BY-SA (siehe dazu <a href="/daten/">Daten</a>).</p>
+        <h3 style="font-weight: bold">/api/documents</h3>
+        
+        <p>Mit dieser Methode können einzelne oder mehrere Dokumente anhand ihrer Kennung abgerufen oder anhand von weiteren Kriterien gesucht werden.</p>
+        
+        <p><strong>Modus-Unterscheidung zwischen Suche und Direktabruf</strong></p>
+        
+        <p>Bei dieser Methode gibt es zwei unterschiedliche Modi:</p>
+        <ul>
+            <li><strong>Direktabruf</strong>: ein Dokument (oder mehrere Dokumente) wird anhand einer Kennung (<code>reference</code>) bzw. einer Liste von Kennungen abgefragt.</li>
+            <li><strong>Suche</strong>: Ist der Parameter <code>reference</code> nicht gesetzt, handelt es sich um den Modus <b>Suche</b>.</li>
+        </ul>
+        
+        <p>Einige Abfrageparameter können nur im Suchmodus verwendet werden.</p>
+        
+        <h4>Beispielhafte Abfragen:</h4>
+        <ul>
+            <li><code><a href="/api/documents?reference=2961/2011" target="_blank">/api/documents?reference=2961/2011</a></code>
+            <br />Ruft das Dokument mit der Kennung 2961/2011 ab (Direktabruf).</li>
+            <li><code><a href="/api/documents?reference=2961/2011&amp;output=attachments" target="_blank">/api/documents?reference=2961/2011&amp;output=attachments</a></code>
+            <br />Wie zuvor, es werden jedoch zusätzlich Daten zu Anlagen (<code>attachments</code>) ausgegeben.</li>
+            <li><code><a href="/api/documents?reference=2961/2011&amp;output=attachments,thumbnails" target="_blank">/api/documents?reference=2961/2011&amp;output=attachments,thumbnails</a></code>
+            <br />Wie zuvor, es werden jedoch zusätzlich Daten zu Vorschaubildern (<code>thumbnails</code>) ausgegeben.</li>
+            <li><code><a href="/api/documents?reference=2961/2011&amp;output=consultations" target="_blank">/api/documents?reference=2961/2011&amp;output=consultations</a></code>
+            <br />Ruft das Dokument mit der Kennung 2961/2011 ab (Direktabruf) und gibt zusätzlich die Sitzungen, in denen das Dokument beraten wurde, aus (<code>consultations</code>).</li>
+            <li><code><a href="/api/documents" target="_blank">/api/documents</a></code>
+            <br />Ruft die 10 neusten Dokumente ab. Da der Parameter <code>reference</code> nicht gesetzt ist, handelt es sich implizit um eine Suche.</li>
+            <li><code><a href="/api/documents?q=fahrrad" target="_blank">/api/documents?q=fahrrad</a></code>
+            <br />Suche nach Dokumenten, in denen der Begriff <code>fahrrad</code> vorkommt.</li>
+            <li><code><a href="/api/documents?fq=type:%22Antrag%22" target="_blank">/api/documents?fq=type:%22Antrag%22</a></code>
+            <br />Suche nach Dokumenten, bei denen die Eigenschaft <code>type</code> dem Wert &raquo;Antrag&laquo; entspricht.</li>
+        </ul>
+        
+        <h4>Parameter:</h4>
+        
+        <p>Alle Parameter sind optional.</p>
+        
+        <dl>
+            <dt><code>reference</code></dt>
+            <dd>
+                <p>Die Kennung eines Dokuments, z.B. <code>2961/2011</code>. Alle Dokumente und Sitzungen im Kölner Ratsinformationssystem (RIS) haben eine solche eindeutige Kennung (im Kölner RIS gelegentlich auch &raquo;Session-Nummer&laquo; genannt). In ganz wenigen Fällen teilen sich mehrere Dokumente dieselbe Kennung. Dann ist es jedoch in der Regel so, dass diese Dokumente inhaltlich zusammengehörig oder identisch sind. Hier bei Offenes Köln werden mehrere Dokumente mit derselben Kennung daher zu einem Dokument zusammen gefasst.</p>
+                
+                <p>Wenn der <code>reference</code>-Parameter gesetzt ist, handelt es sich bei der Abfrage um einen Direktabruf. Auf die Suche bezogene Parameter wie <code>q</code>, <code>fq</code> und <code>sort</code> können in diesem Modus nicht verwendet werden.</p>
+                
+                <p>Modus-Beschränkung: Durch Verwendung dieses Parameters wurd der Modus <em>Direktabruf</em> aktiviert. Daher ist der Prameter <em>nicht</em> im Modus <em>Suche</em> einsetzbar.</p>
+                
+            </dd>
+            
+            <dt><code>output</code></dt>
+            <dd>
+                <p>Kann die Werte <code>attachments</code>, <code>thumbnails</code>, <code>consultations</code>, <code>facets</code> annehmen. Es können auch mehrere Werte, durch Komma getrennt, kombiniert werden.</p>
+                
+                <p>Der Parameter bestimmt, welche zusätzlichen Details zur Dokumentenabfrage ausgegeben werden sollen. Es sollten immer nur die benötigten Details aktiviert werden, da im Hintegrund für jedes aktivierbare Detail zusätzliche Datenbankabfragen nötig sind, die die Antwort verzögern. Zweck dieses Parameters ist es, die Abfrage so schnell wie möglich und die übertragenen Daten so klein wie möglich zu halten.</p>
+                
+                <p><code>attachments</code> aktiviert die Ausgabe von Daten zu den Anlagen, die mit einem Dokument verknüpft sind. Dazu gehören im gegebenen Fall auch Information zur Sperrung bzw. Depublikation (<code>exclusion</code>) eines Anhangs (<a href="https://github.com/marians/offeneskoeln/wiki/Attachments-depublizieren" target="_blank">Details zu Depublikation im Wiki</a>).</p>
+                
+                <p><code>thumbnails</code> aktiviert die Ausgabe von Daten zu allen Vorschaubildern zu den Anlagen des Dokuments. Erfordert die Angabe von <code>attachments</code>.</p>
+                
+                <p><code>consultations</code> aktiviert die Ausgabe der Beratungsfolge eines Dokuments, also die Liste der Sitzungen, in der ein Dokument vorgelegt wurde.</p>
+                
+                <p><code>facets</code> aktiviert die Ausgabe von Facetten, was nur im Modus <em>Suche</em> möglich ist. Bei einer <em>Direktabfrage</em> hat dieser Wert keine Wirkung. Facetten sind eine Zusammenfassung darüber, welche Dokumenteneigenschaften im Suchergebnis wie häufig vorkommen.</p>
+                
+                <p>Modus-Beschränkung: Der Parameter <code>output</code> kann unabhängig vom Modus eingesetzt werden. Der Wert <code>facets</code> ist nur im Modus <em>Suche</em> wirksam.</p>
+            </dd>
+            
+            <dt><code>q</code></dt>
+            <dd>
+                <p>Suchbegriff(e). Ist dieser Parameter leer oder nicht gesetzt, entspricht dies einer Wildcard-Suche nach allen Dokumenten. Mehrere Suchbegriffe, durch Leerzeichen (%20) getrennt, schränken das Suchergebnis ein, denn es werden nur Dokumente zurückgegeben, die allen Suchbegriffen entsprechen. Der Parameter unterstützt <a href="http://lucene.apache.org/java/2_9_1/queryparsersyntax.html" target="_blank">Lucene Query Syntax</a>. Das bedeutet, es können komplexe Suchabfragen mit Klammerung und Operatoren wie <code>+</code> und <code>-</code>, <code>AND</code>, <code>OR</code> und <code>NOT</code> gebildet werden. Durch Kombination mit dem Parameter <code>fq</code> kann die Suche weiter eingeschränkt werden.</p>
+                
+                <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
+            </dd>
+            
+            <dt><code>fq</code></dt>
+            <dd>
+                <p>Einschränkung des Suchergebnisses durch zusätzliche Filter (fq steht für Filter Query). Dieser Parameter unterstützt <a href="http://lucene.apache.org/java/2_9_1/queryparsersyntax.html" target="_blank">Lucene Query Syntax</a>. Soll das Suchergebnis anhand einer exakten Dokumenteneigenschaft, z.B. dem Typ (<code>type</code>), eingeschränkt werden, ist dieser Parameter der Verwendung von <code>q</code> vorzuziehen, da die Einschränkung mit Hilfe des <code>fq</code>-Parameters oft deutlich schneller ist. Um beispielsweise alle Dokumente des Typs &raquo;Antrag&raquo; zu finden, muss der Parameter <code>fq=type:%22Antrag%22</code> lauten.</p>
+                
+                <p>Das Schema für solche Filter auf Basis von Dokumenteneigenschaften ist <code>eigenschaft:wert</code>. Soll der Wert hinter dem Doppelpunkt Leerzeichen enthalten können, ist dieser in Anführungszeichen (<code>&quot;</code> bzw. <code>%22</code>) zu setzen.</p>
+                
+                <p>Die zur Auswahl stehenden Dokumenteneigenschaften für derartige Filter sind: <code>title</code> (Dokumententitel), <code>term</code> (Stichworte), <code>type</code> (Art des Dokuments), <code>person</code> (Person), <code>attachment</code> (Anlage), <code>session</code> (Sitzung), <code>committee</code> (Gremium), <code>street</code> (Straße).</p>
+                
+                <p>Im Parameter <code>fq</code> können mehrere Filter mit einander kombiniert werden. Wie beim Parameter <code>q</code> kann ein Leerzeichen benutzt werden, um eine implizite UND-Verknüpfung zu erreichen. Um andere logische Verknüpfungen zu bewirken, stehen die boolschen Operatoren <code>OR</code> und <code>NOT</code> zur Auswahl.</p>
 
-	</div>
-</div>
-<div class="content middle">
-	<div class="text">
-
-		<h3 style="font-weight: bold">positions-by-name</h3>
-		
-		<p>Gibt alle Geo-Posiotionen aus, die zum angegebenen Straßennamen vorliegen.</p>
-		
-		<p>Der Parameter <code>name</code> muss angegeben werden und enthält den Namen einer Straße oder eines Platzes in Köln. Optional kann die Ausagbe mit dem Parameter contain=average auf einen Mittelwert beschränkt werden.</p>
-		
-		<p><code>http://offeneskoeln.de/api/positions-by-name?name=Merkensstra%C3%9Fe&amp;contain=average</code></p>
-		
-		<p>Die ausgegebenen Koordinatendaten stammen vom OpenStreetMap Projekt und unterliegen entsprechend der Lizenz CC-BY-SA (siehe dazu <a href="/daten/">Daten</a>).</p>
-
-	</div>
-</div>
-<div class="content middle">
-	<div class="text">
-
-		<h3 style="font-weight: bold">query</h3>
-		
-		<p>Hiermit können Dokumente gesucht werden. Alle Parameter sind optional. Mögliche Parameter:</p>
-		
-		<dl>
-			<dt><code>q</code></dt>
-			<dd>Suchbegriff(e). Ist dieser Parameter leer oder nicht gesetzt, entspricht dies einer Suche nach allen Dokumenten. Die Suche kann jedoch zusätzlich durch den <code>fq</code> Parameter eingegrenzt werden. Dieser Parameter unterstützt <a href="http://lucene.apache.org/java/2_9_1/queryparsersyntax.html">Lucene Query Syntax</a>. <em>TODO: erklären, was das bedeutet.</em></dd>
-			
-			<dt><code>docs</code></dt>
-			<dd>Anzahl Treffer-Dokumente, die zurück gegeben werden sollen. Standard ist 10, Maximum ist 100. Mit dem Wert 0 kann die Dokumentenausgabe unterdrückt werden. Je weniger Dokumente ausgegeben werden, desto schneller ist die Suche und desto weniger Daten werden übertragen. Dies kann nützlich sein, wenn nur die Anzahl der Treffer benötigt wird, nicht aber die Treffer selbst.</dd>
-			
-			<dt><code>start</code></dt>
-			<dd>Anzahl der Dokumente, die am Anfang des Suchergebnisses ausgelassen werden sollen. Damit kann durch ein Suchergebnis &raquo;geblättert&laquo; werden. Ist der Parameter nicht gesetzt, entspricht dies <code>start=0</code>.</dd>
-			
-			<dt><code>facets</code></dt>
-			<dd>Aktiviert die Ausgabe von Facetten. Kann entweder 0 oder 1 sein, Standard ist 0 (keine Facetten). Es empfiehlt sich grundsätzlich, die Facetten-Ausgabe nur bei Bedarf zu aktivieren, da sie die Antwortzeit der Suche um ein Vielfaches erhöht und die Ausgabe deutlich vergrößert.</dd>
-			
-			<dt><code>sort</code></dt>
-			<dd>Sortierung. Wenn nicht gesetzt, wird der Standard in Abhängigkeit davon gesetzt, ob der Parameter <code>q</code> gesetzt ist oder nicht. Ist <code>q</code> gesetzt, dann ist die Standard-Sortierung <code>score desc</code>, was bedeutet &raquo;Sortierung nach Relevanz, absteigend&raquo;. Ist <code>q</code> nicht gesetzt, ist die Sortierung standardmäßig <code>datum desc</code> (nach Datum, neuste Dokumente zuerst). Die dritte mögliche Sortierung ist <code>datum asc</code> (nach Datum, älteste Dokumente zuerst).</dd>
-			
-			<dt><code>fq</code></dt>
-			<dd>Einschränkung des Suchergebnisses durch zusätzliche Filter. <em>TODO: Syntax beschreiben</em></dd>
-			
-			<dt><code>date</code></dt>
-			<dd>Einschränkung des Suchergebnisses auf Dokumente, die in einem bestimmten Datumsbereich veröffentlicht wurden. Das Format entspricht <code>[&lt;datum_von&gt;][-][&lt;datum_bis&gt;]</code>, wobei alle drei Teile optional sind. <code>datum_von</code> und <code>datum_bis</code> werden im Format YYYY, YYYYMM oder YYYYMMDD angegeben (Y-Jahr, M=Monat, D=Tag). Z.B. bedeutet <code>date=2010</code>, dass alle Dokumente aus dem Jahr 2010 zurück gegeben werden sollen. <code>date=2010-</code> bewirkt, dass alle Dokumente ab 2010 gefunden werden. <code>date=201007-201202</code> findet alle Dokumente zwischen 1. Juli 2010 und 29. Februar 2012.</dd>
-			
-		</dl>
-		
-		<h4>Beispiele:</h4>
-		
-		<p><code>http://offeneskoeln.de/api/query?fq=strasse%3A%22Borsigstra%C3%9Fe%22&amp;docs=0</code><br>
-		<code>http://offeneskoeln.de/api/query?q=sanierung+schauspielhaus&amp;facets=1</code></p>
-		
-		<h4>Ausgabe:</h4>
-		
-		<form><textarea style="width: 100%; height: 30em; white-space: pre; font-family: monospace;" rows="30" wrap="physical">{
-    "status": 0,
-    "querytime": 63,
-    "params": {
-        "q": "sanierung schauspielhaus", 
-        "fq": "",
-        "rows": "1",
-        "start": "0",
-        "sort": "score desc"
+                <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
+            </dd>
+            
+            <dt><code>docs</code></dt>
+            <dd>
+                <p>Anzahl Treffer-Dokumente, die zurück gegeben werden sollen. Standard ist 10, Maximum ist 100. Mit dem Wert 0 kann die Dokumentenausgabe unterdrückt werden. Je weniger Dokumente ausgegeben werden, desto schneller ist die Suche und desto weniger Daten werden übertragen. Dies kann nützlich sein, wenn nur die Anzahl der Treffer benötigt wird, nicht aber die Treffer selbst.</p>
+                
+                <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar. Im Modus <em>Direktabruf</em> wird die Anzahl der zurückgegebenen Dokumente durch die übergebenen Kennungen bestimmt.</p>
+            </dd>
+            
+            <dt><code>start</code></dt>
+            <dd>
+                <p>Anzahl der Dokumente, die am Anfang des Suchergebnisses ausgelassen werden sollen. Damit kann durch ein Suchergebnis &raquo;geblättert&laquo; werden. Ist der Parameter nicht gesetzt, entspricht dies <code>start=0</code>.</p>
+                
+                <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
+            </dd>
+            
+            <dt><code>sort</code></dt>
+            <dd>
+                <p>Bestimmt die Sortierung des Suchergebnisses. Wenn nicht gesetzt, wird der Standard in Abhängigkeit davon gesetzt, ob der Parameter <code>q</code> gesetzt ist oder nicht. Ist <code>q</code> gesetzt, dann ist die Standard-Sortierung <code>score desc</code>, was bedeutet &raquo;Sortierung nach Relevanz, absteigend&raquo;. Ist <code>q</code> <em>nicht</em> gesetzt, ist die Sortierung standardmäßig <code>datum desc</code> (nach Datum, neuste Dokumente zuerst). Die dritte mögliche Sortierung ist <code>datum asc</code> (nach Datum, älteste Dokumente zuerst).</p>
+                
+                <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
+            </dd>
+            
+            <dt><code>date</code></dt>
+            <dd>
+                <p>Erlaubt die Einschränkung des Suchergebnisses auf Dokumente, die in einem bestimmten Datumsbereich veröffentlicht wurden.</p>
+                
+                <p>Das Format entspricht <code>[&lt;Anfangsdatum&gt;][-][&lt;Enddatum&gt;]</code>, wobei alle drei Teile optional sind. Für die Angabe des Anfangsdatums und des Enddatums kann jeweils eine von drei Genauigkeiten gewählt werden: Jahr, Monat oder Tag. Dies geschieht durch Angabe des jeweiligen Datums in einem der drei Formate <code>YYYY</code>, <code>YYYYMM</code> oder <code>YYYYMMDD</code> (Y-Jahr, M=Monat, D=Tag).</p>
+                
+                <p>Wird nur ein Datum ohne vorangestelltes oder nachfolgendes <code>-</code> Zeichen angegeben, dann werden alle Dokumente ausgegeben, deren Datum mit dem angegebenen Datum übereinstimmt. Zum Beispiel werden bei <code>date=2010</code> alle Dokumente aus dem Jahr 2010 getroffen und bei  <code>date=201011</code> alle Dokumente aus November 2010.</p>
+                
+                <p>Wird nur ein Anfangsdatum mit anschließendem <code>-</code> Zeichen angegeben, bedeutet dies, dass ein nach oben offener Bereich definiert wurde. Beispielsweise findet die Angabe <code>date=2010-</code> alle Dokumente, die im Jahr 2010 oder später veröffentlicht wurden. <code>date=20110315-</code> findet alle Dokumente, die ab dem 15. März 2011 veröffentlicht wurden.</p>
+                
+                <p>Umgekehrt bedeutet ein vorangestelltes <code>-</code> Zeichen, dass der Datumsbereich nach unten (in die Vergangenheit) unbegrenzt ist. <code>date=-20110315</code> findet also alle Dokumente, die bis einschließlich zum 15. März 2011 veröffentlicht wurden.</p>
+                
+                <p>Mit einem Anfangs- und Enddatum lässt sich schließlich ein exakt begrenzter Datumsbereich definieren. <code>date=2010-2012</code> steht beispielsweise für den Zeitraum vom 1. Januar 2010 bis zum 31. Dezember 2012. <code>date=201201-201202</code> steht für die Zeit vom 1. Januar bis 29. Februar 2012 (ja, Schaltjahre werden berücksichtigt) und <code>date=20120204-20120206</code> für die Zeit vom 4. bis zum 6 Februar 2012.</p>
+                
+                <p>Anfangs- und Enddatum müssen nicht die selbe Genauigkeit haben. Beispielsweise ist <code>date=2010-20120206</code> eine gültige Angabe.</p>
+                
+                <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
+            </dd>
+            
+        </dl>
+                
+        <h4>Beispielhafte Ausgaben:</h4>
+        
+        <p>Direktabruf <a href="/api/documents?reference=2021/2011&amp;output=attachments,thumbnails,consultations">/api/documents?reference=2021/2011&amp;output=attachments,thumbnails,consultations</a>:</p>
+        
+        <form><textarea style="width: 100%; height: 30em; white-space: pre; font-family: monospace;" rows="30" wrap="physical">{
+    status: 0,
+    duration: 10,
+    request: {
+        references: [
+            "2021/2011"
+        ]
+        output: [
+            "attachments",
+            "thumbnails",
+            "consultations"
+        ],
     },
-    "result": {
-        "numhits": 69
-        "maxscore": 1.5180292,
-        "sort": "score desc",
-        "rows": 1,
-        "start": 0,
-        "docs": [
+    response: {
+        numrows: 1,
+        documents: [
             {
-                "id": "request6521",
-                "timestamp": "2012-01-23",
-                "datum": "2010-03-17",
-                "score": 1.5180292,
-                "betreff": "Sanierung oder Neubau Schauspielhaus",
-                "aktenzeichen": "AN/0549/2010",
-                "typ": "Antrag",
-                "sitzung": [
-                    "4307 Rat/0005/2010"
+                reference: "2021/2011",
+                title: [
+                    "Schließung Wachsfabrik Köln AN/0856/2011"
                 ],
-                "gremium": [
-                    "1 Rat"
+                url: "http://offeneskoeln.de/dokumente/2021-2011/",
+                original_url: [
+                    "http://ratsinformation.stadt-koeln.de/vo0050.asp?__kvonr=28125"
                 ],
-                "anhang": [
-                    "227504 B\u00fcndnis 90/Die Gr\u00fcnen Anfrage nach \u00a7 4"
+                date: [
+                    "2011-05-18"
+                ],
+                type: [
+                    "Mitteilung/Beantwortung - BV"
+                ],
+                consultations: [
+                    {
+                        date: "2011-05-30",
+                        committee_id: 21,
+                        committee_name: "Bezirksvertretung 2 (Rodenkirchen)",
+                        session_reference: "BV2/0016/2011",
+                        session_description: "Sitzung der Bezirksvertretung Rodenkirchen"
+                        agendaitem_title: "Schließung Wachsfabrik Köln; Anfrage von Herrn Bronisz",
+                        agendaitem_number: "7.2.1",
+                        agendaitem_result: null,
+                    }
+                ],
+                attachments: [
+                    {
+                        id: 305731,
+                        url: "http://offeneskoeln.de/attachments/1/3/pdf305731.pdf",
+                        filename: "2021_2011_Mitteilung_Beantwortung_BV.pdf",
+                        last_modified: "2012-02-12T12:40:12Z",
+                        role: "Mitteilung/Beantwortung BV [PDF, 29 KB]",
+                        type: "application/pdf",
+                        size: 29453,
+                        numpages: 1,
+                        submission_id: 28125,
+                        exclusion: null,
+                        content: "Der Oberbürgermeister Dezernat, Dienststelle VII/41 Vorlage-Nr.: 2021/2011 Unterlage zur Sitzung im öffentlichen Teil. Gremium...",
+                        thumbnails: [
+                            {
+                                uri: "http://offeneskoeln.de/static/thumbs/1/3/305731-150.jpg",
+                                width: 106,
+                                height: 150,
+                                page: 0
+                            },
+                            {
+                                uri: "http://offeneskoeln.de/static/thumbs/1/3/305731-300.jpg",
+                                width: 212,
+                                height: 300,
+                                page: 0
+                            },
+                            {
+                                uri: "http://offeneskoeln.de/static/thumbs/1/3/305731-600.jpg",
+                                width: 424,
+                                height: 600,
+                                page: 0
+                            }
+                        ]
+                    }
                 ]
             }
-        ],
-        "highlighting": {
-            "request6521": {
-                "betreff": ["<em>Sanierung</em> oder Neubau <em>Schauspielhaus</em>"]
-            }
-        },
-        "facets": {
-            "gremium": {
-                "6 Ausschuss Bauen und Wohnen": 1,
-                "19 Integrationsrat": 1,
-                "16 Ausschuss Umwelt, Gesundheit und Gr\u00fcn": 4,
-                "28 Bezirksvertretung 9 (M\u00fclheim)": 3,
-                "74 Ausschuss Allgemeine Verwaltung und Rechtsfragen / Vergabe / Internationales": 2,
-                "29 Betriebsausschuss Geb\u00e4udewirtschaft": 3,
-                "23 Bezirksvertretung 4 (Ehrenfeld)": 2,
-                "26 Bezirksvertretung 7 (Porz)": 1,
-                "25 Bezirksvertretung 6 (Chorweiler)": 1,
-                "18 Wirtschaftsausschuss": 5,
-                "24 Bezirksvertretung 5 (Nippes)": 2,
-                ...
-            },
-            "datum": {
-                "start": "2006-10", 
-                "counts": {
-                    "2011-08": 1, 
-                    "2008-03": 0, 
-                    "2011-02": 2, 
-                    "2011-03": 5, 
-                    "2011-01": 2, 
-                    "2011-06": 0, 
-                    "2011-07": 0, 
-                    ...
+        ]
+    }
+}</textarea></form>
+
+        <p>Suche <a href="/api/documents?q=fahrrad">/api/documents?q=fahrrad</a> (gekürzt):</p>
+        
+        <form><textarea style="width: 100%; height: 30em; white-space: pre; font-family: monospace;" rows="30" wrap="physical">{
+    status: 0,
+    duration: 23,
+    request: {
+        sort: "score desc",
+        fq: "",
+        rows: "10",
+        q: "fahrrad",
+        start: "0",
+        output: [
+            ""
+        ]
+    },
+    response: {
+        numhits: 237,
+        numdocs: 10,
+        maxscore: 3.8882058,
+        start: 0,
+        documents: [
+            {
+                reference: "4972/2011",
+                url: "http://offeneskoeln.de/dokumente/4972-2011/",
+                original_url: [
+                    "http://ratsinformation.stadt-koeln.de/vo0050.asp?__kvonr=31496"
+                ],
+                date: [
+                    "2011-12-01"
+                ],
+                type: [
+                    "Beantwortung einer Anfrage (BV)"
+                ],
+                title: [
+                    "Parkordnung für Fahrräder und motorisierte Zweiräder"
+                ],
+                highlighting: {
+                    title: [
+                        "Parkordnung für &lt;em&gt;Fahrräder&lt;/em&gt; und motorisierte Zweiräder"
+                    ]
                 },
-                "end": "2012-01"
+                score: 3.8882058
             },
-            "person": {
-                "80 Monika Schultes (SPD)": 40,
-                "98 Henk Benthem van (CDU)": 42,
-                "38 Polina Frebel (SPD)": 43,
-                "75 Michael Paetzold (SPD)": 40,
-                "92 Ralph Sterck (FDP)": 42,
-                "18 B\u00fcrgermeister Hans-Werner Bartsch (CDU)": 42,
-                "53 Helmut Jung (CDU)": 50,
-                "23 Ulrich Breite (FDP)": 40,
-                ...
-            },
-            "schlagwort": {
-                "oper": 54, 
-                "m\u00f6glichkeit": 37, 
-                "fl\u00e4che": 39, 
-                "neubau": 41, 
-                "zusammenhang": 34, 
-                "verfahren": 40, 
-                "betrieb": 34, 
-                "nutzung": 41, 
-                "entwicklung": 37, 
-                "innenstadt": 36, 
-                "stra\u00dfen": 37, 
-                "lage": 33,
-                ...
-            }, "strasse": {
-                "Eintrachtstra\u00dfe": 8,
-                "Waidmarkt": 9,
-                "Hohe Stra\u00dfe": 7,
-                "Aachener Stra\u00dfe": 13,
-                "Ubierring": 9,
-                "Kreuzgasse": 12,
-                "Z\u00fclpicher Stra\u00dfe": 10,
-                "Br\u00fcsseler Stra\u00dfe": 8,
-                "Blaubach": 8,
-                "Friesenplatz": 7,
-                ...
-            },
-            "typ": {
-                "Beschlussvorlage": 23,
-                "Antrag": 22,
-                "Mitteilung": 23,
-                "Mitteilungsvorlage": 1
-            }
-        }
+            ...
+        ]
     }
 }</textarea></form>
 
@@ -236,127 +322,410 @@ $var additional_scripts: /static/js/map.js
     
         <dl>
             <dt><code>status</code></dt>
-            <dd>0 steht für eine erfolgreiche Suche. Erfolgreich heißt dabei nicht, dass Treffer gefunden wurden, sondern lediglich, dass keine Fehler aufgetreten sind.</dd>
+            <dd><p>0 steht für eine erfolgreiche Abfrage. Erfolgreich heißt dabei nicht zwingend, dass Treffer gefunden wurden, sondern lediglich, dass keine Fehler aufgetreten sind.</p></dd>
             
-            <dt><code>querytime</code></dt>
-            <dd>Die Suchdauer in Millisekunden.</dd>
+            <dt><code>duration</code></dt>
+            <dd><p>Die Dauer für die Bearbeitung der Abfrage in Millisekunden.</p></dd>
             
-            <dt><code>params.*</code></dt>
-            <dd>In diesem Objekt werden die verwendeten Suchparameter ausgegeben.</dd>
+            <dt><code>request</code></dt>
+            <dd><p>Wiedergabe der verwendeten Abfrage-Parameter</p></dd>
             
-            <dt><code>result.numhits</code></dt>
-            <dd>Anzahl der gefundenen Dokumente</dd>
+            <dt><code>response</code></dt>
+            <dd><p>Beantwortung der Abfrage</p></dd>
             
-            <dt><code>result.maxscore</code></dt>
-            <dd>Höchster <code>score</code> Wert im Suchergebnis. Wird nur ausgegeben, wenn <code>numhits</code> größer als null ist und der Abfrageparameter <code>docs</code> größer 0 ist.</dd>
+            <dt><code>response &rarr; numdocs</code></dt>
+            <dd><p>Anzahl der Dokumente, die in dieser Antwort enthalten sind. Dieser Wert korrespondiert mit dem Abfrage-Parameter <code>docs</code>, kann jedoch auch kleiner ausfallen, wenn weniger Dokumente vorhanden sind oder zur Abfrage passen, als mit <code>docs</code> angefordert.</p></dd>
             
-            <dt><code>result.sort</code></dt>
-            <dd>Die verwendete Sortierung</dd>
+            <dt><code>response &rarr; numhits</code></dt>
+            <dd><p>Anzahl der Dokumente, die insgesamt zu den angegebenen Suchparamtern passen. Wird nur im Modus <em>Suche</em> ausgegeben.</p></dd>
             
-            <dt><code>result.rows</code></dt>
-            <dd>Die Anzahl zurückgegebener Dokumente</dd>
+            <dt><code>response &rarr; maxscore</code></dt>
+            <dd><p>Höchster <code>score</code> (Relevanz-Wert) im Suchergebnis. Wird nur im Modus <em>Suche</em> ausgegeben, wenn <code>response &rarr; numdocs</code> größer als null ist. Mehr Informationen zu diesem Wert gibt es in einem <a href="https://github.com/marians/offeneskoeln/wiki/Relevanzsortierung-der-Suche" target="_blank">Wiki-Artikel</a>.</p></dd>
             
-            <dt><code>result.start</code></dt>
-            <dd>Die Anzahl der übersprungenen Dokumente</dd>
+            <dt><code>response &rarr; sort</code> (TODO)</dt>
+            <dd><p>Die für das Ergebnis verwendete Sortierung. Dieser Wert korrespondiert mit dem Abfrage-Parameter <code>sort</code>. Wird nur im Modus <em>Suche</em> ausgegeben.</p></dd>
+            
+            <dt><code>response &rarr; start</code></dt>
+            <dd><p>Die Anzahl der am Anfang des Suchergebnisses ausgelassenen Dokumente. Dieser Wert korrespondiert mit dem Abfrage-Parameter <code>start</code>. Wird nur im Modus <em>Suche</em> ausgegeben.</p></dd>
 
-            <dt><code>result.docs.*</code></dt>
-            <dd>Die Treffer-Dokumente</dd>
+            <dt><code>response &rarr; documents</code></dt>
+            <dd><p>Die zurückgegebenen Dokumente</p></dd>
             
-            <dt><code>result.docs.id</code></dt>
-            <dd>Die interne, eindeutige ID des Dokuments.</dd>
+            <dt><code>response &rarr; documents &rarr; reference</code></dt>
+            <dd><p>Die Kennung des Dokuments</p></dd>
             
-            <dt><code>result.docs.betreff</code></dt>
-            <dd>Titel des Dokuments</dd>
+            <dt><code>response &rarr; documents &rarr; title</code></dt>
+            <dd><p>Liste der Titel des Dokuments. In der Regel enthält die Liste genau ein Element. Da es jedoch in der Praxis auch vorkommt, dass es mehrere Dokumente mit der selben Kennung gibt, kann die Liste mehrere Titel enthalten.</p></dd>
             
-            <dt><code>result.docs.typ</code></dt>
-            <dd>Art des Dokuments</dd>
+            <dt><code>response &rarr; documents &rarr; url</code></dt>
+            <dd><p>Der URL der Dokumenten-Detailseite auf offeneskoeln.de</p></dd>
             
-            <dt><code>result.docs.aktenzeichen</code></dt>
-            <dd>Die Kennung des Dokuments im Ratsinformationssystem der Stadt Köln, dort auch Session Nummer genannt.</dd>
+            <dt><code>response &rarr; documents &rarr; original_url</code></dt>
+            <dd><p>Liste der URLs der Dokumenten-Detailseiten im RIS der Stadt Köln. In der Regel ist hier nur eine URL enthalten. Handelt es sich jedoch um eine Dokumentenkennung, zu der mehrere Dokumente gehören, sind hier auch mehrere URLs angegeben.</p></dd>
             
-            <dt><code>result.docs.score</code></dt>
-            <dd>Relevanz-Wert dieses Dokuments, ein Fließkomma-Wert. Größere Werte stehen für höhere Relevanz. Die Relevanz wird unter anderem nach dem Vorkommen des Suchbegriffs in bestimmten Feldern errechnet. So wirken sich zum Beispiel Vorkommen im Betreff-Feld stärker aus als im Volltext. Häufigeres Vorkommen erhöht den Relevanz-Wert ebenso.</dd>
+            <dt><code>response &rarr; documents &rarr; date</code></dt>
+            <dd><p>Veröffentlichungsdatum des Dokuments</p></dd>
             
-            <dt><code>result.docs.datum</code></dt>
-            <dd>Veröffentlichungsdatum des Dokuments</dd>
+            <dt><code>response &rarr; documents &rarr; type</code></dt>
+            <dd><p>Art des Dokuments als Liste. Achtung: Der hier ausgegebene Wert ist nicht normalisiert und stimmt daher nicht mit den Wert überein, der bei der Suche als Filter für das Feld &quot;type&quot; genutzt werden können. Dies ist als <a href="https://github.com/marians/offeneskoeln/issues/44" target="_blank">Issue #44</a> näher beschrieben. Da in seltenen Fällen mehrere Dokumente dieselbe Kennung haben können, werden hier alle Dokumententypen als List ausgegeben.</p></dd>
             
-            <dt><code>result.docs.timestamp</code></dt>
-            <dd>Datum der Indexierung dieses Dokuments für die Suche</dd>
+            <dt><code>response &rarr; documents &rarr; score</code></dt>
+            <dd><p>Relevanz-Wert dieses Dokuments, ein Fließkomma-Wert. Größere Werte stehen für höhere Relevanz. Mehr Infos dazu <a href="https://github.com/marians/offeneskoeln/wiki/Relevanzsortierung-der-Suche" target="_blank">im Wiki</a>.</p></dd>
             
-            <dt><code>result.docs.gremium</code></dt>
-            <dd>Liste der Gremien, denen dieses Dokument vorgelegt wurde. Diese ergibt sich aus der Beratungsfolge, die das Dokument durchlaufen hat. Die vorangestellte Zahl ist die numerische ID des Gremiums.</dd>
+            <dt><code>response &rarr; documents &rarr; consultations</code></dt>
+            <dd><p>Die Beratungsfolge des Dokuments. Jede Sitzung, in der das Dokument auf der Tagesordnung stand, ist hier mit einem Eintrag in dieser Liste vertreten.</p></dd>
             
-            <dt><code>result.docs.sitzung</code></dt>
-            <dd>Liste der Sitzungen, in denen das Dokument beraten wurde. Die vorangestellte Zahl ist die numerische ID der Sitzung. Danach folgt die Kennung der Sitzung im Ratsinformationssystem der Stadt Köln. Diese besteht aus einem Kürzel für das Gremium, einer laufenden Nummer und einer Jahreszahl.</dd>
+            <dt><code>response &rarr; documents &rarr; consultations &rarr; date</code></dt>
+            <dd><p>Datum der Sitzung</p></dd>
             
-            <dt><code>result.docs.anhang</code></dt>
-            <dd>Liste der Anhänge, die mit diesem Dokument verknüpft sind. Die vorangestellte Zahl ist die numerische ID des Anhangs, danach folgt der Titel des Anhangs.</dd>
+            <dt><code>response &rarr; documents &rarr; consultations &rarr; committee_id</code></dt>
+            <dd><p>Numerische ID des Gremiums, dem die Sitzung zugeordnet ist.</p></dd>
             
-            <dt><code>result.highlighting.*</code></dt>
-            <dd>Hervorhebungen von Fundstellen der Suchbegriffe (Abfrage-Parameter <code>q</code>) in den Treffer-Dokumenten. Sofern Fundstellen vorhanden sind, sind in diesem Objekt Einträge anhand der <code>result.docs.id</code> zu finden. Darunter befindet sich je Feld, in dem eine Fundstelle auftaucht, eine Liste mit Auszügen. In den Auszügen (Snippets) ist das Fundstück mit dem &lt;em&gt; Tag markiert.</dd>
+            <dt><code>response &rarr; documents &rarr; consultations &rarr; committee_name</code></dt>
+            <dd><p>Name des Gremiums</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; session_reference</code></dt>
+            <dd><p>Kennung der Sitzung</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; session_description</code></dt>
+            <dd><p>Ausführliche Bezeichnung der Sitzung</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; agendaitem_title</code></dt>
+            <dd><p>Ausführliche Bezeichnung des Tagesordnungspunkts</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; agendaitem_number</code></dt>
+            <dd><p>Nummer des Tagesordnungspunkts, z.B. "3.1". Enthält manchmal auch längere Textzusätze.</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; agendaitem_result</code></dt>
+            <dd><p>Normalisierte Zeichenkette, die das Ergebnis eines Beschlusses repräsentiert. Kann auch null sein.</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments</code></dt>
+            <dd><p>Liste der Anhänge, die mit diesem Dokument verknüpft sind.</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; id</code></dt>
+            <dd><p>Numerische ID des Anhangs</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; url</code></dt>
+            <dd><p>Download-URL des Anhangs. Sollte der Anhang depubliziert/gesperrt worden sein, ist dies null.</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; filename</code></dt>
+            <dd><p>Dateiname des Anhangs</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; last_modified</code></dt>
+            <dd><p>Datum und Uhrzeit der letzten Änderung der Kopie dieser Datei auf offeneskoeln.de (UTC).</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; role</code></dt>
+            <dd><p>Erläuterung zur Bedeutung des Anhangs</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; type</code></dt>
+            <dd><p>Dateityp des Anhangs nach MIME</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; size</code></dt>
+            <dd><p>Dateigröße in Bytes</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; numpages</code></dt>
+            <dd><p>Anzahl der Seiten. In seltenen Fällen handelt es sich bei den Anhängen um Word-Dokumente, bei denen die Seitenzahl aktuell nicht ausgegeben wird.</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; content</code></dt>
+            <dd><p>Textinhalt des Anhangs, sofern es einen gibt bzw. dieser extrahiert werden kann.</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; exclusion</code></dt>
+            <dd><p>Ggf. Information zur Sperrung bzw. Depublikazion des Anhangs</p></dd>
+            
+             <dt><code>response &rarr; documents &rarr; attachments &rarr; exclusion &rarr; date</code></dt>
+            <dd><p>Datum und Uhrzeit der Einrichtung der Sperrung</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; exclusion &rarr; reason_code</code></dt>
+            <dd><p>Ein Code für die Begründung der Sperrung, z.B. COPYRIGHT_RISK. Siehe dazu ein <a href="https://github.com/marians/offeneskoeln/wiki/Attachments-depublizieren" target="_blank">Wiki-Artikel</a>.</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; exclusion &rarr; reason_text</code></dt>
+            <dd><p>Ausführliche Begründung der Depublikation und evtl. weiterführende Informationen für Nutzer.</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; thumbnails</code></dt>
+            <dd><p>Liste aller Vorschaubilder zu dem Anhang. Es gibt Vorschaubilder üblicherweise für jede Seite des Anhangs, jeweils in mehreren Höhen-Stufen. Aktuell (Stand März 2012) sind dies 150, 300 und 600 Pixel. Die Breite richtet sich dabei nach den Proportionen der jeweiligen Dokumentenseite. In Einzelfällen kann es sein, dass keine Vorschabilder angebiten werden, wenn z.B. das Dokument gesperrt ist  (siehe exclusion), es sich um ein verschlüsseltes PDF handelt oder die Datei aus technischen Gründen nicht verarbeitet werden kann.</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; thumbnails &rarr; url</code></dt>
+            <dd><p>URL des Vorschaubilds</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; thumbnails &rarr; width</code></dt>
+            <dd><p>Breite des Vorschaubilds</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; thumbnails &rarr; height</code></dt>
+            <dd><p>Höhe des Vorschaubilds</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; thumbnails &rarr; page</code></dt>
+            <dd><p>Seitennummer der Dokumentenseite. Die erste Seite hat die Nummer 0.</p></dd>
+            
+            <dt><code>response &rarr; documents &rarr; attachments &rarr; thumbnails &rarr; page</code></dt>
+            <dd><p>Seitennummer der Dokumentenseite. Die erste Seite hat die Nummer 0.</p></dd>
+            
+            <dt><code>response &rarr; documenty &rarr; highlighting</code></dt>
+            <dd><p>Hervorhebungen von Fundstellen der Suchbegriffe (Abfrage-Parameter <code>q</code>) in den Treffer-Dokumenten. Sofern Fundstellen vorhanden sind, sind in diesem Objekt Einträge zu finden. Darunter befindet sich je Feld, in dem eine Fundstelle auftaucht, eine Liste mit Auszügen. In den Auszügen (Snippets) ist das Fundstück mit dem &lt;em&gt; Tag markiert.</p></dd>
 
-            <dt><code>result.facets.*</code></dt>
-            <dd>Die Facetten liefern die Information, welche Dokumenteneigenschaften im Suchergebnis mit welcher Häufigkeit auftreten. Sie können für die weitere Eingrenzung des Suchergebnisses verwendet werden. Zu jeder Facette gibt es Wertepaare aus einer Zeichenkette und einer Zahl, wobei die Zahl die Anzahl der Treffer repräsentiert. Die Ausgabe ist auf 30 Elemente je Facette begrenzt, hierbei werden jeweils die Werte mit der höchsten Trefferzahl ausgegeben.</dd>
+            <dt><code>response &rarr; facets</code></dt>
+            <dd><p>Die Facetten liefern die Information, welche Dokumenteneigenschaften im Suchergebnis mit welcher Häufigkeit auftreten. Sie können für die weitere Eingrenzung des Suchergebnisses verwendet werden. Zu jeder Facette gibt es Wertepaare aus einer Zeichenkette und einer Zahl, wobei die Zahl die Anzahl der Treffer repräsentiert. Die Ausgabe ist auf 30 Elemente je Facette begrenzt, hierbei werden jeweils die Werte mit der höchsten Trefferzahl ausgegeben.</p></dd>
 
-            <dt><code>result.facets.typ</code></dt>
-            <dd>Zeigt an, welcher Wert der Dokumenten-Eigenschaft <code>typ</code> wie häufig im aktuellen Suchergebnis vorkommt.</dd>
+            <dt><code>response &rarr; facets &rarr; typ</code></dt>
+            <dd><p>Zeigt an, welcher Wert der Dokumenten-Eigenschaft <code>typ</code> wie häufig im aktuellen Suchergebnis vorkommt.</p></dd>
 
-            <dt><code>result.facets.gremium</code></dt>
-            <dd>Zeigt an, welche Werte der Dokumenten-Eigenschaft <code>gremium</code> wie häufig im aktuellen Suchergebnis vorkommen. Die vorangestellte Zahl beim Wert ist die numerische ID des Gremiums.</dd>
+            <dt><code>response &rarr; facets &rarr; gremium</code></dt>
+            <dd><p>Zeigt an, welche Werte der Dokumenten-Eigenschaft <code>gremium</code> wie häufig im aktuellen Suchergebnis vorkommen. Die vorangestellte Zahl beim Wert ist die numerische ID des Gremiums.</p></dd>
 
-            <dt><code>result.facets.person</code></dt>
-            <dd>Zeigt an, welcher Wert der Dokumenten-Eigenschaft <code>person</code> wie häufig im aktuellen Suchergebnis vorkommt. Die vorangestellte Zahl beim Wert ist die numerische ID der Person.</dd>
+            <dt><code>response &rarr; facets &rarr; person</code></dt>
+            <dd><p>Zeigt an, welcher Wert der Dokumenten-Eigenschaft <code>person</code> wie häufig im aktuellen Suchergebnis vorkommt. Die vorangestellte Zahl beim Wert ist die numerische ID der Person.</p></dd>
 
-            <dt><code>result.facets.schlagwort</code></dt>
-            <dd>Zeigt an, welche Werte der Dokumenten-Eigenschaft <code>schlagwort</code> wie häufig im aktuellen Suchergebnis vorkommen. Die Eigenschaft <code>schlagwort</code> wird aus dem gesamten Volltext des jeweiligen Dokuments gebildet, wobei alle Schreibweisen auf Kleinschreibung reduziert und eine Vielzahl von Wörtern herausgefiltert werden.</dd>
+            <dt><code>response &rarr; facets &rarr; schlagwort</code></dt>
+            <dd><p>Zeigt an, welche Werte der Dokumenten-Eigenschaft <code>schlagwort</code> wie häufig im aktuellen Suchergebnis vorkommen. Die Eigenschaft <code>schlagwort</code> wird aus dem gesamten Volltext des jeweiligen Dokuments gebildet, wobei alle Schreibweisen auf Kleinschreibung reduziert und eine Vielzahl von Wörtern herausgefiltert werden.</p></dd>
 
-            <dt><code>result.facets.datum.*</code></dt>
-            <dd>Diese Facette ist eine Besonderheit, da sie auf der Dokumenten-Eigenschaft <code>datum</code> basiert und eine andere Datenstruktur besitzt, als Facetten, die auf Zeichenketten-Eigenschaften basieren. Ein weiterer Unterschied ist, dass hier auch Null-Werte ausgegeben werden und anzahl der Werte nicht limitiert ist, sondern immer den Zeitraum ab Oktober 2006 abdeckt, also seit der Veröffentlichung der ältesten Dokumente im Bestand.</dd>
+            <dt><code>response &rarr; facets &rarr; datum.*</code></dt>
+            <dd><p>Diese Facette ist eine Besonderheit, da sie auf der Dokumenten-Eigenschaft <code>datum</code> basiert und eine andere Datenstruktur besitzt, als Facetten, die auf Zeichenketten-Eigenschaften basieren. Ein weiterer Unterschied ist, dass hier auch Null-Werte ausgegeben werden und anzahl der Werte nicht limitiert ist, sondern immer den Zeitraum ab Oktober 2006 abdeckt, also seit der Veröffentlichung der ältesten Dokumente im Bestand.</p></dd>
 
-            <dt><code>result.facets.datum.start</code></dt>
-            <dd>Gibt den Startmonat des Zeitraums an, der von dieser Factte abgedeckt wird.</dd>
+            <dt><code>response &rarr; facets &rarr; datum &rarr; start</code></dt>
+            <dd><p>Gibt den Startmonat des Zeitraums an, der von dieser Factte abgedeckt wird.</p></dd>
 
-            <dt><code>result.facets.datum.end</code></dt>
-            <dd>Gibt den Endmonat des Zeitraums an, der von dieser Factte abgedeckt wird. Dabei sollte es sich immer um den nächsten Monat, ausgehend vom aktuellen Datum, handeln.</dd>
+            <dt><code>response &rarr; facets &rarr; datum &rarr; end</code></dt>
+            <dd><p>Gibt den Endmonat des Zeitraums an, der von dieser Factte abgedeckt wird. Dabei sollte es sich immer um den nächsten Monat, ausgehend vom aktuellen Datum, handeln.</p></dd>
 
-            <dt><code>result.facets.datum.count.*</code></dt>
-            <dd>Enthälte die Wertepaare mit monatlicher Auflösung.</dd>
+            <dt><code>response &rarr; facets &rarr; datum &rarr; count</code></dt>
+            <dd><p>Enthälte die Wertepaare mit monatlicher Auflösung.</p></dd>
 
         </dl>
 
-	</div>
+    </div>
 </div>
-<div class="content middle">
-	<div class="text">
+<div class="content middle" id="locations">
+    <div class="text">
 
-		<h3 style="font-weight: bold">terms</h3>
-		
-		<p>Dient zur Ausgabe von Begriffen (Dokumenten-Eigenschaft <code>schlagwort</code>) mit einem bestimmten Präfix, z.B. für Auto-Vervollständigung. Wird der Parameter <code>prefix</code> nicht übergeben, werden die häufigsten Schlagworte zurückgegeben.</p>
-		
-		<p><code>http://offeneskoeln.de/api/terms?prefix=schau</code><br />
-		<code>http://offeneskoeln.de/api/terms</code></p>
+        <h3 style="font-weight: bold">/api/locations</h3>
+        
+        <p>Gibt alle Geo-Positionen aus, die zum angegebenen Straßennamen im Kölner Stadtgebiet vorliegen.</p>
+        
+        <h4>Datenherkunft und Lizenz</h4>
+        
+        <p>Die Koordinatendaten der einzelnen Geo-Posiotionen stammen vom OpenStreetMap Projekt und unterliegen entsprechend der Lizenz CC-BY-SA (siehe dazu <a href="/daten/">Daten</a>).</p>
 
-	</div>
+        <h4>Beispielhafte Abfragen:</h4>
+        
+        <ul>
+            <li><code><a href="/api/locations?street=Roncalliplatz" target="_blank">/api/locations?street=Roncalliplatz</a></code>
+            <br />Gibt alle Details zum &raquo;Roncalliplatz&laquo; aus.</li>
+            <li><code><a href="/api/locations?street=Marzellenstra%C3%9Fe&output=averages" target="_blank">/api/locations?street=Marzellenstra%C3%9Fe&amp;output=averages</a></code>
+            <br />Gibt die Durchschnitts-Position für die Marzellenstraße aus.</li>
+            <li><code><a href="/api/locations?street=Aachener%20Stra%C3%9Fe&output=nodes" target="_blank">/api/locations?street=Aachener%20Stra%C3%9Fe&amp;output=nodes</a></code>
+            <br />Gibt die einzelnen Knoten der Aachaner Straße(n) aus.</li>
+        </ul>
+        
+        <h4>Parameter:</h4>
+        
+        <dl>
+            <dt><code>street</code> (Pflicht)</dt>
+            <dd>
+                <p>Name der Straße oder des Platzes, dessen Position(en) ausgegeben werden soll.</p>
+            </dd>
+
+            <dt><code>output</code></dt>
+            <dd>
+                <p>Bestimmt, welche Details zu der angegebenen Straße ausgegeben werden. Kann die Werte <code>nodes</code> und <code>averages</code> enthalten, sowie eine mit Komma getrennte Kombination aus beidem. Default-Wert ist <code>nodes,averages</code></p>
+                
+                <p><code>nodes</code> aktiviert die Ausgabe der einzelnen Positionen aller Knoten, die bei OpenStreetMap zu der/den Straße/n mit dem angegebenen Namen vorhanden sind.</p>
+                
+                <p><code>averages</code> aktiviert die Ausgabe von Durschschnitts-Koordinaten. Diese können beispielsweise verwendet werden, um die gesuchte Straße mit einem Marker auf einer Karte zu markieren. Dabei ist zu beachten, dass bisher nicht betrachtet wird, ob es sich bei den Einzelkoordinaten um dieselbe Straße oder um verschiedene Straßen handelt. Daher kann es vorkommen, dass die Durchschnittsposition aller Knoten irgendwo zwischen zwei oder mehr Straßen gleichnamigen Straßen liegt. Siehe hierzu auch <a href="https://github.com/marians/offeneskoeln/issues/21" target="_blank">Issue #21</a></p>
+            </dd>
+
+        </dl>
+        
+        <h4>Beispielhafte Ausgabe:</h4>
+        <p><a href="/api/locations?street=Alpenerplatz">/api/locations?street=Alpenerplatz</a>:</p>
+        <form><textarea style="width: 100%; height: 30em; white-space: pre; font-family: monospace;" rows="30" wrap="physical">{
+    status: 0,
+    duration: 2,
+    request: {
+        street: "Alpenerplatz"
+    },
+    response: {
+        nodes: [
+            [
+                50.9557814, 6.9058522
+            ],
+            [
+                50.9560511, 6.906079
+            ],
+            [
+                50.9557962, 6.9068515
+            ]
+        ],
+        averages: [
+            [
+                50.955876233333335, 6.9062608999999995
+            ]
+        ]
+    }
+}</textarea></form>
+        
+
+    </div>
 </div>
-<div class="content middle">
-	<div class="text">
+<div class="content middle" id="streets">
+    <div class="text">
 
-		<h3 style="font-weight: bold">document</h3>
-		
-		<p>Gibt ein einzelnes Dokument mit vorhandenen Anlagen zurück.</p>
-		
-		<p><code>http://offeneskoeln.de/api/document?id=4500-2009</code></p>
-
-	</div>
+        <h3 style="font-weight: bold">/api/streets</h3>
+        
+        <p>Dient zum Auffinden von Straßen im Umkreis einer Geo-Position im Kölner Stadtgebiet. Die Ausgabe erfolgt aufsteigend sortiert nach Entfernung zum Ausgangspunkt.</p>
+        
+        <p>In den Geodaten des OpenStreetmap Projekts besteht jede Straße aus mehreren Punkten. Damit sich eine Straße als im Umkreis zu einer Position befindlich qualifiziert, muss mindestens einer der Punkte der Straße in dem Umkreis liegen.</p>
+        
+        <h4>Datenherkunft und Lizenz</h4>
+        
+        <p>Die Straßennamen entstammen den Daten des OpenStreetMap Projekts und unterliegen entsprechend der Lizenz CC-BY-SA (siehe dazu <a href="/daten/">Daten</a>).</p>
+        
+        <h4>Beispielhafte Abfrage:</h4>
+        
+        <ul>
+            <li><code><a href="/api/streets?lat=50.959&amp;lon=6.946" target="_blank">/api/streets?lat=50.959&amp;lon=6.946</a></code>
+            <br />Straßen im Umkreis der Position 50,959/6,946 mit Radius 500 Meter</li>
+        </ul>
+        
+        <h4>Parameter:</h4>
+        
+        <dl>
+            <dt><code>lat</code> (Pflicht)</dt>
+            <dd>
+                <p>Breitengrad der Geo-Position, um die  herum Straßen gefunden werden sollen. Dezimalschreibweise.</p>
+            </dd>
+            
+            <dt><code>lon</code> (Pflicht)</dt>
+            <dd>
+                <p>Längengrad der Geo-Position, um die  herum Straßen gefunden werden sollen. Dezimalschreibweise.</p>
+            </dd>
+            
+            <dt><code>radius</code></dt>
+            <dd>
+                <p>Radius des Umkreises in Metern. Standard: 500. Kann maximal 1000 Meter betragen.</p>
+            </dd>
+        </dl>
+        
+        <h4>Beispielhafte Ausgabe:</h4>
+        <p><a href="/api/streets?lat=50.959&amp;lon=6.946">/api/streets?lat=50.959&amp;lon=6.946</a> (gekürzt):</p>
+        <form><textarea style="width: 100%; height: 30em; white-space: pre; font-family: monospace;" rows="30" wrap="physical">{
+    duration: 90,
+    request: {
+        lat: 50.959,
+        radius: 500,
+        lon: 6.946
+    },
+    response: {
+        streets: [
+            [
+                "Nohlstraße",
+                60
+            ],
+            [
+                "Sechzigstraße",
+                60
+            ],
+            [
+                "Hartwichstraße",
+                70
+            ],
+            ...
+        ]
+    }
+}</textarea></form>
+    </div>
 </div>
-<div class="content middle">
-	<div class="text">
+<div class="content middle" id="session">
+    <div class="text">
 
-		<h3 style="font-weight: bold">attachment-thumbs</h3>
-		
-		<p>Gibt die Pfade (uri), Abmessungen (width, height) und Seitenzahl (page) zu allen vorhandenen Vorschau-Bildern (Thumbnails) von Anlagen aus. Die Ausgabe ist sortiert nach Höhe und Seitenzahl. Die erste Seite wird mit 0 (Null) gekennzeichnet.</p>
-		
-		<p><code>http://offeneskoeln.de/api/attachment-thumbs?id=202778</code></p>
-		
-	</div>
+        <h3 style="font-weight: bold">/api/session</h3>
+        
+        <p>Lesen und Schreiben von Session-Eigenschaften.</p>
+        
+        <p>Wenn die Geo-Position des Nutzers (mittels Parameter <code>lat</code> und <code>lon</code>) gesetzt wird, wird automatisch versucht, die Adresse zu dieser Position, sofern sie im Kölner Stadtgebiet liegt, auzulösen. Dies geschieht im Hintergrund über die Yahoo Placefinder API.</p>
+        
+        <h4>Beispielhafte Abfragen:</h4>
+        
+        <ul>
+            <li><code><a href="/api/session" target="_blank">/api/session</a></code>
+            <br />Gibt den vollständigen Inhalt des Session-Objekts aus.</li>
+            <li><code><a href="/api/session?lat=50.959&amp;lon=6.946" target="_blank">/api/session?lat=50.959&amp;lon=6.946</a></code>
+            <br />Setzt die Geo-Position des Nutzers auf 50.959,6.946.</li>
+            <li><code><a href="/api/session?location_entry=Aachener%20Strasse%20(50674)" target="_blank">/api/session?location_entry=Aachener%20Strasse%20(50674)</a></code>
+            <br />Setzt die zuletzt vom Nutzer eingegebene Position auf &raquo;Aachener Strasse (50674)&laquo;</li>
+        </ul>
+        
+        <h4>Parameter</h4>
+        
+        <p>Alle Parameter sind optional.</p>
+        
+        <dl>
+            <dt><code>lat</code></dt>
+            <dd>
+                <p>Breitengrad der Geo-Position des Nutzers, die gesetzt werden soll. Dezimalschreibweise.</p>
+            </dd>
+
+            <dt><code>lon</code></dt>
+            <dd>
+                <p>Längengrad der Geo-Position des Nutzers, die gesetzt werden soll. Dezimalschreibweise.</p>
+            </dd>
+
+            <dt><code>location_entry</code></dt>
+            <dd>
+                <p>Die letzte vom Nutzer angegebene Positionsbeschreibung bzw. Adresse.</p>
+            </dd>
+
+        </dl>
+        
+        <h4>Beispielhafte Ausgabe:</h4>
+        
+        <p><a href="/api/session">/api/session</a>:</p>
+        <form><textarea style="width: 100%; height: 20em; white-space: pre; font-family: monospace;" rows="20" wrap="physical">{
+    status: 0,
+    response: {
+        session: {
+            location: {
+                lat: "50.936490",
+                lon: "6.937715",
+                resolved: {
+                    house: "10",
+                    postal: "50674",
+                    street: "Aachener Strasse"
+                },
+                location_entry: "Aachener Strasse (50674)",
+            }
+        }
+    }
+}</textarea></form>
+        
+    </div>
+</div>
+<div class="content middle" id="terms">
+    <div class="text">
+
+        <h3 style="font-weight: bold">/api/terms</h3>
+        
+        <p>Dient zur Ausgabe von Stichwörtern (Dokumenten-Eigenschaft <code>term</code>) mit einem bestimmten Präfix, z.B. für Auto-Vervollständigung. Wird der Parameter <code>prefix</code> nicht übergeben, werden die häufigsten Schlagworte zurückgegeben.</p>
+        
+        <h4>Beispielhafte Abfragen:</h4>
+        
+        <ul>
+            <li><code><a href="/api/terms?prefix=schau" target="_blank">/api/terms?prefix=schau</a></code>
+            <br />Gibt die Top 10 Stichwörter aus, die mit &raquo;schau&laquo; anfangen</li>
+            <li><code><a href="/api/terms" target="_blank">/api/terms</a></code>
+            <br />Gibt die Top 10 Stichwörter aus</li>
+        </ul>
+        
+        <p>Diese Funktion wird auch bei offeneskoeln.de aktuell noch nicht eingesetzt und ist daher noch als experimentell zu verstehen. Sie wird ausführlicher dokumentiert, sobald sie in Produktion geht.</p>
+
+    </div>
+</div>
+<div class="content middle" id="proxy-geocode">
+    <div class="text">
+
+        <h3 style="font-weight: bold">/api/proxy/geocode</h3>
+        
+        <p>Die Methoden unter /api/proxy sind nicht zur öffentlichen Nutzung gedacht.</p>
+        
+        <p>Bei der Methode /api/proxy/geocode handelt es sich um eine Proxy-Methode für die <a href="http://developer.yahoo.com/geo/placefinder/" target="_blank">Yahoo! Placefinder API</a>, mit deren Hilfe Ortsangaben wie z.B. Adressen in Geo-Positionen aufgelöst werden können. Wenn Du die Placefinder API nutzen möchtest, geh bitte direkt auf die entsprechende Website bei Yahoo und richte Dir dort einen eigenen App-Key ein. Das geht einfach und kostet nichts.</p>
+
+    </div>
 </div>
