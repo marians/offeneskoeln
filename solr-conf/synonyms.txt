@@ -45,3 +45,4 @@ planung, planungen, pläne, plan
 fnp, flächennutzungsplan
 areal, gelände
 hpl, haushaltsplan
+heizpilz, heizstrahler
