@@ -39,7 +39,7 @@ bv, bezirksvertretung
 top, tagesordnungspunkt
 einschl, einschließlich
 inkl, inklusive
-lsa, lichtsignalanlage, ampel
+lsa, lichtsignalanlage, ampel, lichtzeichenanlage, lichtsignalgeber
 fgü, fußgängerüberweg, zebrastreifen
 planung, planungen, pläne, plan
 fnp, flächennutzungsplan
