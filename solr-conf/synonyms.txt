@@ -30,6 +30,7 @@ militärring, militärringstraße
 domplatte, roncalliplatz
 kvb, Kölner Verkehrsbetriebe
 spielplatzpaten, spielplatzpatin, spielplatzpatinnen
+heliosgelände, helios-gelände
 
 # Allgemeine Synonyme
 
