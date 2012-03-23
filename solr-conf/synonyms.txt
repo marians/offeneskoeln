@@ -47,3 +47,4 @@ fnp, flächennutzungsplan
 areal, gelände
 hpl, haushaltsplan
 heizpilz, heizstrahler
+sportvereine, sportverein
