@@ -30,7 +30,7 @@ import datetime
 from calendar import monthrange
 
 
-def range_string_to_dates(param):
+def to_dates(param):
     """
     This function takes a date URL parameter in various string formats
     and converts it to a normalized and validated date range. A list
@@ -121,22 +121,22 @@ def expand_date_param(param, lower_upper):
 
 
 def test():
-    print range_string_to_dates('2012')
-    print range_string_to_dates('201201')
-    print range_string_to_dates('20121001')
-    print range_string_to_dates('2011-2011')
-    print range_string_to_dates('2011-2012')
-    print range_string_to_dates('201104-2012')
-    print range_string_to_dates('201104-201203')
-    print range_string_to_dates('20110408-2011')
-    print range_string_to_dates('2011-')
-    print range_string_to_dates('201104-')
-    print range_string_to_dates('20110408-')
-    print range_string_to_dates('-2011')
-    print range_string_to_dates('-201104')
-    print range_string_to_dates('-20110408')
-    print range_string_to_dates('200902')
-    print range_string_to_dates('201002')
-    print range_string_to_dates('201102')
-    print range_string_to_dates('201202')
-    print range_string_to_dates('201302')
+    print to_dates('2012')
+    print to_dates('201201')
+    print to_dates('20121001')
+    print to_dates('2011-2011')
+    print to_dates('2011-2012')
+    print to_dates('201104-2012')
+    print to_dates('201104-201203')
+    print to_dates('20110408-2011')
+    print to_dates('2011-')
+    print to_dates('201104-')
+    print to_dates('20110408-')
+    print to_dates('-2011')
+    print to_dates('-201104')
+    print to_dates('-20110408')
+    print to_dates('200902')
+    print to_dates('201002')
+    print to_dates('201102')
+    print to_dates('201202')
+    print to_dates('201302')
