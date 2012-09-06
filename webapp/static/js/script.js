@@ -5,6 +5,9 @@
 var disqus_shortname = 'offeneskoeln';
 var OffenesKoeln = {
     
+    a: 6378137,
+    b: (6378137 * 297.257223563) / 298.257223563,
+    
     monthstr: {
             '01': 'Januar',
             '02': 'Februar',
@@ -25,28 +28,28 @@ var OffenesKoeln = {
      * which are in a given rdius
      */
     streetsForPosition: function(lat, lon, radius, callback) {
-        $.getJSON('/api/streets-by-position', {'lat': lat, 'lon': lon, 'radius': radius}, callback);
+        $.getJSON('/api/streets', {'lat': lat, 'lon': lon, 'radius': radius}, callback);
     },
     /**
      * returns a list of position coordinates for a street name,
      * as well as the average coordinates
      */
-    positionsForName: function(name, list_nodes, callback) {
+    locationsForStreet: function(name, list_nodes, callback) {
         var contain = ['result', 'average'];
         if (!list_nodes) {
             contain = ['average'];
         }
-        $.getJSON('/api/positions-by-name', {'name': name, 'contain': contain.join(',')}, callback);
+        $.getJSON('/api/locations', {'street': name, 'contain': contain.join(',')}, callback);
     },
     /**
-     * Does the same as positionsForName, but for a list of names.
+     * Does the same as locationsForStreet, but for a list of names.
      * Requests are queued.
      */
-    positionsForNamesQueued: function(names, callback) {
+    locationsForStreetsQueued: function(names, callback) {
         for (var name in names) {
-            $.ajaxq('positionsForNamesQueuedQueue', {
-                url: "/api/positions-by-name",
-                data: { name: names[name], contain: 'average'},
+            $.ajaxq('locationsForStreetsQueuedQueue', {
+                url: "/api/locations",
+                data: { street: names[name], output: 'averages'},
                 dataType: 'json',
                 cache: true,
                 success: callback
@@ -58,7 +61,10 @@ var OffenesKoeln = {
      * Fetch details for a dicument
      */
     documentDetails: function(id, callback) {
-        $.getJSON('/api/document', {'id': id}, callback);
+        options = {
+            reference: id,
+            output: 'consultations,attachments,thumbnails'}
+        $.getJSON('/api/documents', options, callback);
     },
     
     /**
@@ -67,10 +73,12 @@ var OffenesKoeln = {
      * @return  String   Deutsches Datum
      */
     formatIsoDate: function(datestr){
-        var year = datestr.substr(0,4);
-        var month = datestr.substr(5,2);
-        var day = datestr.substr(8,2);
-        return parseInt(day, 10) + '. ' + this.monthstr[month] + ' ' + year;
+        if (datestr != null && typeof datestr != "undefined") {
+            var year = datestr.substr(0,4);
+            var month = datestr.substr(5,2);
+            var day = datestr.substr(8,2);
+            return parseInt(day, 10) + '. ' + this.monthstr[month] + ' ' + year;
+        }
     },
     
     truncateText: function(text, size){
@@ -86,10 +94,10 @@ var OffenesKoeln = {
     },
     
     fileSizeString: function(bytes){
-        if (bytes < (1024 * 800)) {
-            return (bytes / 1024).toPrecision(2).replace('.', ',') + ' KB';
-        } else {
-            return (bytes / 1024 / 1024).toPrecision(2).replace('.', ',') + ' MB';
+        if (bytes < (1024 * 700)) {
+            return Math.round(bytes / 1024) + ' KB';
+        } else if (bytes < (1024 * 1024 * 5)) {
+            return (bytes / 1024 / 1024).toFixed(1).replace('.', ',') + ' MB';
         }
     },
     
@@ -148,7 +156,129 @@ var OffenesKoeln = {
     
     search: function(params, callback){
         var cleanParams = OffenesKoeln.processSearchParams(params);
-        $.getJSON('/api/query', cleanParams, callback);
+        $.getJSON('/api/documents', cleanParams, callback);
     },
     
+    session: function(params, callback){
+        $.getJSON('/api/session', params, callback);
+    },
+    
+    /**
+     * Verarbeitet das Placefinder Suchergebnis und sortiert
+     * Einträge, die nicht zur Auswahl angezeigt werden sollen,
+     * aus.
+     */
+    filterPlacefinderChoices: function(results){
+        results = OffenesKoeln.deepCopy(results);
+        //console.log(results);
+        // Alle Einträge bekommen eigenen Qualitäts-Koeffizienten
+        for (var n in results) {
+            results[n].okquality = 1.0;
+            // multipliziere mit quality
+            results[n].okquality *= results[n].quality;
+            // verdreifache wenn neighborhood gesetzt
+            if (results[n].neighborhood != '') {
+                results[n].okquality *= 3.0;
+            }
+            // verdopple wenn postal gesetzt
+            if (results[n].postal != '') {
+                results[n].okquality *= 3.0;
+            }
+            // keine Straße gesetzt: Punktzahl durch 10
+            if (results[n].street == '') {
+                results[n].okquality *= 0.1;
+            }
+        }
+        // Sortieren nach 'okquality' abwärts
+        results.sort(OffenesKoeln.placefinderQualitySort);
+        // Elemente nach woeid geschlüsselt sammeln, so dass
+        // jede woeid nur einmal vertreten ist
+        results_by_woeid = {};
+        for (var n in results) {
+            var woeid = results[n].woeid;
+            if (typeof results_by_woeid[woeid] == "undefined") {
+                results_by_woeid[woeid] = results[n];
+            }
+        }
+        //console.log(results_by_woeid);
+        ret = [];
+        for (var woeid in results_by_woeid) {
+            if (results_by_woeid[woeid].street != '') {
+                ret.push(results_by_woeid[woeid]);
+            }
+        }
+        ret.sort(OffenesKoeln.placefinderLongitudeSort);
+        return ret;
+    },
+    
+    placefinderQualitySort: function(a, b) {
+        return b['okquality'] - a['okquality']
+    },
+
+	placefinderLongitudeSort: function(a, b) {
+        return parseFloat(a['longitude']) - parseFloat(b['longitude'])
+    },
+
+	cylindrics: function(phi) {
+		var	u = this.a * Math.cos(phi),
+			v = this.b * Math.sin(phi),
+			w = Math.sqrt(u * u + v * v),
+			r = this.a * u / w,
+			z = this.b * v / w,
+			R = Math.sqrt(r * r + z * z);
+		return { r : r, z : z, R : R };
+	},
+	
+	/**
+	 * Anstand zwischen zwei Geo-Koordinaten
+	 * @param    phi1     Float    Länge Punkt 1
+	 * @param    lon1     Float    Breite Punkt 1
+	 * @param    phi2     Float    Länge Punkt 2
+	 * @param    lon2     Float    Breite Punkt 3
+	 * @param    small    Boolean  True für kleine Distanzen
+	 */
+	geo_distance: function(phi1, lon1, phi2, lon2, small) {
+	    var dLambda = lon1 - lon2;
+		with (cylindrics(phi1)) {
+			var	r1 = r,
+				z1 = z,
+				R1 = R;
+		}
+		with (cylindrics(phi2)) {
+			var	r2 = r,
+				z2 = z,
+				R2 = R;
+		}
+		var	cos_dLambda = Math.cos(dLambda),
+			scalar_xy = r1 * r2 * cos_dLambda,
+			cos_alpha = (scalar_xy + z1 * z2) / (R1 * R2);
+
+		if (small) {
+			var	dr2 = r1 * r1 + r2 * r2 - 2 * scalar_xy,
+				dz2 = (z1 - z2) * (z1 - z2),
+				R = Math.sqrt((dr2 + dz2) / (2 * (1 - cos_alpha)));
+		}
+		else R = Math.pow(a * a * b, 1/3);
+		return R * Math.acos(cos_alpha);
+	},
+
+    /**
+     * Aendert eine URL, so dass sie vom Offenes Koeln CDN ausgeliefert wird.
+     * Dabei wird jede URL auf einen von mehreren Servern gemappt. Das Mapping
+     * ist rekonstruierbar und verteilt die Anfragen möglichst gleichmäßig.
+     *
+     * @param   String  url   Vollstaendige URL der Datei
+     */
+    cdnify_url: function(url) {
+        var hosts = ['a.ok.mycdn.de', 'b.ok.mycdn.de', 'c.ok.mycdn.de'];
+        var res = 0;
+        for (var i=0; i < url.length; i++) {
+            res += url.charCodeAt(i) * (url.length - i);
+        }
+        var recoded = res.toString(hosts.length);
+        var num = recoded.substr(recoded.length-1, 1);
+        console.log(url, recoded, num, hosts[num]);
+        var re = /^http[s]*:\/\/[^\/]+\/static/;
+        return url.replace(re, 'http://'+hosts[num]);
+    }
 };
