@@ -36,7 +36,8 @@ def get_documents(date=None):
     """
     Führt den API-Request für das Abrufen von Dokumenten aus
     """
-    url = 'http://offeneskoeln.de/api/documents?docs=10000&output=attachments&date=%s' % date
+    url = 'http://offeneskoeln.de/api/documents'
+    url += 'docs=10000&output=attachments&date=%s' % date
     request = urllib.urlopen(url)
     if request.getcode() != '200':
         sys.stderr.write('Bad HTTP Status: ' + str(request.getcode()))
@@ -46,11 +47,11 @@ def get_documents(date=None):
         return json.loads(jsons)
 
 if __name__ == '__main__':
-    usage = "usage: %prog <daterange>\n\nWhere daterange is e.g. 2010-2011 or 201208-201209"
+    usage = "usage: %prog <daterange>"
+    usage += "\n\nWhere daterange is e.g. 2010-2011 or 201208-201209"
     parser = OptionParser(usage=usage)
     (options, args) = parser.parse_args()
     if len(args) != 1:
         parser.error("No date range given")
     docs = get_documents(args[0])
     print docs
-
