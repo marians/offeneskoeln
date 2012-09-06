@@ -11,7 +11,7 @@ Hier gibt es:
 Der Bereich **Quellcode** enthält folgende Dateien:
 
 - db: Datenbankschema
-- webapp: Die Web-Applikation offeneskoeln.de (noch unvollständig!)
+- webapp: Die Web-Applikation offeneskoeln.de
 - solr-conf: Konfigurationsdateien für den Solr Such-Dienst
 - scripts: Unterstützende Werkzeuge und Helferlein
 
