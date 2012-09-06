@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 """
-Lädt Anhänge bis zu einem gewissen Veröffentlichungsdatum herunter
+Lädt Anhänge eines bestimmten Datumsbereichs herunter
 
 Copyright (c) 2012 Marian Steinbach
 
@@ -27,6 +27,7 @@ entstanden.
 """
 
 import sys
+import os
 import json
 import urllib
 from optparse import OptionParser
@@ -37,9 +38,9 @@ def get_documents(date=None):
     Führt den API-Request für das Abrufen von Dokumenten aus
     """
     url = 'http://offeneskoeln.de/api/documents'
-    url += 'docs=10000&output=attachments&date=%s' % date
+    url += '?docs=10000&output=attachments&date=%s' % date
     request = urllib.urlopen(url)
-    if request.getcode() != '200':
+    if request.getcode() != 200:
         sys.stderr.write('Bad HTTP Status: ' + str(request.getcode()))
         sys.stderr.write(request.read())
     else:
@@ -50,8 +51,22 @@ if __name__ == '__main__':
     usage = "usage: %prog <daterange>"
     usage += "\n\nWhere daterange is e.g. 2010-2011 or 201208-201209"
     parser = OptionParser(usage=usage)
+    parser.add_option("-f", "--folder", dest="folder",
+                  help="write files to folder FOLDER", metavar="FOLDER")
     (options, args) = parser.parse_args()
     if len(args) != 1:
         parser.error("No date range given")
-    docs = get_documents(args[0])
-    print docs
+    if options.folder is None:
+        options.folder = '.'
+    result = get_documents(args[0])
+    num = result['response']['numhits']
+    print num, "Document(s) found"
+    if num > 0:
+        for doc in result['response']['documents']:
+            if 'attachments' in doc:
+                for attachment in doc['attachments']:
+                    print "Downloading", attachment['url']
+                    filename = attachment['url'].split('/')[-1]
+                    path = options.folder + os.sep + filename
+                    urllib.urlretrieve(attachment['url'], filename)
+
