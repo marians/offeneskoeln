@@ -2,38 +2,40 @@
 # encoding: utf-8
 
 """
-    Utility für Zeichenketten zur Angabe von Datumszeiträumen
-    
-    Copyright (c) 2012 Marian Steinbach
+Utility für Zeichenketten zur Angabe von Datumszeiträumen
 
-    Hiermit wird unentgeltlich jeder Person, die eine Kopie der Software und
-    der zugehörigen Dokumentationen (die "Software") erhält, die Erlaubnis 
-    erteilt, sie uneingeschränkt zu benutzen, inklusive und ohne Ausnahme, dem 
-    Recht, sie zu verwenden, kopieren, ändern, fusionieren, verlegen, 
-    verbreiten, unterlizenzieren und/oder zu verkaufen, und Personen, die diese 
-    Software erhalten, diese Rechte zu geben, unter den folgenden Bedingungen:
+Copyright (c) 2012 Marian Steinbach
 
-    Der obige Urheberrechtsvermerk und dieser Erlaubnisvermerk sind in allen 
-    Kopien oder Teilkopien der Software beizulegen.
+Hiermit wird unentgeltlich jeder Person, die eine Kopie der Software und
+der zugehörigen Dokumentationen (die "Software") erhält, die Erlaubnis
+erteilt, sie uneingeschränkt zu benutzen, inklusive und ohne Ausnahme, dem
+Recht, sie zu verwenden, kopieren, ändern, fusionieren, verlegen,
+verbreiten, unterlizenzieren und/oder zu verkaufen, und Personen, die diese
+Software erhalten, diese Rechte zu geben, unter den folgenden Bedingungen:
 
-    Die Software wird ohne jede ausdrückliche oder implizierte Garantie 
-    bereitgestellt, einschließlich der Garantie zur Benutzung für den 
-    vorgesehenen oder einen bestimmten Zweck sowie jeglicher Rechtsverletzung, 
-    jedoch nicht darauf beschränkt. In keinem Fall sind die Autoren oder 
-    Copyrightinhaber für jeglichen Schaden oder sonstige Ansprüche haftbar zu 
-    machen, ob infolge der Erfüllung eines Vertrages, eines Delikts oder anders 
-    im Zusammenhang mit der Software oder sonstiger Verwendung der Software 
-    entstanden.
+Der obige Urheberrechtsvermerk und dieser Erlaubnisvermerk sind in allen
+Kopien oder Teilkopien der Software beizulegen.
+
+Die Software wird ohne jede ausdrückliche oder implizierte Garantie
+bereitgestellt, einschließlich der Garantie zur Benutzung für den
+vorgesehenen oder einen bestimmten Zweck sowie jeglicher Rechtsverletzung,
+jedoch nicht darauf beschränkt. In keinem Fall sind die Autoren oder
+Copyrightinhaber für jeglichen Schaden oder sonstige Ansprüche haftbar zu
+machen, ob infolge der Erfüllung eines Vertrages, eines Delikts oder anders
+im Zusammenhang mit der Software oder sonstiger Verwendung der Software
+entstanden.
 """
 
 import datetime
 from calendar import monthrange
 
-"""
+
+def range_string_to_dates(param):
+    """
     This function takes a date URL parameter in various string formats
     and converts it to a normalized and validated date range. A list
     with two elements is returned, lower and upper date boundary.
-    
+
     Valid inputs are, for example:
     2012              => Jan 1 20012 - Dec 31 2012 (whole year)
     201201            => Jan 1 2012  - Jan 31 2012 (whole month)
@@ -51,8 +53,7 @@ from calendar import monthrange
     -2011             Jan 1 0000 - Dez 31 2011
     -201104           Jan 1 0000 - Apr 30, 2011
     -20110408         Jan 1 0000 - Apr 8, 2011
-"""
-def range_string_to_dates(param):
+    """
     pos = param.find('-')
     lower, upper = (None, None)
     if pos == -1:
@@ -63,18 +64,19 @@ def range_string_to_dates(param):
     ret = (expand_date_param(lower, 'lower'), expand_date_param(upper, 'upper'))
     return ret
 
-"""
+
+def expand_date_param(param, lower_upper):
+    """
     Expands an (possibly) incomplete date string to either the lowest
     or highest possible contained date and returns
     datetime.date for that string.
-    
+
     0753 (lowest) => 0753-01-01
     2012 (highest) => 2012-12-31
     2012 (lowest) => 2012-01-01
     201208 (highest) => 2012-08-31
     etc.
-"""
-def expand_date_param(param, lower_upper):
+    """
     year = 0
     month = 0
     day = 0
@@ -116,27 +118,25 @@ def expand_date_param(param, lower_upper):
     (firstday, dayspermonth) = monthrange(year, month)
     day = min(dayspermonth, max(1, day))
     return datetime.date(year=year, month=month, day=day)
-    
-    
-    
-def test():
-    print process_date_range_param('2012')
-    print process_date_range_param('201201')
-    print process_date_range_param('20121001')
-    print process_date_range_param('2011-2011')
-    print process_date_range_param('2011-2012')
-    print process_date_range_param('201104-2012')
-    print process_date_range_param('201104-201203')
-    print process_date_range_param('20110408-2011')
-    print process_date_range_param('2011-')
-    print process_date_range_param('201104-')
-    print process_date_range_param('20110408-')
-    print process_date_range_param('-2011')
-    print process_date_range_param('-201104')
-    print process_date_range_param('-20110408')
-    print process_date_range_param('200902')
-    print process_date_range_param('201002')
-    print process_date_range_param('201102')
-    print process_date_range_param('201202')
-    print process_date_range_param('201302')
 
+
+def test():
+    print range_string_to_dates('2012')
+    print range_string_to_dates('201201')
+    print range_string_to_dates('20121001')
+    print range_string_to_dates('2011-2011')
+    print range_string_to_dates('2011-2012')
+    print range_string_to_dates('201104-2012')
+    print range_string_to_dates('201104-201203')
+    print range_string_to_dates('20110408-2011')
+    print range_string_to_dates('2011-')
+    print range_string_to_dates('201104-')
+    print range_string_to_dates('20110408-')
+    print range_string_to_dates('-2011')
+    print range_string_to_dates('-201104')
+    print range_string_to_dates('-20110408')
+    print range_string_to_dates('200902')
+    print range_string_to_dates('201002')
+    print range_string_to_dates('201102')
+    print range_string_to_dates('201202')
+    print range_string_to_dates('201302')
