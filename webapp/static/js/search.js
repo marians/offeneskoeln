@@ -4,22 +4,22 @@ $(document).ready(function(){
         $('#search .result').append('<div class="loading big outer"><div class="loading big inner">Suche...</div></div>');
         //console.log("Page search settings:", ok_search_settings);
         var search_parms = OffenesKoeln.deepCopy(ok_search_settings);
-        search_parms['facets'] = 1;
+        search_parms['output'] = 'facets';
         OffenesKoeln.search(
             search_parms,
-            function(response) {
+            function(data) {
                 //console.log('query response:', data);
                 $('#search .result').empty();
                 $('#facets').remove();
-                if (response.status == 0) {
-                    if (typeof response.result.facets != 'undefined') {
+                if (data.status == 0) {
+                    if (typeof data.response.facets != 'undefined') {
                         $('#search .content.middle').after('<div id="facets" class="content middle"></div>');
-                        displaySearchResultFacets(response.result.facets, response.params, '#facets');
+                        displaySearchResultFacets(data.response.facets, data.request, '#facets');
                     }
-                    displaySearchResult(response);
-                    displayPagerWidget(response.result.numhits, ok_search_settings.num, response.result.start, '#search .result');
-                    if (response.result.numhits > 1) {
-                        displaySortWidget(response.result, '#search .result h3');
+                    displaySearchResult(data);
+                    displayPagerWidget(data.response.numhits, ok_search_settings.num, data.response.start, '#search .result');
+                    if (data.response.numhits > 1) {
+                        displaySortWidget(data.request, '#search .result h3');
                     }
                 } else {
                     displaySearchErrorMessage();
@@ -28,6 +28,11 @@ $(document).ready(function(){
         );
 
     }
+
+    $('#search-submit').click(function(evt){
+        evt.preventDefault();
+        $('#searchform').trigger('submit');
+    });
     
     /*
     $('#qinput').makeAutocompleteSearchField({
@@ -64,14 +69,14 @@ $(document).ready(function(){
     function displaySearchResultFacets(facets, query, targetSelector) {
         if (typeof facets != 'undefined') {
             // typ facet
-            typ_facet = createSearchResultFacet('typ', facets.typ, 'Typ', 'value', query.fq);
-            $(targetSelector).append(typ_facet);
+            type_facet = createSearchResultFacet('type', facets.type, 'Typ', 'value', query.fq);
+            $(targetSelector).append(type_facet);
             // gremium facet
-            gremium_facet = createSearchResultFacet('gremium', facets.gremium, 'Gremium', 'value', query.fq, true);
-            $(targetSelector).append(gremium_facet);
+            committee_facet = createSearchResultFacet('committee', facets.committee, 'Gremium', 'value', query.fq, true);
+            $(targetSelector).append(committee_facet);
             // schlagwort facet
-            schlagwort_facet = createSearchResultFacet('schlagwort', facets.schlagwort, 'Stichwort', 'value', query.fq, true);
-            $(targetSelector).append(schlagwort_facet);
+            term_facet = createSearchResultFacet('term', facets.term, 'Stichwort', 'value', query.fq, true);
+            $(targetSelector).append(term_facet);
         }
     }
     
@@ -133,27 +138,26 @@ $(document).ready(function(){
         var result = $('#search .result');
         
         // headline
-        $('h1').text(data.result.numhits + ' gefundene Dokumente');
-        if (data.result.numhits > 0) {
+        $('h1').text(data.response.numhits + ' gefundene Dokumente');
+        if (data.response.numhits > 0) {
             var subheadline = $(document.createElement('h3'));
-            subheadline.text('Seite ' + (Math.floor(data.result.start / ok_search_settings.num)+1) + ' von ' + (Math.floor(data.result.numhits / ok_search_settings.num)+1));
+            subheadline.text('Seite ' + (Math.floor(data.response.start / ok_search_settings.num)+1) + ' von ' + (Math.floor(data.response.numhits / ok_search_settings.num)+1));
             result.append(subheadline);
         }
         
         // results ol
         var resultlist = $(document.createElement('ol'));
-        resultlist.attr('start', data.result.start+1);
+        resultlist.attr('start', data.response.start+1);
         result.append(resultlist);
-        for (var i in data.result.docs) {
+        for (var i in data.response.documents) {
             var item = $(document.createElement('li')).attr('class','resultitem');
             resultlist.append(item);
-            var id = data.result.docs[i].aktenzeichen.replace(/\//g, '-');
-            var link = $(document.createElement('a')).attr('href', '/dokumente/' + id + '/');
+            var link = $(document.createElement('a')).attr('href', data.response.documents[i].url);
             item.append(link);
-            var title = $(document.createElement('span')).attr('class','title').html(itemTitle(data.result.docs[i], data.result.highlighting));
+            var title = $(document.createElement('span')).attr('class','title').html(itemTitle(data.response.documents[i]));
             link.append(title);
             var snippet = $(document.createElement('span')).attr('class','snippet');
-            snippet.text(snippetText(data.result.docs[i]));
+            snippet.text(snippetText(data.response.documents[i]));
             link.append(snippet);
         }
     }
@@ -161,19 +165,21 @@ $(document).ready(function(){
     /**
      * Generate the output title and apply, if possible, search term highlighting
      */
-    function itemTitle(document, highlights) {
-        if (document.betreff != '') {
-            if (typeof highlights[document.id].betreff != 'undefined' && typeof highlights[document.id].betreff[0] != 'undefined') {
-                return highlights[document.id].betreff[0];
+    function itemTitle(document) {
+        if (document.title[0] != '') {
+            if (typeof document.highlighting != 'undefined' 
+                && typeof document.highlighting.title != 'undefined'
+                && typeof document.highlighting.title[0] != 'undefined') {
+                return document.highlighting.title[0];
             }
-            return document.betreff;
+            return document.title[0];
         } else {
             return 'Dokument ohne Titel';
         }
     }
     
     function snippetText(document) {
-        return document.typ + ' ' + document.aktenzeichen + ' vom ' + OffenesKoeln.formatIsoDate(document.datum);
+        return document.type + ' ' + document.reference + ' vom ' + OffenesKoeln.formatIsoDate(document.date[0]);
     }
     
     /**
@@ -187,15 +193,22 @@ $(document).ready(function(){
         $(targetSelector).append(pager);
         // previous page
         if (start > 0) {
-            pager.append('<a class="back" href="/suche/?'+ searchQueryString({start: (start - ok_search_settings.num)}) +'">Seite zurück</a>');
+            pager.append('<a class="awesome extrawide paging back" href="/suche/?'+ searchQueryString({start: (start - ok_search_settings.num)}) +'">&larr; &nbsp; Seite zurück</a>');
         }
         pager.append(' ');
         // next page
         if (numhits > (start + rows)) {
-            pager.append('<a class="next" href="/suche/?'+ searchQueryString({start: (start + ok_search_settings.num)}) +'">Seite weiter</a>');
+            pager.append('<a class="awesome extrawide paging next" href="/suche/?'+ searchQueryString({start: (start + ok_search_settings.num)}) +'">Seite weiter &nbsp; &rarr;</a>');
         }
     }
     
+    /**
+     * Kontrollelement zur Anzeige der aktuellen Sortierung und zum
+     * Aendern der Sortierung
+     *
+     * @param   Object  data               Request-Parameter
+     * @param   String  targetSelector     jQuery Selector zur Bestimmgung des DOM-Elements für die Ausgabe
+     */
     function displaySortWidget(data, targetSelector) {
         var widget = $(document.createElement('span'));
         widget.attr('class', 'sort');
@@ -204,9 +217,9 @@ $(document).ready(function(){
         var parts = [];
         var sortOptions = {
             'score desc': 'Relevanz',
-            'datum desc': 'Datum: neuste zuerst',
-            'datum asc': 'Datum: älteste zuerst'
-        }
+            'date desc': 'Datum: neuste zuerst',
+            'date asc': 'Datum: älteste zuerst'
+        };
         for (var o in sortOptions) {
             if (data.sort == o) {
                 parts.push('<b>' + sortOptions[o] + '</b>');
@@ -220,7 +233,7 @@ $(document).ready(function(){
     /**
      * creates a search query string for a modified search.
      * Takes parameters from ok_search_settings and overrides parameters
-     * given in 
+     * given in
      * @param   overwrite
      */
     function searchQueryString(overwrite) {
