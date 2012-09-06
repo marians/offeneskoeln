@@ -1125,12 +1125,13 @@ def headers(type=None, cache_hours=None):
             web.header('Cache-Control', 'max-age=' + str(seconds))
 
 
+app = web.application(urls, globals())
+store = web.session.DBStore(config.DB, config.HTTP_SESSION_TABLE_NAME)
+session = web.session.Session(app, store, initializer={'location': {}})
+render = web.template.render(config.BASE_PATH + os.sep + 'templates/', base="layout",
+    globals={'context': session})
+
 if __name__ == "__main__":
-    app = web.application(urls, globals())
-    store = web.session.DBStore(config.DB, config.HTTP_SESSION_TABLE_NAME)
-    session = web.session.Session(app, store, initializer={'location': {}})
-    render = web.template.render('templates/', base="layout",
-        globals={'context': session})
     try:
         # benoetigt für FastCGI
         import flup.server.fcgi as flups
