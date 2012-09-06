@@ -97,3 +97,10 @@ web.config.handler_parameters = {
 
 DB = web.database(dbn=DB_TYPE, db=DB_NAME, user=DB_USER, pw=DB_PASS)
 
+# Ratsinfomrationssystem Köln URLs
+#
+# URL-Muster für Anträge
+RIS_AG_URLPATTERN = 'http://ratsinformation.stadt-koeln.de/ag0050.asp?__kagnr=%d'
+# URL-Muster für Vorlagen
+RIS_VO_URLPATTERN = 'http://ratsinformation.stadt-koeln.de/vo0050.asp?__kvonr=%d'
+
