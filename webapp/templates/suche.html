@@ -1,7 +1,7 @@
 $def with (search_settings)
 $var title: Suche
 $var description: Hier findest Du alle amtlichen Dokumente im Bestand
-$var additional_scripts: /static/js/search_20120308.js
+$var additional_scripts: /static/js/search.js
 
 <script type="text/javascript">
 var ok_search_settings = {
@@ -22,7 +22,7 @@ var ok_search_settings = {
 		<form action="/suche/" method="get" id="searchform" accept-charset="utf-8">
 			<label class="qlabel" for="qinput">Suche:</label>
 			<input type="text" id="qinput" name="q" value="$search_settings['q']" autocomplete="off" />
-			<a class="submit awesome extrawide" id="submit" href="/suche/">Suchen</a>
+			<a id="search-submit" class="submit awesome extrawide" id="submit" href="/suche/">Suchen</a>
 		</form>
 	</div>
 	<div class="result content bottom">
