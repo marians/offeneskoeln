@@ -27,7 +27,7 @@ entstanden.
 import config
 import web
 import os
-import simplejson
+import json
 import solr
 import urllib
 import urllib2
@@ -279,7 +279,7 @@ class ApiDocuments:
             if 'start' in query['result']:
                 ret['response']['start'] = query['result']['start']
         headers(type='application/json', cache_hours=24)
-        return simplejson.dumps(ret)
+        return json.dumps(ret)
 
 
 class ApiTerms:
@@ -303,14 +303,14 @@ class ApiTerms:
         request = urllib2.urlopen(config.SOLR_URL + '/terms',
                                   urllib.urlencode(requestdata))
         response = request.read()
-        obj = simplejson.loads(response)
+        obj = json.loads(response)
         ret = {
             'duration': int((time.time() - start) * 1000),
             'request': {'prefix': prefix},
             'response': {'terms': obj['terms']['term']}
         }
         headers(type='application/json', cache_hours=24)
-        return simplejson.dumps(ret)
+        return json.dumps(ret)
 
 
 class ApiSession:
@@ -354,7 +354,7 @@ class ApiSession:
             if rt in session:
                 session_ret[rt] = session[rt]
         headers(type='application/json', cache_hours=0)
-        return simplejson.dumps({
+        return json.dumps({
             'status': 0,
             'response': {'session': session_ret}
         })
@@ -406,7 +406,7 @@ class ApiStreets:
             'response': {'streets': rows}
         }
         headers(type='application/json', cache_hours=24)
-        return simplejson.dumps(ret)
+        return json.dumps(ret)
 
 
 class ApiLocations:
@@ -461,7 +461,7 @@ class ApiLocations:
         ret['duration'] = int((time.time() - start) * 1000)
         ret['request']['street'] = street
         headers(type='application/json', cache_hours=24)
-        return simplejson.dumps(ret)
+        return json.dumps(ret)
 
 
 class ApiGeocode:
@@ -474,7 +474,7 @@ class ApiGeocode:
         obj = placefinder_geocode(url_params.street)
         obj['duration'] = int((time.time() - start) * 1000)
         headers(type='application/json', cache_hours=24)
-        return simplejson.dumps(obj)
+        return json.dumps(obj)
 
 
 ############# Datenbank-Abruf, Hilfsfunktionen etc. ###############
@@ -504,7 +504,7 @@ def placefinder_geocode(location_string):
         request = urllib2.urlopen(yurl + '?' + urllib.urlencode(params))
         response = request.read()
         try:
-            obj = simplejson.loads(response)
+            obj = json.loads(response)
             return obj
         except:
             raise web.internalerror()
@@ -524,7 +524,7 @@ def placefinder_reverse_geocode(lat, lon):
         request = urllib2.urlopen(yurl + '?' + urllib.urlencode(params))
         response = request.read()
         try:
-            obj = simplejson.loads(response)
+            obj = json.loads(response)
             return obj
         except:
             raise web.internalerror()
