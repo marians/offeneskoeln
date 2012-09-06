@@ -346,7 +346,7 @@ def import_doc(reference, streets, verbose=False):
               content=solr_body,
               #location=positions_for_streetnames(unique(solr_streets.keys()))
               )
-    except UnicodeDecodeError as err:
+    except UnicodeDecodeError, err:
         print >> sys.stderr, (
             "UnicodeDecodeError beim Import von request_id", reference)
         print >> sys.stderr, err
@@ -361,6 +361,7 @@ def import_doc(reference, streets, verbose=False):
                               'content': solr_body,
                               #'location': positions_for_streetnames(unique(solr_streets.keys()))
                               }
+
 if __name__ == '__main__':
     s = solr.SolrConnection(config.SOLR_URL)
     db = DataStore(config.DBNAME, config.DBHOST, config.DBUSER, config.DBPASS)
@@ -397,3 +398,4 @@ if __name__ == '__main__':
     s.commit(wait_flush=True, wait_searcher=False)
     s.optimize()
     print num_docs, "Dokumente geschrieben"
+
