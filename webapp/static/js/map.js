@@ -6,11 +6,11 @@ $(document).ready(function(){
     map.addLayer(markerLayerGroup);
     
     // 'http://{s}.ok.mycdn.de/tiles/{z}/{x}/{y}.png'
-    var tileUrlSchema = 'http://{s}.ok.mycdn.de/tiles/v2/{z}/{x}/{y}.png',
+    var tileUrlSchema = 'http://{s}.ok.mycdn.de/tiles/v3/{z}/{x}/{y}.png',
         attribution = '&copy; OpenStreetMap Mitwirkende',
         backgroundLayer = new L.TileLayer(tileUrlSchema, {
-            maxZoom: 16,
-            minZoom: 11,
+            maxZoom: 17,
+            minZoom: 8,
             attribution: attribution
         });
     
