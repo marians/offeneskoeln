@@ -24,6 +24,9 @@ $def with (content)
 </head>
 <body>
   <div id="container">
+    <!--<div id="maintenance">
+	  Liebe Nutzerinnen und Nutzer! In der Nacht von Samstag 2. auf Sonntag 3. März ab etwa 0:00 Uhr werden wir ca. eine halbe Stunde lang neue Software einspielen und sind daher nicht erreichbar.
+    </div>-->
     <header>
       <div id="logo"><a href="/"><img src="/static/img/logo/logo_header_86x71.png" width="86" height="71" alt="" /></a></div>
       <div id="nametagline">
@@ -58,12 +61,15 @@ $def with (content)
         	<li><a href="/disclaimer/" class="warn">Datenqualität/Haftungsausschluss</a></li>
         </ul>
       </div>
+      <div style="padding-top: 1em; padding-bottom: 1em;">
+        <span style="font-weight: bold; color: orange">NEU:</span> <a href="/lab/unfallkarte/" target="_blank">Die Unfallkarte für Köln</a>
+      </div>
     </footer>
   </div> <!--! end of #container -->
     <script type="text/javascript" src="http://b.ok.mycdn.de/js/jquery.min.js"></script>
     <script type="text/javascript" src="http://c.ok.mycdn.de/js/leaflet_0.3.1.min.js"></script>
     <script type="text/javascript" src="http://a.ok.mycdn.de/js/jquery.ajaxq.js"></script>
-    <script type="text/javascript" src="/static/js/script_20120308.js"></script>
+    <script type="text/javascript" src="/static/js/script.js"></script>
     $if content.additional_scripts:
         <script type="text/javascript" src="$content.additional_scripts"></script>
 
@@ -71,6 +77,18 @@ $def with (content)
     <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
     <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
   <![endif]-->
-  
+
+  <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-34010656-1']);
+  _gaq.push(['_gat._anonymizeIp']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+  </script>
 </body>
 </html>
