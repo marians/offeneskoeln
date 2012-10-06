@@ -34,12 +34,12 @@ heliosgelände, helios-gelände
 
 # Allgemeine Synonyme
 
-str, straße
+str, straße, strasse
 go, gemeindeordnung
 bv, bezirksvertretung
 top, tagesordnungspunkt
 einschl, einschließlich
-inkl, inklusive
+inkl, inklusive, inkl.
 lsa, lichtsignalanlage, ampel, lichtzeichenanlage, lichtsignalgeber
 fgü, fußgängerüberweg, zebrastreifen
 planung, planungen, pläne, plan
