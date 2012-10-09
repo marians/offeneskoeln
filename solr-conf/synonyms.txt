@@ -1,4 +1,4 @@
-# Allgemeine Synonyme für die Suche
+﻿# Allgemeine Synonyme für die Suche
 #
 # Alle Begriffe, die in einer Zeile angegeben werden, werden bei der einfachen
 # Suche nach Stichwörtern völlig identisch behandelt.
@@ -34,12 +34,12 @@ heliosgelände, helios-gelände
 
 # Allgemeine Synonyme
 
-str, straße
+str, straße, strasse
 go, gemeindeordnung
 bv, bezirksvertretung
 top, tagesordnungspunkt
 einschl, einschließlich
-inkl, inklusive
+inkl, inklusive, inkl.
 lsa, lichtsignalanlage, ampel, lichtzeichenanlage, lichtsignalgeber
 fgü, fußgängerüberweg, zebrastreifen
 planung, planungen, pläne, plan
@@ -47,4 +47,6 @@ fnp, flächennutzungsplan
 areal, gelände
 hpl, haushaltsplan
 heizpilz, heizstrahler
-sportvereine, sportverein
+sportvereine, sportverein, sportclub
+handy, mobiltelefon
+holland, niederlande
