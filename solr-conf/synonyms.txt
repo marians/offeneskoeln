@@ -49,3 +49,4 @@ hpl, haushaltsplan
 heizpilz, heizstrahler
 sportvereine, sportverein, sportclub
 handy, mobiltelefon
+holland, niederlande
