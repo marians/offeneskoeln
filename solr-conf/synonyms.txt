@@ -1,4 +1,4 @@
-# Allgemeine Synonyme für die Suche
+﻿# Allgemeine Synonyme für die Suche
 #
 # Alle Begriffe, die in einer Zeile angegeben werden, werden bei der einfachen
 # Suche nach Stichwörtern völlig identisch behandelt.
@@ -48,3 +48,4 @@ areal, gelände
 hpl, haushaltsplan
 heizpilz, heizstrahler
 sportvereine, sportverein, sportclub
+handy, mobiltelefon
