@@ -39,7 +39,7 @@ go, gemeindeordnung
 bv, bezirksvertretung
 top, tagesordnungspunkt
 einschl, einschließlich
-inkl, inklusive, inkl.
+inkl, inklusive
 lsa, lichtsignalanlage, ampel, lichtzeichenanlage, lichtsignalgeber
 fgü, fußgängerüberweg, zebrastreifen
 planung, planungen, pläne, plan
