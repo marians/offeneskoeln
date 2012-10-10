@@ -19,6 +19,8 @@ Der **Scraper**, mit dem die Daten aus dem Ratsinformationssystem der Stadt Köl
 
 [https://github.com/marians/cologne-ris-scraper](https://github.com/marians/cologne-ris-scraper)
 
+Weitere Informationen findest Du im [https://github.com/marians/offeneskoeln/wiki/_pages](Wiki), insbesondere eine [https://github.com/marians/offeneskoeln/wiki/Leitfaden-f%C3%BCr-Entwickler](Anleitung zum Aufsetzen einer Entwicklungsumgebung). 
+
 ###Lizenz
 
 Der Code steht unter einer MIT-artigen [Lizenz](https://github.com/marians/offeneskoeln/blob/master/LIZENZ.txt).
