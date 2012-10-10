@@ -118,8 +118,10 @@ def generate_thumbs_for_file(file_id, source_file, size):
             print >> sys.stderr, "Could not create directory " + config.THUMBS_PATH + '/' + subpath
             sys.exit(1)
     dest_file = config.THUMBS_PATH + '/' + subpath + '/' + file_id + '-' + str(size) + '.' + config.THUMBNAILS_SUFFIX
-    print "Creating", size, dest_file
-    cmd = "%s -t %d -m %d %s -thumbnail x%d %s %s" % (TIMEOUT_CMD, config.THUMBNAILS_CPU_TIME_LIMIT, config.THUMBNAILS_MEMORY_LIMIT, CONVERT_CMD, size, source_file, dest_file)
+    print "Size", size, source_file
+    cmd = ("%s -t %d -m %d %s -thumbnail x%d %s %s" %
+        (config.TIMEOUT_CMD, config.THUMBNAILS_CPU_TIME_LIMIT, config.THUMBNAILS_MEMORY_LIMIT,
+        config.CONVERT_CMD, size, source_file, dest_file))
     output, error = subprocess.Popen(
         cmd.split(' '), stdout=subprocess.PIPE,
         stderr=subprocess.PIPE).communicate()
