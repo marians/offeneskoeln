@@ -2,12 +2,20 @@
 # encoding: utf-8
 
 """
-Generiert Thumbnails von allen Attachments
+Generiert Thumbnails (Vorschaubilder) von allen Attachments im
+Attachments-Ordner, sofern möglich.
+
+Abhängigkeiten:
+- ImageMagick
+- timeout.pl - siehe https://github.com/pshved/timeout
+
 
 TODO:
 - Prüfen, ob Dokument neuer ist als Thumbnail und ggf. Thumb neu produzieren.
 - Nur bei bestimmten Dateiendungen Thumbnail erzeugen
+"""
 
+"""
 Copyright (c) 2012 Marian Steinbach
 
 Hiermit wird unentgeltlich jeder Person, die eine Kopie der Software und
@@ -42,18 +50,19 @@ VALID_TYPES = ['jpg', 'pdf', 'tif', 'bmp', 'png', 'gif']
 # Diese Größen (Höhe) werden generiert:
 SIZES = [300, 800, 150]
 
+# Datei-Endung der generierten Thumbnail-Dateien
 THUMB_SUFFIX = 'jpg'
 
+# Maximaler Arbeitsspeicherbedarf des Sub-Prozesses in Byte
 MEMORY_LIMIT = 100000
 
+# Maximale erlaubte Laufzeit des Sub-Prozesses in Sekunden
 CPU_TIME_LIMIT = 60
 
 # Pfad zum ImageMagick convert Tool
 CONVERT_CMD = '/usr/bin/convert'
 
 # Pfad zum Timeout-Script
-# Das Script timeout ist ein Perl-Script. Es kommt von
-# https://github.com/pshved/timeout
 TIMEOUT_CMD = '/home/marian/scripts/offeneskoeln/timeout.pl'
 
 STATS = {
@@ -61,6 +70,8 @@ STATS = {
     'attachments_erfolgreich': 0
 }
 
+# Auf False setzen, um die Thumbs-Generierung für
+# Debugging-Zwecke zu deaktivieren
 GENERATE = True
 
 
@@ -115,7 +126,7 @@ def subfolders_for_file_id(file_id):
 
 def generate_thumbs_for_file(file_id, source_file, size):
     """
-    Generiert Thumbnils fuer eine bestimmte Source-Datei
+    Generiert Thumbnails fuer eine bestimmte Source-Datei
     und eine bestimmte Groesse
     """
     #print source_file
