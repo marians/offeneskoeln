@@ -13,6 +13,7 @@ Abhängigkeiten:
 TODO:
 - Prüfen, ob Dokument neuer ist als Thumbnail und ggf. Thumb neu produzieren.
 - Nur bei bestimmten Dateiendungen Thumbnail erzeugen
+- Prüfen, ob die Thumbnails für alle Seiten vorhanden sind. Es können einzelne fehlen.
 """
 
 """
