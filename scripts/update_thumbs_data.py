@@ -10,6 +10,9 @@ TODO:
 - Check in umgekehrte Richtung: Prüfen, welche Einträge aus der
   Datenbank gelöscht werden können, weil die Thumbnail-Datei nicht
   mehr existiert.
+- Es sollte einen beschleunigten Modus geben, in dem nur Dateien mit
+  Änderungsdatum in einem bestimmten Zeitraum erfasst werden. Dafür
+  z.B. Kommandozeilen-Parameter "--maxage 30" für 30 Tage
 """
 
 """
@@ -39,8 +42,10 @@ entstanden.
 import config
 import os
 import re
+import sys
 import Image
 import MySQLdb
+from optparse import OptionParser
 
 
 def find_thumbs(thumbs_folder):
@@ -69,14 +74,19 @@ def write_to_db(file_id, filename, path):
     Schreibt einen Thumbnail-Eintrag in die Datenbank
     """
     global cursor
-    im = Image.open(path)
+    try:
+        im = Image.open(path)
+    except IOError:
+        sys.stderr.write("ERROR: Unreadable file " + path + "\n")
+        return
     im.size[0], im.size[1]
     # get page number
     page = 0
     m = re.match(r'[0-9]+\-[0-9]+\-([0-9]+)\.[a-z]+', filename)
     if m is not None:
         page = m.group(1)
-    print file_id, filename, im.size[0], im.size[1], page
+    if options.verbose:
+        print file_id, filename, im.size[0], im.size[1], page
     sql = """INSERT INTO """ + config.DB_THUMBS_TABLE + """
         (attachment_id, filename, width, height, page) VALUES
         (%s, %s, %s, %s, %s)
@@ -85,6 +95,9 @@ def write_to_db(file_id, filename, path):
 
 
 if __name__ == '__main__':
+    parser = OptionParser()
+    parser.add_option("-v", action="store_true", dest="verbose", default=False)
+    (options, args) = parser.parse_args()
     conn = MySQLdb.connect(host=config.DB_HOST, user=config.DB_USER, passwd=config.DB_PASS, db=config.DB_NAME)
     cursor = conn.cursor(MySQLdb.cursors.DictCursor)
     find_thumbs(config.THUMBS_PATH)
