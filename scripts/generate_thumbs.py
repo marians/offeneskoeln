@@ -62,6 +62,8 @@ def generate_all_thumbs(attachments_folder, thumbs_folder):
             file_id = get_id_from_file(fname)
             if file_id is None:
                 continue
+            if get_file_suffix(fname) not in config.THUMBNAILS_VALID_TYPES:
+                continue
             # Teste, ob Thumbnail schon existiert
             for size in config.THUMBNAILS_SIZES:
                 if thumb_exists(file_id, size):
@@ -80,6 +82,11 @@ def get_id_from_file(filename):
     m = re.match(r'[a-z]*([0-9]+)\.[a-z]+', filename)
     if m is not None:
         return m.group(1)
+
+
+def get_file_suffix(filename):
+    """Return suffix of file (part after last period)"""
+    return filename.split('.')[-1]
 
 
 def thumb_exists(file_id, size):
