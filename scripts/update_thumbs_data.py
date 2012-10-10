@@ -7,9 +7,6 @@ Schreibt Daten über Attachment-Thumbnails in die Datenbank
 Für jede existierende Thumbnail-Datei wird ein Eintrag vorgenommen.
 
 TODO:
-- Check in umgekehrte Richtung: Prüfen, welche Einträge aus der
-  Datenbank gelöscht werden können, weil die Thumbnail-Datei nicht
-  mehr existiert.
 - Es sollte einen beschleunigten Modus geben, in dem nur Dateien mit
   Änderungsdatum in einem bestimmten Zeitraum erfasst werden. Dafür
   z.B. Kommandozeilen-Parameter "--maxage 30" für 30 Tage
@@ -56,8 +53,37 @@ def find_thumbs(thumbs_folder):
         for fname in files:
             file_id = get_id_from_file(fname)
             if file_id is not None:
-                path = root + '/' + fname
+                path = root + os.sep + fname
                 write_to_db(file_id, fname, path)
+
+
+def check_database():
+    """
+    Prüft alle Einträge in der DB-Tabelle, ob die
+    entsprechenden Dateien vorhanden sind
+    """
+    sql = "SELECT attachment_id, filename FROM %s" % config.DB_THUMBS_TABLE
+    try:
+        cursor.execute(sql)
+    except MySQLdb.Error, e:
+        sys.stderr.write("Error %d: %s\n" % (e.args[0], e.args[1]))
+        return
+    while (1):
+        row = cursor.fetchone()
+        if row == None:
+            break
+        path = (config.THUMBS_PATH + os.sep + subfolders_for_file_id(str(row['attachment_id'])) +
+            os.sep + row['filename'])
+        if not os.path.exists(path):
+            if options.verbose:
+                print "Thumbnail does not exist: " + path
+            remove = 'DELETE FROM %s WHERE filename="%s"' % (config.DB_THUMBS_TABLE, row['filename'])
+            cursor.execute(remove)
+
+
+def subfolders_for_file_id(file_id):
+    """Generates sub path like 1/2 based on file id"""
+    return file_id[-1] + os.sep + file_id[-2]
 
 
 def get_id_from_file(filename):
@@ -96,8 +122,14 @@ def write_to_db(file_id, filename, path):
 
 if __name__ == '__main__':
     parser = OptionParser()
+    # Kommandozeilen-Optionen
     parser.add_option("-v", action="store_true", dest="verbose", default=False)
     (options, args) = parser.parse_args()
     conn = MySQLdb.connect(host=config.DB_HOST, user=config.DB_USER, passwd=config.DB_PASS, db=config.DB_NAME)
     cursor = conn.cursor(MySQLdb.cursors.DictCursor)
+    if options.verbose:
+        print "Checking for orphaned database entries..."
+    check_database()
+    if options.verbose:
+        print "Checking for new thumbnail files..."
     find_thumbs(config.THUMBS_PATH)
