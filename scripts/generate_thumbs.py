@@ -44,26 +44,6 @@ import re
 import sys
 import subprocess
 
-# Bei diesen Attachment-Endungen werden Thumbs generiert:
-VALID_TYPES = ['jpg', 'pdf', 'tif', 'bmp', 'png', 'gif']
-
-# Diese Größen (Höhe) werden generiert:
-SIZES = [300, 800, 150]
-
-# Datei-Endung der generierten Thumbnail-Dateien
-THUMB_SUFFIX = 'jpg'
-
-# Maximaler Arbeitsspeicherbedarf des Sub-Prozesses in Byte
-MEMORY_LIMIT = 100000
-
-# Maximale erlaubte Laufzeit des Sub-Prozesses in Sekunden
-CPU_TIME_LIMIT = 60
-
-# Pfad zum ImageMagick convert Tool
-CONVERT_CMD = '/usr/bin/convert'
-
-# Pfad zum Timeout-Script
-TIMEOUT_CMD = '/home/marian/scripts/offeneskoeln/timeout.pl'
 
 STATS = {
     'attachments_ohne_thumbnails_vorher': 0,
@@ -83,7 +63,7 @@ def generate_all_thumbs(attachments_folder, thumbs_folder):
             if file_id is None:
                 continue
             # Teste, ob Thumbnail schon existiert
-            for size in SIZES:
+            for size in config.THUMBNAILS_SIZES:
                 if thumb_exists(file_id, size):
                     continue
                 STATS['attachments_ohne_thumbnails_vorher'] += 1
@@ -106,12 +86,12 @@ def thumb_exists(file_id, size):
     """checks if thumbnail for given file id and size already exists"""
     base = config.THUMBS_PATH + '/' + subfolders_for_file_id(file_id)
     # without page number (single page files)
-    path = base + '/' + file_id + '-' + str(size) + '.' + THUMB_SUFFIX
+    path = base + '/' + file_id + '-' + str(size) + '.' + config.THUMBNAILS_SUFFIX
     #print "Checking for", path
     if not os.path.isfile(path):
         # first variant not found. Now check for second variant.
         # with page number (multi page files) - checking only first (0)
-        path = base + '/' + file_id + '-' + str(size) + '-0.' + THUMB_SUFFIX
+        path = base + '/' + file_id + '-' + str(size) + '-0.' + config.THUMBNAILS_SUFFIX
         #print "Checking for", path
         if not os.path.isfile(path):
             # Both variants not found
@@ -137,9 +117,9 @@ def generate_thumbs_for_file(file_id, source_file, size):
         except:
             print >> sys.stderr, "Could not create directory " + config.THUMBS_PATH + '/' + subpath
             sys.exit(1)
-    dest_file = config.THUMBS_PATH + '/' + subpath + '/' + file_id + '-' + str(size) + '.' + THUMB_SUFFIX
+    dest_file = config.THUMBS_PATH + '/' + subpath + '/' + file_id + '-' + str(size) + '.' + config.THUMBNAILS_SUFFIX
     print "Creating", size, dest_file
-    cmd = "%s -t %d -m %d %s -thumbnail x%d %s %s" % (TIMEOUT_CMD, CPU_TIME_LIMIT, MEMORY_LIMIT, CONVERT_CMD, size, source_file, dest_file)
+    cmd = "%s -t %d -m %d %s -thumbnail x%d %s %s" % (TIMEOUT_CMD, config.THUMBNAILS_CPU_TIME_LIMIT, config.THUMBNAILS_MEMORY_LIMIT, CONVERT_CMD, size, source_file, dest_file)
     output, error = subprocess.Popen(
         cmd.split(' '), stdout=subprocess.PIPE,
         stderr=subprocess.PIPE).communicate()

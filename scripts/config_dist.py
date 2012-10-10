@@ -50,8 +50,30 @@ DB_USER = 'offeneskoeln'
 DB_PASS = ''
 DB_NAME = 'offeneskoeln'
 
-# Tabelle für Thumbnail-Informationen
+# Datenbank: Name der Tabelle für Thumbnail-Informationen
 DB_THUMBS_TABLE = 'attachment_thumbnails'
 
 # Straßenverzeichnis (Liste aller bekannten Straßennamen)
+# TODO: Relativ zu konfigurierbarem Verzeichnis
 STREETS_FILE = '../data/strassen.txt'
+
+# Bei diesen Attachment-Endungen werden Thumbs generiert:
+THUMBNAILS_VALID_TYPES = ['jpg', 'pdf', 'tif', 'bmp', 'png', 'gif']
+
+# Diese Größen (Höhe) werden generiert:
+THUMBNAILS_SIZES = [300, 800, 150]
+
+# Datei-Endung der generierten Thumbnail-Dateien
+THUMBNAILS_SUFFIX = 'jpg'
+
+# Maximaler Arbeitsspeicherbedarf des Sub-Prozesses in Byte
+THUMBNAILS_MEMORY_LIMIT = 100000
+
+# Maximale erlaubte Laufzeit des Sub-Prozesses in Sekunden
+THUMBNAILS_CPU_TIME_LIMIT = 60
+
+# Pfad zum ImageMagick convert Tool
+CONVERT_CMD = '/usr/bin/convert'
+
+# Pfad zum Timeout-Script
+TIMEOUT_CMD = '/home/marian/scripts/offeneskoeln/timeout.pl'
