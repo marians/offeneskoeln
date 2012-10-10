@@ -329,10 +329,10 @@ class ApiSession:
         """
         url_params = web.input(lat=None, lon=None, location_entry=None)
         if url_params.lat is not None and url_params.lon is not None:
-            if ('lat' not in session.location
-                or 'lon' not in session.location
-                or url_params.lat != session.location['lat']
-                or url_params.lon != session.location['lon']):
+            if ('lat' not in session.location or
+                'lon' not in session.location or
+                url_params.lat != session.location['lat'] or
+                url_params.lon != session.location['lon']):
                 session.location['lat'] = url_params.lat
                 session.location['lon'] = url_params.lon
                 reverse_geo = placefinder_reverse_geocode(url_params.lat,
