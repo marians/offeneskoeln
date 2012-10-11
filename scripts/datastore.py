@@ -37,7 +37,7 @@ class DataStore:
             self.conn = MySQLdb.connect(host=host, user=user, passwd=password, db=dbname)
             self.cursor = self.conn.cursor(MySQLdb.cursors.DictCursor)
             self.cursor.execute("SET NAMES 'utf8'")
-            self.cursor.execute("SET CHARACTER SET 'utf8'")
+            self.cursor.execute("SET CHARACTER SET utf8")
         except MySQLdb.Error, e:
             print "Error %d: %s" % (e.args[0], e.args[1])
             sys.exit(1)
