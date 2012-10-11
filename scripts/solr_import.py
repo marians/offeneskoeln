@@ -364,7 +364,7 @@ def import_doc(reference, streets, verbose=False):
 
 if __name__ == '__main__':
     s = solr.SolrConnection(config.SOLR_URL)
-    db = DataStore(config.DBNAME, config.DBHOST, config.DBUSER, config.DBPASS)
+    db = DataStore(config.DB_NAME, config.DB_HOST, config.DB_USER, config.DB_PASS)
     parser = OptionParser()
     parser.add_option("-s", "--sample", dest="sample", default=1,
                   help="z.B. die Zahl 10 um nur jedes zehnte Dokument zu importieren. Beschleunigt den Import beim Entwickeln.")
