@@ -53,9 +53,11 @@ DB_NAME = 'offeneskoeln'
 # Datenbank: Name der Tabelle für Thumbnail-Informationen
 DB_THUMBS_TABLE = 'attachment_thumbnails'
 
+# Verzeichnis des offeneskoeln Clones
+OK_HOME_PATH = '/home/offeneskoeln/offeneskoeln'
+
 # Straßenverzeichnis (Liste aller bekannten Straßennamen)
-# TODO: Relativ zu konfigurierbarem Verzeichnis
-STREETS_FILE = '../data/strassen.txt'
+STREETS_FILE = OK_HOME_PATH + '/data/strassen.txt'
 
 # Bei diesen Attachment-Endungen werden Thumbs generiert:
 THUMBNAILS_VALID_TYPES = ['jpg', 'pdf', 'tif', 'bmp', 'png', 'gif']
