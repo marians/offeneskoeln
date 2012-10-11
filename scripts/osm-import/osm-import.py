@@ -66,7 +66,7 @@ class StreetCollector(object):
 
 if __name__ == '__main__':
     try:
-        conn = MySQLdb.connect(host=config.DBHOST, user=config.DBUSER, passwd=config.DBPASS, db=config.DBNAME)
+        conn = MySQLdb.connect(host=config.DB_HOST, user=config.DB_USER, passwd=config.DB_PASS, db=config.DB_NAME)
         cursor = conn.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SET NAMES 'utf8'")
         cursor.execute("SET CHARACTER SET 'utf8'")
