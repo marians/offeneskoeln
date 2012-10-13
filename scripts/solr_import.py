@@ -179,8 +179,8 @@ def normalize_doctype(dtype):
         'FDP Antrag nach § 3': 'Antrag',
         'Die Linke. Antrag nach § 3': 'Antrag',
         'Pro Köln Antrag nach § 3': 'Antrag',
-        'Antrag nach § 3 BV1 (Die Linke)': 'Antrag'
-
+        'Antrag nach § 3 BV1 (Die Linke)': 'Antrag',
+        'CDU Anfrage nach § 4': 'Anfrage'
     }
     if dtype in mapping:
         return mapping[dtype]
