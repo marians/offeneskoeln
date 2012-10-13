@@ -88,7 +88,7 @@ class TestWebapp(unittest.TestCase):
         self.assertTrue('agendaitem_result' in con[0])
         # test attachments
         self.assertNotEqual(att, None)
-        self.assertGreater(len(att), 0)
+        self.assertTrue(len(att) > 0)
         self.assertTrue('last_modified' in att[0])
         self.assertNotEqual(att[0]['numpages'], None)
         self.assertNotEqual(att[0]['url'], None)
@@ -101,7 +101,7 @@ class TestWebapp(unittest.TestCase):
         # test attachment thumbnails
         self.assertTrue('thumbnails' in att[0])
         self.assertNotEqual(thumb, None)
-        self.assertGreater(len(thumb), 0)
+        self.assertTrue(len(thumb) > 0)
         self.assertNotEqual(thumb[0]['url'], None)
         self.assertNotEqual(thumb[0]['width'], None)
         self.assertNotEqual(thumb[0]['height'], None)
