@@ -50,8 +50,13 @@ class TestSolr(unittest.TestCase):
             reference="blahblub")
         self.connection.commit()
 
-    def test_add_ascii(self):
-        """Versuch, Dokument mit Nicht-ASCII-Zeichen anzulegen"""
+    def test_add_ascii1(self):
+        """Versuch 1, Dokument mit Nicht-ASCII-Zeichen anzulegen"""
+        self.assertRaises(UnicodeDecodeError, self.connection.add,
+            title="Schließung Köln")
+
+    def test_add_ascii2(self):
+        """Versuch 2, Dokument mit Nicht-ASCII-Zeichen anzulegen"""
         doc = {
             'reference': "nonasciitest",
             'importance': 1.0,
