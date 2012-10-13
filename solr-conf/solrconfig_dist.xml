@@ -647,7 +647,7 @@
 	<lst name="defaults">
 			<str name="echoParams">explicit</str>
 			<str name="defType">edismax</str>
-			<int name="rows">0</int>
+			<int name="rows">10</int>
 			<str name="wt">json</str>
 			<str name="fl">reference,score</str>
 			<str name="facet">true</str>
