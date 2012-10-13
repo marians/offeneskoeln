@@ -85,11 +85,11 @@ class TestWebapp(unittest.TestCase):
         self.assertNotEqual(con[0]['date'], None)
         self.assertNotEqual(con[0]['committee_name'], None)
         self.assertNotEqual(con[0]['session_description'], None)
-        self.assertIn('agendaitem_result', con[0])
+        self.assertTrue('agendaitem_result' in con[0])
         # test attachments
         self.assertNotEqual(att)
         self.assertGreater(len(att), 0)
-        self.assertIn('last_modified', att[0])
+        self.assertTrue('last_modified' in att[0])
         self.assertNotEqual(att[0]['numpages'], None)
         self.assertNotEqual(att[0]['url'], None)
         self.assertNotEqual(att[0]['filename'], None)
@@ -99,7 +99,7 @@ class TestWebapp(unittest.TestCase):
         self.assertNotEqual(att[0]['size'], None)
         self.assertIsNone(att[0]['exclusion'])
         # test attachment thumbnails
-        self.assertIn('thumbnails', att[0])
+        self.assertTrue('thumbnails' in att[0])
         self.assertNotEqual(thumb, None)
         self.assertGreater(len(thumb), 0)
         self.assertNotEqual(thumb[0]['url'], None)
@@ -111,13 +111,13 @@ class TestWebapp(unittest.TestCase):
         """Einfache Solr-Suche"""
         q = dispatch.solr_query(q='reference:"AN/0438/2010"')
         self.assertEqual(type(q), dict)
-        self.assertIn('status', q)
+        self.assertTrue('status' in q)
         self.assertEqual(q['status'], 0)
 
     def test_solr_query_2(self):
         q = dispatch.solr_query(q='straßenverkehr ampel', docs=10)
         self.assertEqual(type(q), dict)
-        self.assertIn('status', q)
+        self.assertTrue('status' in q)
         self.assertEqual(q['status'], 0)
 
 if __name__ == '__main__':
