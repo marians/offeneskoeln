@@ -61,7 +61,7 @@ class TestWebapp(unittest.TestCase):
         self.assertEqual(len(docs['2021/2011']), 1)
         self.assertNotEqual(docs['2021/2011'][0]['url'], None)
         self.assertEqual(docs['2021/2011'][0]['title'],
-            'Schließung Wachsfabrik Köln AN/0856/2011')
+            u'Schlie\xdfung Wachsfabrik K\xf6ln AN/0856/2011')
         self.assertEqual(docs['2021/2011'][0]['original_url'],
             'http://ratsinformation.stadt-koeln.de/ag0050.asp?__kagnr=28125')
         self.assertEqual(docs['2021/2011'][0]['date'], '2011-05-18')
