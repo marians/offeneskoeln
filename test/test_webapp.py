@@ -97,7 +97,7 @@ class TestWebapp(unittest.TestCase):
         self.assertNotEqual(att[0]['type'], None)
         self.assertNotEqual(att[0]['id'], None)
         self.assertNotEqual(att[0]['size'], None)
-        self.assertIsNone(att[0]['exclusion'])
+        self.assertEqual(att[0]['exclusion'], None)
         # test attachment thumbnails
         self.assertTrue('thumbnails' in att[0])
         self.assertNotEqual(thumb, None)
