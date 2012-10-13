@@ -87,7 +87,7 @@ class TestWebapp(unittest.TestCase):
         self.assertNotEqual(con[0]['session_description'], None)
         self.assertTrue('agendaitem_result' in con[0])
         # test attachments
-        self.assertNotEqual(att)
+        self.assertNotEqual(att, None)
         self.assertGreater(len(att), 0)
         self.assertTrue('last_modified' in att[0])
         self.assertNotEqual(att[0]['numpages'], None)
