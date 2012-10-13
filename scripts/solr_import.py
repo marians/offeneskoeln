@@ -171,6 +171,16 @@ def normalize_doctype(dtype):
         'Mitteilungsvorlage': 'Mitteilung',
         'Beschlussvorlage': 'Beschlussvorlage',
         'Dringlichkeitsvorlage': 'Dringlichkeitsvorlage',
+        'Anfrage nach § 4 BV2 (Grüne)': 'Anfrage',
+        'Anfrage nach § 4 BV6 (Grüne)': 'Anfrage',
+        'Pro Köln Anfrage nach § 4': 'Anfrage',
+        'CDU Antrag nach § 5': 'Antrag',
+        'Dringlichkeitsantrag BV6 (CDU)': 'Dringlichkeitsantrag',
+        'FDP Antrag nach § 3': 'Antrag',
+        'Die Linke. Antrag nach § 3': 'Antrag',
+        'Pro Köln Antrag nach § 3': 'Antrag',
+        'Antrag nach § 3 BV1 (Die Linke)': 'Antrag'
+
     }
     if dtype in mapping:
         return mapping[dtype]
