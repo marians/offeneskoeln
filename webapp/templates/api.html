@@ -157,7 +157,7 @@ $var additional_scripts: /static/js/map.js
             
             <dt><code>sort</code></dt>
             <dd>
-                <p>Bestimmt die Sortierung des Suchergebnisses. Wenn nicht gesetzt, wird der Standard in Abhängigkeit davon gesetzt, ob der Parameter <code>q</code> gesetzt ist oder nicht. Ist <code>q</code> gesetzt, dann ist die Standard-Sortierung <code>score desc</code>, was bedeutet &raquo;Sortierung nach Relevanz, absteigend&raquo;. Ist <code>q</code> <em>nicht</em> gesetzt, ist die Sortierung standardmäßig <code>datum desc</code> (nach Datum, neuste Dokumente zuerst). Die dritte mögliche Sortierung ist <code>datum asc</code> (nach Datum, älteste Dokumente zuerst).</p>
+                <p>Bestimmt die Sortierung des Suchergebnisses. Wenn nicht gesetzt, wird der Standard in Abhängigkeit davon gesetzt, ob der Parameter <code>q</code> gesetzt ist oder nicht. Ist <code>q</code> gesetzt, dann ist die Standard-Sortierung <code>score desc</code>, was bedeutet &raquo;Sortierung nach Relevanz, absteigend&raquo;. Ist <code>q</code> <em>nicht</em> gesetzt, ist die Sortierung standardmäßig <code>date desc</code> (nach Datum, neuste Dokumente zuerst). Die dritte mögliche Sortierung ist <code>date asc</code> (nach Datum, älteste Dokumente zuerst).</p>
                 
                 <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
             </dd>
@@ -477,16 +477,16 @@ $var additional_scripts: /static/js/map.js
             <dt><code>response &rarr; facets &rarr; schlagwort</code></dt>
             <dd><p>Zeigt an, welche Werte der Dokumenten-Eigenschaft <code>schlagwort</code> wie häufig im aktuellen Suchergebnis vorkommen. Die Eigenschaft <code>schlagwort</code> wird aus dem gesamten Volltext des jeweiligen Dokuments gebildet, wobei alle Schreibweisen auf Kleinschreibung reduziert und eine Vielzahl von Wörtern herausgefiltert werden.</p></dd>
 
-            <dt><code>response &rarr; facets &rarr; datum.*</code></dt>
-            <dd><p>Diese Facette ist eine Besonderheit, da sie auf der Dokumenten-Eigenschaft <code>datum</code> basiert und eine andere Datenstruktur besitzt, als Facetten, die auf Zeichenketten-Eigenschaften basieren. Ein weiterer Unterschied ist, dass hier auch Null-Werte ausgegeben werden und anzahl der Werte nicht limitiert ist, sondern immer den Zeitraum ab Oktober 2006 abdeckt, also seit der Veröffentlichung der ältesten Dokumente im Bestand.</p></dd>
+            <dt><code>response &rarr; facets &rarr; date.*</code></dt>
+            <dd><p>Diese Facette ist eine Besonderheit, da sie auf der Dokumenten-Eigenschaft <code>date</code> basiert und eine andere Datenstruktur besitzt, als Facetten, die auf Zeichenketten-Eigenschaften basieren. Ein weiterer Unterschied ist, dass hier auch Null-Werte ausgegeben werden und anzahl der Werte nicht limitiert ist, sondern immer den Zeitraum ab Oktober 2006 abdeckt, also seit der Veröffentlichung der ältesten Dokumente im Bestand.</p></dd>
 
-            <dt><code>response &rarr; facets &rarr; datum &rarr; start</code></dt>
+            <dt><code>response &rarr; facets &rarr; date &rarr; start</code></dt>
             <dd><p>Gibt den Startmonat des Zeitraums an, der von dieser Factte abgedeckt wird.</p></dd>
 
-            <dt><code>response &rarr; facets &rarr; datum &rarr; end</code></dt>
+            <dt><code>response &rarr; facets &rarr; date &rarr; end</code></dt>
             <dd><p>Gibt den Endmonat des Zeitraums an, der von dieser Factte abgedeckt wird. Dabei sollte es sich immer um den nächsten Monat, ausgehend vom aktuellen Datum, handeln.</p></dd>
 
-            <dt><code>response &rarr; facets &rarr; datum &rarr; count</code></dt>
+            <dt><code>response &rarr; facets &rarr; date &rarr; count</code></dt>
             <dd><p>Enthälte die Wertepaare mit monatlicher Auflösung.</p></dd>
 
         </dl>
