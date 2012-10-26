@@ -6,10 +6,9 @@ Schreibt Daten über Attachment-Thumbnails in die Datenbank
 
 Für jede existierende Thumbnail-Datei wird ein Eintrag vorgenommen.
 
-TODO:
-- Es sollte einen beschleunigten Modus geben, in dem nur Dateien mit
-  Änderungsdatum in einem bestimmten Zeitraum erfasst werden. Dafür
-  z.B. Kommandozeilen-Parameter "--maxage 30" für 30 Tage
+- Mit -v wird der versbose-Mode eingeschaltet
+- Mit -a bzw --maxage <int> kann das maximale Dateialter in Tagen
+  angegeben werden. Ältere Dateien werden ignoriert.
 """
 
 """
@@ -42,10 +41,11 @@ import re
 import sys
 import Image
 import MySQLdb
+import time
 from optparse import OptionParser
 
 
-def find_thumbs(thumbs_folder):
+def find_thumbs(thumbs_folder, maxage=-1):
     """
     Durchsucht durch den Thumbnail-Ordner
     """
@@ -54,13 +54,24 @@ def find_thumbs(thumbs_folder):
             file_id = get_id_from_file(fname)
             if file_id is not None:
                 path = root + os.sep + fname
+                if maxage > -1:
+                    age = get_file_age(path)
+                    if age > maxage:
+                        continue
                 write_to_db(file_id, fname, path)
+
+
+def get_file_age(path):
+    st = os.stat(path)
+    age_sec = time.time() - st.st_mtime
+    return float(age_sec) / 86400.0
 
 
 def check_database():
     """
     Prüft alle Einträge in der DB-Tabelle, ob die
-    entsprechenden Dateien vorhanden sind
+    entsprechenden Thumbnail-Dateien vorhanden sind
+    und entfernt bei Bedarf den Eintrag.
     """
     sql = "SELECT attachment_id, filename FROM %s" % config.DB_THUMBS_TABLE
     try:
@@ -97,7 +108,8 @@ def get_id_from_file(filename):
 
 def write_to_db(file_id, filename, path):
     """
-    Schreibt einen Thumbnail-Eintrag in die Datenbank
+    Schreibt zu einer Datei einen Thumbnail-Eintrag in die Datenbank.
+    Wenn der Eintrag schon existiert, wird er aktualisiert.
     """
     global cursor
     try:
@@ -112,24 +124,29 @@ def write_to_db(file_id, filename, path):
     if m is not None:
         page = m.group(1)
     if options.verbose:
-        print file_id, filename, im.size[0], im.size[1], page
+        print filename, im.size[0], im.size[1], page
     sql = """INSERT INTO """ + config.DB_THUMBS_TABLE + """
         (attachment_id, filename, width, height, page) VALUES
         (%s, %s, %s, %s, %s)
         ON DUPLICATE KEY UPDATE filename=%s, width=%s, height=%s, page=%s"""
-    cursor.execute(sql, (file_id, filename, im.size[0], im.size[1], page, filename, im.size[0], im.size[1], page))
+    cursor.execute(sql, (file_id, filename, im.size[0], im.size[1],
+        page, filename, im.size[0], im.size[1], page))
 
 
 if __name__ == '__main__':
     parser = OptionParser()
     # Kommandozeilen-Optionen
-    parser.add_option("-v", action="store_true", dest="verbose", default=False)
+    parser.add_option("-v", action="store_true",
+        dest="verbose", default=False)
+    parser.add_option("-a", "--maxage", dest="maxage",
+        help="add entries for files only if newer than MAXAGE days", metavar="MAXAGE", default="-1")
     (options, args) = parser.parse_args()
-    conn = MySQLdb.connect(host=config.DB_HOST, user=config.DB_USER, passwd=config.DB_PASS, db=config.DB_NAME)
+    conn = MySQLdb.connect(host=config.DB_HOST, user=config.DB_USER,
+        passwd=config.DB_PASS, db=config.DB_NAME)
     cursor = conn.cursor(MySQLdb.cursors.DictCursor)
     if options.verbose:
         print "Checking for orphaned database entries..."
     check_database()
     if options.verbose:
         print "Checking for new thumbnail files..."
-    find_thumbs(config.THUMBS_PATH)
+    find_thumbs(config.THUMBS_PATH, int(options.maxage))
