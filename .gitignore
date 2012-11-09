@@ -5,3 +5,4 @@ venv/
 webapp/static/thumbs
 webapp/static/tiles
 webapp/attachments
+webapp/daten
