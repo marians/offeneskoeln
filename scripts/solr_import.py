@@ -133,60 +133,78 @@ def normalize_doctype(dtype):
     - Dringlichkeitsantrag
     - Mitteilung
     """
-    mapping = {
-        'Antrag': 'Antrag',
-        'Stellungnahme zu e. Antrag (Ausschuss)': 'Mitteilung',
-        'Antrag nach § 3 der GeschO des Rates': 'Antrag',
-        'Dringlichkeitsvorlage Rat': 'Dringlichkeitsvorlage',
-        'Dringlichkeitsvorlage Bezirksvertretung': 'Dringlichkeitsvorlage',
-        'Stellungnahme zu einem Antrag (Rat)': 'Mitteilung',
-        'Dringlichkeitsvorlage Hauptausschuss': 'Dringlichkeitsvorlage',
-        'Beantwortung einer Anfrage (Rat)': 'Mitteilung',
-        'Antrag auf eine Aktuelle Stunde nach § 5': 'Antrag',
-        'Stellungnahme zu einem Antrag (BV)': 'Mitteilung',
-        'Beantwortung einer mündl. Anfrage (BV)': 'Mitteilung',
-        'Antrag nach § 12 (Dringlichkeitsantrag)': 'Dringlichkeitsantrag',
-        'Dringlichkeitsvorlage BV': 'Dringlichkeitsvorlage',
-        'Beantwortung einer Anfrage (Ausschuss)': 'Mitteilung',
-        'Beantwortung e. mündl. Anfrage (Auss.)': 'Mitteilung',
-        'Beantwortung einer Anfrage (BV)': 'Mitteilung',
-        'Dringlichkeitsvorlage Ausschuss': 'Dringlichkeitsvorlage',
-        'Dringlichkeitsvorlage Hauptauss. /Rat A': 'Dringlichkeitsvorlage',
-        'Anfrage nach § 4': 'Anfrage',
-        'Beschlussvorlage Rat bzw. Hauptausschuss': 'Beschlussvorlage',
-        'Antrag nach § 3': 'Antrag',
-        'Anfrage nach § 4 der GeschO des Rates': 'Anfrage',
-        'Stellungnahme/Beantwortung - Rat': 'Mitteilung',
-        'Mitteilung BV': 'Mitteilung',
-        'Antrag nach § 3 der GeschO des Rates': 'Antrag',
-        'Mitteilung Ausschuss': 'Mitteilung',
-        'Beschlussvorlage Bezirksvertretung': 'Beschlussvorlage',
-        'Beschlussvorlage Rat / Hauptausschuss': 'Beschlussvorlage',
-        'Beschlussvorlage Ausschuss': 'Beschlussvorlage',
-        'Mitteilung/Beantwortung - BV': 'Mitteilung',
-        'Mitteilung/Beantwortung - Ausschuss': 'Mitteilung',
-        'Gem. Anfrage nach § 4 (SPD)': 'Anfrage',
-        'Gem. Änderungsantrag (SPD)': 'Antrag',
-        'SPD Anfrage nach § 4': 'Anfrage',
-        'Mitteilungsvorlage': 'Mitteilung',
-        'Beschlussvorlage': 'Beschlussvorlage',
-        'Dringlichkeitsvorlage': 'Dringlichkeitsvorlage',
-        'Anfrage nach § 4 BV2 (Grüne)': 'Anfrage',
-        'Anfrage nach § 4 BV6 (Grüne)': 'Anfrage',
-        'Pro Köln Anfrage nach § 4': 'Anfrage',
-        'CDU Antrag nach § 5': 'Antrag',
-        'Dringlichkeitsantrag BV6 (CDU)': 'Dringlichkeitsantrag',
-        'FDP Antrag nach § 3': 'Antrag',
-        'Die Linke. Antrag nach § 3': 'Antrag',
-        'Pro Köln Antrag nach § 3': 'Antrag',
-        'Antrag nach § 3 BV1 (Die Linke)': 'Antrag',
-        'CDU Anfrage nach § 4': 'Anfrage'
-    }
-    if dtype in mapping:
-        return mapping[dtype]
-    else:
-        print >> sys.stderr, "Vorlagentyp nicht vorhanden:", dtype
-        return ''
+
+    # Aus nachstehender Logik sollten sich unter anderem die folgenden
+    # Zuweisungen ergeben:
+    #
+    # Anfrage nach § 4 -> Anfrage
+    # Anfrage nach § 4 BV2 (Grüne) -> Anfrage
+    # Anfrage nach § 4 BV6 (Grüne) -> Anfrage
+    # Anfrage nach § 4 der GeschO des Rates -> Anfrage
+    # Antrag -> Antrag
+    # Antrag auf eine Aktuelle Stunde nach § 5 -> Antrag
+    # Antrag nach § 12 (Dringlichkeitsantrag) -> Dringlichkeitsantrag
+    # Antrag nach § 3 -> Antrag
+    # Antrag nach § 3 BV1 (Die Linke) -> Antrag
+    # Antrag nach § 3 der GeschO des Rates -> Antrag
+    # Antrag nach § 3 der GeschO des Rates -> Antrag
+    # Beantwortung e. mündl. Anfrage (Auss.) -> Mitteilung
+    # Beantwortung einer Anfrage (Ausschuss) -> Mitteilung
+    # Beantwortung einer Anfrage (BV) -> Mitteilung
+    # Beantwortung einer Anfrage (Rat) -> Mitteilung
+    # Beantwortung einer mündl. Anfrage (BV) -> Mitteilung
+    # Beschlussvorlage -> Beschlussvorlage
+    # Beschlussvorlage Ausschuss -> Beschlussvorlage
+    # Beschlussvorlage Bezirksvertretung -> Beschlussvorlage
+    # Beschlussvorlage Rat / Hauptausschuss -> Beschlussvorlage
+    # Beschlussvorlage Rat bzw. Hauptausschuss -> Beschlussvorlage
+    # CDU Anfrage nach § 4 -> Anfrage
+    # CDU Antrag nach § 5 -> Antrag
+    # Die Linke. Antrag nach § 3 -> Antrag
+    # Dringlichkeitsantrag BV6 (CDU) -> Dringlichkeitsantrag
+    # Dringlichkeitsvorlage -> Dringlichkeitsvorlage
+    # Dringlichkeitsvorlage Ausschuss -> Dringlichkeitsvorlage
+    # Dringlichkeitsvorlage Bezirksvertretung -> Dringlichkeitsvorlage
+    # Dringlichkeitsvorlage BV -> Dringlichkeitsvorlage
+    # Dringlichkeitsvorlage Hauptauss. /Rat A -> Dringlichkeitsvorlage
+    # Dringlichkeitsvorlage Hauptausschuss -> Dringlichkeitsvorlage
+    # Dringlichkeitsvorlage Rat -> Dringlichkeitsvorlage
+    # FDP Antrag nach § 3 -> Antrag
+    # Gem. Anfrage nach § 4 (SPD) -> Anfrage
+    # Gem. Änderungsantrag (SPD) -> Antrag
+    # Mitteilung Ausschuss -> Mitteilung
+    # Mitteilung BV -> Mitteilung
+    # Mitteilung/Beantwortung - Ausschuss -> Mitteilung
+    # Mitteilung/Beantwortung - BV -> Mitteilung
+    # Mitteilungsvorlage -> Mitteilung
+    # Pro Köln Anfrage nach § 4 -> Anfrage
+    # Pro Köln Antrag nach § 3 -> Antrag
+    # SPD Anfrage nach § 4 -> Anfrage
+    # Stellungnahme zu e. Antrag (Ausschuss) -> Mitteilung
+    # Stellungnahme zu einem Antrag (BV) -> Mitteilung
+    # Stellungnahme zu einem Antrag (Rat) -> Mitteilung
+    # Stellungnahme/Beantwortung - Rat -> Mitteilung
+
+    dt = dtype.lower()
+    if 'stellungnahme' in dt:
+        return 'Mitteilung'
+    if 'beantwortung' in dt:
+        return 'Mitteilung'
+    if 'mitteilung' in dt:
+        return 'Mitteilung'
+    if 'dringlichkeitsantrag' in dt:
+        return 'Dringlichkeitsantrag'
+    if 'dringlichkeitsvorlage' in dt:
+        return 'Dringlichkeitsvorlage'
+    if 'beschlussvorlage' in dt:
+        return 'Beschlussvorlage'
+    if 'antrag' in dt:
+        return 'Antrag'
+    if 'anfrage' in dt:
+        return 'Anfrage'
+
+    print >> sys.stderr, "Vorlagentyp nicht auflösbar:", dtype
+    return ''
 
 
 def positions_for_streetnames(names):
