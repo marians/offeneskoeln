@@ -132,58 +132,58 @@ def normalize_doctype(dtype):
     - Dringlichkeitsvorlage
     - Dringlichkeitsantrag
     - Mitteilung
-    """
 
-    # Aus nachstehender Logik sollten sich unter anderem die folgenden
-    # Zuweisungen ergeben:
-    #
-    # Anfrage nach § 4 -> Anfrage
-    # Anfrage nach § 4 BV2 (Grüne) -> Anfrage
-    # Anfrage nach § 4 BV6 (Grüne) -> Anfrage
-    # Anfrage nach § 4 der GeschO des Rates -> Anfrage
-    # Antrag -> Antrag
-    # Antrag auf eine Aktuelle Stunde nach § 5 -> Antrag
-    # Antrag nach § 12 (Dringlichkeitsantrag) -> Dringlichkeitsantrag
-    # Antrag nach § 3 -> Antrag
-    # Antrag nach § 3 BV1 (Die Linke) -> Antrag
-    # Antrag nach § 3 der GeschO des Rates -> Antrag
-    # Antrag nach § 3 der GeschO des Rates -> Antrag
-    # Beantwortung e. mündl. Anfrage (Auss.) -> Mitteilung
-    # Beantwortung einer Anfrage (Ausschuss) -> Mitteilung
-    # Beantwortung einer Anfrage (BV) -> Mitteilung
-    # Beantwortung einer Anfrage (Rat) -> Mitteilung
-    # Beantwortung einer mündl. Anfrage (BV) -> Mitteilung
-    # Beschlussvorlage -> Beschlussvorlage
-    # Beschlussvorlage Ausschuss -> Beschlussvorlage
-    # Beschlussvorlage Bezirksvertretung -> Beschlussvorlage
-    # Beschlussvorlage Rat / Hauptausschuss -> Beschlussvorlage
-    # Beschlussvorlage Rat bzw. Hauptausschuss -> Beschlussvorlage
-    # CDU Anfrage nach § 4 -> Anfrage
-    # CDU Antrag nach § 5 -> Antrag
-    # Die Linke. Antrag nach § 3 -> Antrag
-    # Dringlichkeitsantrag BV6 (CDU) -> Dringlichkeitsantrag
-    # Dringlichkeitsvorlage -> Dringlichkeitsvorlage
-    # Dringlichkeitsvorlage Ausschuss -> Dringlichkeitsvorlage
-    # Dringlichkeitsvorlage Bezirksvertretung -> Dringlichkeitsvorlage
-    # Dringlichkeitsvorlage BV -> Dringlichkeitsvorlage
-    # Dringlichkeitsvorlage Hauptauss. /Rat A -> Dringlichkeitsvorlage
-    # Dringlichkeitsvorlage Hauptausschuss -> Dringlichkeitsvorlage
-    # Dringlichkeitsvorlage Rat -> Dringlichkeitsvorlage
-    # FDP Antrag nach § 3 -> Antrag
-    # Gem. Anfrage nach § 4 (SPD) -> Anfrage
-    # Gem. Änderungsantrag (SPD) -> Antrag
-    # Mitteilung Ausschuss -> Mitteilung
-    # Mitteilung BV -> Mitteilung
-    # Mitteilung/Beantwortung - Ausschuss -> Mitteilung
-    # Mitteilung/Beantwortung - BV -> Mitteilung
-    # Mitteilungsvorlage -> Mitteilung
-    # Pro Köln Anfrage nach § 4 -> Anfrage
-    # Pro Köln Antrag nach § 3 -> Antrag
-    # SPD Anfrage nach § 4 -> Anfrage
-    # Stellungnahme zu e. Antrag (Ausschuss) -> Mitteilung
-    # Stellungnahme zu einem Antrag (BV) -> Mitteilung
-    # Stellungnahme zu einem Antrag (Rat) -> Mitteilung
-    # Stellungnahme/Beantwortung - Rat -> Mitteilung
+    Es sollten sich unter anderem die folgenden
+    Zuweisungen ergeben:
+
+    Anfrage nach § 4 -> Anfrage
+    Anfrage nach § 4 BV2 (Grüne) -> Anfrage
+    Anfrage nach § 4 BV6 (Grüne) -> Anfrage
+    Anfrage nach § 4 der GeschO des Rates -> Anfrage
+    Antrag -> Antrag
+    Antrag auf eine Aktuelle Stunde nach § 5 -> Antrag
+    Antrag nach § 12 (Dringlichkeitsantrag) -> Dringlichkeitsantrag
+    Antrag nach § 3 -> Antrag
+    Antrag nach § 3 BV1 (Die Linke) -> Antrag
+    Antrag nach § 3 der GeschO des Rates -> Antrag
+    Antrag nach § 3 der GeschO des Rates -> Antrag
+    Beantwortung e. mündl. Anfrage (Auss.) -> Mitteilung
+    Beantwortung einer Anfrage (Ausschuss) -> Mitteilung
+    Beantwortung einer Anfrage (BV) -> Mitteilung
+    Beantwortung einer Anfrage (Rat) -> Mitteilung
+    Beantwortung einer mündl. Anfrage (BV) -> Mitteilung
+    Beschlussvorlage -> Beschlussvorlage
+    Beschlussvorlage Ausschuss -> Beschlussvorlage
+    Beschlussvorlage Bezirksvertretung -> Beschlussvorlage
+    Beschlussvorlage Rat / Hauptausschuss -> Beschlussvorlage
+    Beschlussvorlage Rat bzw. Hauptausschuss -> Beschlussvorlage
+    CDU Anfrage nach § 4 -> Anfrage
+    CDU Antrag nach § 5 -> Antrag
+    Die Linke. Antrag nach § 3 -> Antrag
+    Dringlichkeitsantrag BV6 (CDU) -> Dringlichkeitsantrag
+    Dringlichkeitsvorlage -> Dringlichkeitsvorlage
+    Dringlichkeitsvorlage Ausschuss -> Dringlichkeitsvorlage
+    Dringlichkeitsvorlage Bezirksvertretung -> Dringlichkeitsvorlage
+    Dringlichkeitsvorlage BV -> Dringlichkeitsvorlage
+    Dringlichkeitsvorlage Hauptauss. /Rat A -> Dringlichkeitsvorlage
+    Dringlichkeitsvorlage Hauptausschuss -> Dringlichkeitsvorlage
+    Dringlichkeitsvorlage Rat -> Dringlichkeitsvorlage
+    FDP Antrag nach § 3 -> Antrag
+    Gem. Anfrage nach § 4 (SPD) -> Anfrage
+    Gem. Änderungsantrag (SPD) -> Antrag
+    Mitteilung Ausschuss -> Mitteilung
+    Mitteilung BV -> Mitteilung
+    Mitteilung/Beantwortung - Ausschuss -> Mitteilung
+    Mitteilung/Beantwortung - BV -> Mitteilung
+    Mitteilungsvorlage -> Mitteilung
+    Pro Köln Anfrage nach § 4 -> Anfrage
+    Pro Köln Antrag nach § 3 -> Antrag
+    SPD Anfrage nach § 4 -> Anfrage
+    Stellungnahme zu e. Antrag (Ausschuss) -> Mitteilung
+    Stellungnahme zu einem Antrag (BV) -> Mitteilung
+    Stellungnahme zu einem Antrag (Rat) -> Mitteilung
+    Stellungnahme/Beantwortung - Rat -> Mitteilung
+    """
 
     dt = dtype.lower()
     if 'stellungnahme' in dt:
