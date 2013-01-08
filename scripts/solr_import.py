@@ -294,6 +294,8 @@ def import_doc(reference, streets, verbose=False):
     """
     global s
     global db
+    if reference is None:
+        return None
     documents = db.get_documents(reference=reference)
     if verbose:
         print "%d Dokument(e): %s (id=%d)" % (len(documents), documents[0]['title'], documents[0]['id'])
