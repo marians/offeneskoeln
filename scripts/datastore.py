@@ -107,10 +107,14 @@ class DataStore:
         der Datenbank zurück.
         """
         result = {}
-        rows = self.get_rows('SELECT DISTINCT submission_identifier AS reference FROM submissions')
+        rows = self.get_rows('''SELECT DISTINCT submission_identifier AS reference
+            FROM submissions
+            WHERE submission_identifier IS NOT NULL''')
         for row in rows:
             result[row['reference']] = True
-        rows = self.get_rows('SELECT DISTINCT request_identifier AS reference FROM requests')
+        rows = self.get_rows('''SELECT DISTINCT request_identifier AS reference
+            FROM requests
+            WHERE request_identifier IS NOT NULL''')
         for row in rows:
             result[row['reference']] = True
         return result.keys()
