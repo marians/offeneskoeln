@@ -24,3 +24,10 @@ Weitere Informationen findest Du im [https://github.com/marians/offeneskoeln/wik
 ###Lizenz
 
 Der Code steht unter einer MIT-artigen [Lizenz](https://github.com/marians/offeneskoeln/blob/master/LIZENZ.txt).
+
+### Versionen / Releases
+
+Das letzte Release ist mit "v1.0" getaggt. Nur bis zu diesem Tag ist die Funktion, wie hier auf der Website
+beschrieben, gewährleistet. Die späteren Commits bringen weitreichende Änderungen mit sich, die unter anderem
+eine andere Datenbank voraussetzen. Sobald das nächste Release ansteht, werden die Informatione hier dann 
+angepasst.
