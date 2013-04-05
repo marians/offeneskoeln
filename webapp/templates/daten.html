@@ -1,8 +1,9 @@
-$def with (filelist)
-$var title: Daten
-$var description: Hier kannst Du die Daten hinter offeneskoeln.de herunter laden. Open Data First!
-$var additional_scripts: /static/js/map.js
+{% extends "layout.html" %}
+{% block title %}Daten{% endblock %}
+{% block ogtitle %}Daten{% endblock %}
+{% block meta_description %}Hier kannst Du die Daten hinter offeneskoeln.de herunter laden. Open Data First!.{% endblock %}
 
+{% block content %}
 <div class="content top">
 
 	<h1>Daten</h1>
@@ -36,8 +37,9 @@ $var additional_scripts: /static/js/map.js
 		<p>Unsere Datenbank-Exporte enthalten alle Daten zu Sitzungen, Gremien, Tagesordnungen etc.</p>
 		
 		<ul>
-		$for file in filelist: 
-			<li><a href="$file['name']">$file['name']</a> ($file['size'] MB)</li>
+		{% for file in filelist %}
+			<li><a href="{{ file.name }}">{{ file.name }}</a> ({{ file.size }} MB)</li>
+		{% endfor %}
 		</ul>
 		
 		<p>Die Dateiendung <b>.sql.gz</b> steht für GZip-komprimierte SQL-Dateien, <b>.csv.gz</b> steht für GZip-kompromierte CSV-Dateien (Seperator: ;, Zeilentrenner: \n, Escape-Zeichen: \, Zeichensatz: UTF-8)</p>
@@ -53,3 +55,4 @@ $var additional_scripts: /static/js/map.js
 	
 	</div>
 </div>
+{% endblock %}
