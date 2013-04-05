@@ -2,16 +2,49 @@
 # encoding: utf-8
 
 """
-Generiert Thumbnails (Vorschaubilder) von allen Attachments im
-Attachments-Ordner, sofern möglich.
+Generiert Thumbnails (Vorschaubilder) von allen Datei-Anhängen in
+der Datenbank.
 
-Abhängigkeiten:
-- ImageMagick
-- timeout.pl - siehe https://github.com/pshved/timeout
+Datenstruktur in einem Dokument der collection "attachments":
 
+{
+    _id: ...,
+    thumbnails: {
+        800: [
+            {
+                page: 1,
+                width: 565,
+                height: 800
+            },
+            {
+                page: 2,
+                width: 565,
+                height: 800
+            }
+        ],
+        300: [...],
+        150: [...]
+    },
+    thumbnails_generated: ISODate("2013-04-04T14:45:32.242Z"),
+    ...
+}
+
+Die Dateien werden in einem Verzeichnis abgelegt, dass aus der _id des attachments
+und der Höhe des Thumbnails gebildet wird. Für die _id "515d920cc9791e05b5047e8f"
+lauten beispielhafte Pfade:
+
+config.THUMBS_PATH + 'f/8/515d920cc9791e05b5047e8f/800/1.png'
+config.THUMBS_PATH + 'f/8/515d920cc9791e05b5047e8f/300/1.png'
+config.THUMBS_PATH + 'f/8/515d920cc9791e05b5047e8f/150/1.png'
+...
+
+Dabei wird der Präfix f/8 aus den lezten beiden Zeichen der _id gebildet.
+
+
+Besondere Abhängigkeiten:
+- Ghostscript
 
 TODO:
-- Prüfen, ob Dokument neuer ist als Thumbnail und ggf. Thumb neu produzieren.
 - Prüfen, ob die Thumbnails für alle Seiten vorhanden sind. Es können einzelne fehlen.
 """
 
@@ -40,48 +73,52 @@ entstanden.
 
 import config
 import os
-import re
+import tempfile
 import sys
 import subprocess
+from pymongo import MongoClient
+import gridfs
+import shutil
+from PIL import Image
+import datetime
+import time
 
 
 STATS = {
-    'attachments_ohne_thumbnails_vorher': 0,
-    'attachments_erfolgreich': 0
+    'attachments_without_thumbs': 0,
+    'attachments_with_outdated_thumbs': 0,
+    'thumbs_created_for_n_attachments': 0,
+    'thumbs_created': 0,
+    'thumbs_not_created': 0,
+    'ms_saving_tempfile': 0,
+    'ms_creating_maxsize': 0,
+    'ms_creating_thumb': 0,
+    'num_saving_tempfile': 0,
+    'num_creating_maxsize': 0,
+    'num_creating_thumb': 0
 }
 
-# Auf False setzen, um die Thumbs-Generierung für
-# Debugging-Zwecke zu deaktivieren
-GENERATE = True
+# Aktiviert die Zeitmessung
+TIMING = True
 
 
-def generate_all_thumbs(attachments_folder, thumbs_folder):
-    """Generiert alle Thumbnails fuer einen Ordner"""
-    for root, dirs, files in os.walk(attachments_folder):
-        for fname in files:
-            file_id = get_id_from_file(fname)
-            if file_id is None:
-                continue
-            if get_file_suffix(fname) not in config.THUMBNAILS_VALID_TYPES:
-                continue
-            # Teste, ob Thumbnail schon existiert
-            for size in config.THUMBNAILS_SIZES:
-                if thumb_exists(file_id, size):
-                    continue
-                STATS['attachments_ohne_thumbnails_vorher'] += 1
-                if not GENERATE:
-                    continue
-                path = root + '/' + fname
-                result = generate_thumbs_for_file(file_id, path, size)
-                if result:
-                    STATS['attachments_erfolgreich'] += 1
-
-
-def get_id_from_file(filename):
-    """returns numeric ID part from attachment file name"""
-    m = re.match(r'[a-z]*([0-9]+)\.[a-z]+', filename)
-    if m is not None:
-        return m.group(1)
+def generate_thumbs(db, thumbs_folder):
+    """Generiert alle Thumbnails für die gesamte attachments-Collection"""
+    # Attachments mit veralteten Thumbnails
+    query = {'thumbnails_generated': {'$exists': True}}
+    for doc in db.attachments.find(query):
+        # Dateiinfo abholen
+        filedoc = db.fs.files.find_one({'_id': doc['file'].id})
+        if filedoc['uploadDate'] > doc['thumbnails_generated']:
+            # Thumbnails müssen erneuert werden
+            STATS['attachments_with_outdated_thumbs'] += 1
+            generate_thumbs_for_attachment(doc['_id'], db)
+    # Attachments ohne Thumbnails
+    query = {'thumbnails': {'$exists': False}}
+    for doc in db.attachments.find(query):
+        if get_file_suffix(doc['filename']) in config.THUMBNAILS_VALID_TYPES:
+            STATS['attachments_without_thumbs'] += 1
+            generate_thumbs_for_attachment(doc['_id'], db)
 
 
 def get_file_suffix(filename):
@@ -89,57 +126,161 @@ def get_file_suffix(filename):
     return filename.split('.')[-1]
 
 
-def thumb_exists(file_id, size):
-    """checks if thumbnail for given file id and size already exists"""
-    base = config.THUMBS_PATH + '/' + subfolders_for_file_id(file_id)
-    # without page number (single page files)
-    path = base + '/' + file_id + '-' + str(size) + '.' + config.THUMBNAILS_SUFFIX
-    #print "Checking for", path
-    if not os.path.isfile(path):
-        # first variant not found. Now check for second variant.
-        # with page number (multi page files) - checking only first (0)
-        path = base + '/' + file_id + '-' + str(size) + '-0.' + config.THUMBNAILS_SUFFIX
-        #print "Checking for", path
-        if not os.path.isfile(path):
-            # Both variants not found
-            return False
-    return True
+def subfolders_for_attachment(attachment_id):
+    """Generates sub path like 1/2 based on attachment id"""
+    attachment_id = str(attachment_id)
+    return os.path.join(attachment_id[-1],
+        attachment_id[-2],
+        attachment_id)
 
 
-def subfolders_for_file_id(file_id):
-    """Generates sub path like 1/2 based on file id"""
-    return file_id[-1] + '/' + file_id[-2]
-
-
-def generate_thumbs_for_file(file_id, source_file, size):
+def generate_thumbs_for_attachment(attachment_id, db):
     """
-    Generiert Thumbnails fuer eine bestimmte Source-Datei
-    und eine bestimmte Groesse
+    Generiert alle Thumbnails fuer ein bestimmtes Attachment
     """
-    #print source_file
-    subpath = subfolders_for_file_id(file_id)
-    if not os.path.exists(config.THUMBS_PATH + '/' + subpath):
-        try:
-            os.makedirs(config.THUMBS_PATH + '/' + subpath)
-        except:
-            print >> sys.stderr, "Could not create directory " + config.THUMBS_PATH + '/' + subpath
-            sys.exit(1)
-    dest_file = config.THUMBS_PATH + '/' + subpath + '/' + file_id + '-' + str(size) + '.' + config.THUMBNAILS_SUFFIX
-    print "Size", size, source_file
-    cmd = ("%s -t %d -m %d %s -thumbnail x%d %s %s" %
-        (config.TIMEOUT_CMD, config.THUMBNAILS_CPU_TIME_LIMIT, config.THUMBNAILS_MEMORY_LIMIT,
-        config.CONVERT_CMD, size, source_file, dest_file))
+    # temporaere Datei des Attachments anlegen
+    if TIMING:
+        start = milliseconds()
+    doc = db.attachments.find_one({'_id': attachment_id}, {'file': 1, 'filename': 1})
+    #print "Trying to get file id", doc['file'].id
+    file_doc = fs.get(doc['file'].id)
+    temppath = tempdir + os.sep + doc['filename']
+    print "Creating thumb - attachment_id=%s, filename=%s" % (str(attachment_id), doc['filename'])
+    tempf = open(temppath, 'wb')
+    tempf.write(file_doc.read())
+    tempf.close()
+    if TIMING:
+        after_file_write = milliseconds()
+        file_write_duration = after_file_write - start
+        STATS['ms_saving_tempfile'] += file_write_duration
+        STATS['num_saving_tempfile'] += 1
+    subpath = subfolders_for_attachment(attachment_id)
+    abspath = config.THUMBS_PATH + os.sep + subpath
+    if not os.path.exists(abspath):
+        os.makedirs(abspath)
+
+    # TODO: Only do this for .pdf files
+    #  create maximum size PNGs first
+    max_folder = abspath + os.sep + 'max'
+    if not os.path.exists(max_folder):
+            os.makedirs(max_folder)
+    file_path = max_folder + os.sep + '%d.png'
+    cmd = ('%s -dQUIET -dSAFER -dBATCH -dNOPAUSE -sDisplayHandle=0 -sDEVICE=png16m -r100 -dTextAlphaBits=4 -sOutputFile=%s -f %s' %
+            (config.GS_CMD, file_path, temppath))
+    execute(cmd)
+    if TIMING:
+        after_maxthumbs = milliseconds()
+        maxthumbs_duration = after_maxthumbs - after_file_write
+        STATS['ms_creating_maxsize'] += maxthumbs_duration
+        STATS['num_creating_maxsize'] += 1
+
+    thumbnails = {}
+    for size in config.THUMBNAILS_SIZES:
+        thumbnails[str(size)] = []
+
+    # create thumbs based on large pixel version
+    for maxfile in os.listdir(max_folder):
+        path = max_folder + os.sep + maxfile
+        num = maxfile.split('.')[0]
+        im = Image.open(path)
+        im = conditional_to_greyscale(im)
+        (owidth, oheight) = im.size
+        for size in config.THUMBNAILS_SIZES:
+            if TIMING:
+                before_thumb = milliseconds()
+            size_folder = abspath + os.sep + str(size)
+            if not os.path.exists(size_folder):
+                os.makedirs(size_folder)
+            out_path = size_folder + os.sep + num + '.' + config.THUMBNAILS_SUFFIX
+            (width, height) = scale_width_height(size, owidth, oheight)
+            #print (width, height)
+            # Two-way resizing
+            resizedim = im
+            if oheight > (height * 2.5):
+                # generate intermediate image with double size
+                resizedim = resizedim.resize((width * 2, height * 2), Image.NEAREST)
+            resizedim = resizedim.resize((width, height), Image.ANTIALIAS)
+            resizedim.save(out_path)
+            thumbnails[str(size)].append({
+                'page': num,
+                'width': width,
+                'height': height,
+                'filesize': os.path.getsize(out_path)
+            })
+            if os.path.exists(out_path):
+                STATS['thumbs_created'] += 1
+            else:
+                sys.stderr.write("ERROR: Thumbnail has not been saved in %s.\n" % out_path)
+                STATS['thumbs_not_created'] += 1
+            if TIMING:
+                after_thumb = milliseconds()
+                thumb_duration = after_thumb - before_thumb
+                STATS['ms_creating_thumb'] += thumb_duration
+                STATS['num_creating_thumb'] += 1
+    # delete temp file
+    os.unlink(temppath)
+    # delete max size images
+    shutil.rmtree(max_folder)
+    now = datetime.datetime.utcnow()
+    db.attachments.update({'_id': attachment_id}, {
+        '$set': {
+            'thumbnails': thumbnails,
+            'thumbnails_generated': now,
+            'last_modified': now
+        }
+    })
+    STATS['thumbs_created_for_n_attachments'] += 1
+
+
+def conditional_to_greyscale(image):
+    """
+    Convert the image to greyscale if the image information
+    is greyscale only
+    """
+    bands = image.getbands()
+    if len(bands) >= 3:
+        # histogram for all bands concatenated
+        hist = image.histogram()
+        if len(hist) >= 768:
+            hist1 = hist[0:256]
+            hist2 = hist[256:512]
+            hist3 = hist[512:768]
+            #print "length of histograms: %d %d %d" % (len(hist1), len(hist2), len(hist3))
+            if hist1 == hist2 == hist3:
+                #print "All histograms are the same!"
+                return image.convert('L')
+    return image
+
+
+def scale_width_height(height, original_width, original_height):
+    factor = float(height) / float(original_height)
+    width = int(round(factor * original_width))
+    return (width, height)
+
+
+def execute(cmd):
     output, error = subprocess.Popen(
         cmd.split(' '), stdout=subprocess.PIPE,
         stderr=subprocess.PIPE).communicate()
-    if error is not None and error != '':
-        print >> sys.stderr, "Could not create thumb for " + source_file + " size:" + str(size)
-        #print >> sys.stderr, "Command: " + cmd
-        print >> sys.stderr, error
-        return False
-    else:
-        return True
+    if error is not None and error.strip() != '':
+        print >> sys.stderr, "Command: " + cmd
+        print >> sys.stderr, "Error: " + error
+
+
+def milliseconds():
+    """Return current time as milliseconds int"""
+    return int(round(time.time() * 1000))
+
+
+def print_stats():
+    for key in STATS.keys():
+        print "%s: %d" % (key, STATS[key])
 
 if __name__ == '__main__':
-    generate_all_thumbs(config.ATTACHMENTS_PATH, config.THUMBS_PATH)
-    print STATS
+    connection = MongoClient(config.DB_HOST, config.DB_PORT)
+    db = connection[config.DB_NAME]
+    fs = gridfs.GridFS(db)
+    tempdir = tempfile.mkdtemp()
+    generate_thumbs(db, config.THUMBS_PATH)
+    os.rmdir(tempdir)
+    print_stats()
