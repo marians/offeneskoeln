@@ -59,17 +59,17 @@ def generate_georeferences_for_submission(doc_id, db):
         text += " " + submission['subject']
     text = text.encode('utf-8')
     result = match_streets(text)
-    if result != []:
-        now = datetime.datetime.utcnow()
-        update = {
-            '$set': {
-                'georeferences_generated': now,
-                'georeferences': result
-            }
+    now = datetime.datetime.utcnow()
+    update = {
+        '$set': {
+            'georeferences_generated': now
         }
+    }
+    if result != []:
+        update['$set']['georeferences'] = result
         print ("Writing %d georeferences to submission %s" %
             (len(result), doc_id))
-        db.submissions.update({'_id': doc_id}, update)
+    db.submissions.update({'_id': doc_id}, update)
 
 
 def get_attachment_fulltext(attachment_id):
