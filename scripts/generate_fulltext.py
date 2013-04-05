@@ -44,12 +44,6 @@ STATS = {
     'fulltext_not_created': 0
 }
 
-# Aktiviert die Zeitmessung
-TIMING = True
-
-PDFTOTEXT = '/usr/local/bin/pdftotext'
-PDFINTO = '/usr/local/bin/pdfinfo'
-
 
 def generate_fulltext(db):
     """Generiert Volltexte für die gesamte attachments-Collection"""
@@ -89,7 +83,7 @@ def generate_fulltext_for_attachment(attachment_id, db):
     print "Prozessing attachment_id=%s" % (str(attachment_id))
     path = store_tempfile(attachment_id, db)
 
-    cmd = PDFTOTEXT + ' -nopgbrk -enc UTF-8 ' + path + ' -'
+    cmd = config.PDFTOTEXT_CMD + ' -nopgbrk -enc UTF-8 ' + path + ' -'
     text = execute(cmd)
     if text is not None:
         text = text.strip()
