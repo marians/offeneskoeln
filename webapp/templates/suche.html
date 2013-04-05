@@ -1,16 +1,23 @@
-$def with (search_settings)
-$var title: Suche
-$var description: Hier findest Du alle amtlichen Dokumente im Bestand
-$var additional_scripts: /static/js/search.js
+{% extends "layout.html" %}
+{% block title %}Suche{% endblock %}
+{% block ogtitle %}Suche{% endblock %}
+{% block meta_description %}Hier findest Du alle amtlichen Dokumente im Bestand{% endblock %}
+
+{% block endbody_script %}
+{{ super() }}
+<script type="text/javascript" src="/static/js/search.js"></script>
+{% endblock %}
+
+{% block content %}
 
 <script type="text/javascript">
 var ok_search_settings = {
-	q: '$search_settings["q"]'.replace(/&quot;/g, "\""), // query string
-	fq: '$search_settings["fq"]'.replace(/&quot;/g, "\""), // filter query
-	num: parseInt("$search_settings['num']"), // docs per page
-	start: parseInt("$search_settings['start']"), // page offset
-	sort: "$search_settings['sort']", // sorting
-	date: "$search_settings['date']" // date range
+	q: '{{ search_settings.q }}'.replace(/&quot;/g, "\""), // query string
+	fq: '{{ search_settings.fq }}'.replace(/&quot;/g, "\""), // filter query
+	num: parseInt("{{ search_settings.num }}"), // docs per page
+	start: parseInt("{{ search_settings.start }}"), // page offset
+	sort: "{{ search_settings.sort }}", // sorting
+	date: "{{ search_settings.date }}" // date range
 };
 </script>
 
@@ -21,7 +28,7 @@ var ok_search_settings = {
 	<div class="content middle">
 		<form action="/suche/" method="get" id="searchform" accept-charset="utf-8">
 			<label class="qlabel" for="qinput">Suche:</label>
-			<input type="text" id="qinput" name="q" value="$search_settings['q']" autocomplete="off" />
+			<input type="text" id="qinput" name="q" value="{{ search_settings.q }}" autocomplete="off" />
 			<a id="search-submit" class="submit awesome extrawide" id="submit" href="/suche/">Suchen</a>
 		</form>
 	</div>
@@ -29,3 +36,4 @@ var ok_search_settings = {
 		<div class="loading big outer"><div class="loading big inner">Suche...</div></div>
 	</div>
 </div>
+{% endblock %}
