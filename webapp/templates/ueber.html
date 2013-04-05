@@ -1,6 +1,9 @@
-$var title: Über Offenes Köln
-$var description: Ziele und Pläne für Offenes Köln und weitere Informationen
-$var additional_scripts: /static/js/map.js
+{% extends "layout.html" %}
+{% block title %}Über Offenes Köln{% endblock %}
+{% block ogtitle %}Über Offenes Köln{% endblock %}
+{% block meta_description %}Ziele und Pläne für Offenes Köln und weitere Informationen{% endblock %}
+
+{% block content %}
 
 <div class="content top">
 	<h1>Über Offenes Köln</h1>
@@ -168,3 +171,5 @@ $var additional_scripts: /static/js/map.js
 	Telefon: <a href="tel:+491795917086">0179 5 91 70 86</a></p>
 
 </div>
+
+{% endblock %}
