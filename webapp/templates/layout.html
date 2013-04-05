@@ -1,32 +1,27 @@
-$def with (content)
-<!doctype html>
+<!DOCTYPE html>
 <!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
 <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
 <!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
 <head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>$content.title - Offenes Köln</title>
-    $if content.description:
-        <meta name="description" content="$content.description" />
-    <meta name="publisher" content="Marian Steinbach" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <link rel="icon" href="/static/img/logo/favicon_16x16.png" />
-    <meta property="og:title" content="Offenes Köln"/>
-    <link rel="shortcut icon" href="/static/img/logo/favicon_16x16.png" />
-    <link rel="stylesheet" href="/static/css/style.css"/>
-    <meta property="og:image" content="http://offeneskoeln.de/static/img/logo/logo_header_86x71.png" />
-    <script>
-    var L_ROOT_URL = '/static/img/leaflet/';
-</script>
-<script type="text/javascript" src="http://a.ok.mycdn.de/js/modernizr-2.0.6.min.js"></script>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>{% block title %}{% endblock %} - {{ config.APP_NAME }}</title>
+  <meta name="description" content="{% block meta_description %}{% endblock %}" />
+  <meta name="publisher" content="{{ config.META_PUBLISHER }}" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="{{ config.ICON_URI }}" />
+  <link rel="shortcut icon" href="{{ config.ICON_URI }}" />
+  <meta property="og:title" content="{% block ogtitle %}{% endblock %}"/>
+  <meta property="og:image" content="{{ config.BASE_URL }}static/img/logo/logo_header_86x71.png" />
+  <link rel="stylesheet" href="/static/css/style.css"/>
+  <script>
+  var L_ROOT_URL = '/static/img/leaflet/';
+  </script>
+  <script type="text/javascript" src="http://a.ok.mycdn.de/js/modernizr-2.0.6.min.js"></script>
 </head>
 <body>
   <div id="container">
-    <!--<div id="maintenance">
-	  Liebe Nutzerinnen und Nutzer! In der Nacht von Samstag 2. auf Sonntag 3. März ab etwa 0:00 Uhr werden wir ca. eine halbe Stunde lang neue Software einspielen und sind daher nicht erreichbar.
-    </div>-->
     <header>
       <div id="logo"><a href="/"><img src="/static/img/logo/logo_header_86x71.png" width="86" height="71" alt="" /></a></div>
       <div id="nametagline">
@@ -35,10 +30,10 @@ $def with (content)
       </div>
     </header>
     <div id="main" role="main">
-        <noscript>
-            <p>Du musst JavaScript aktivieren, um diese Site nutzen zu können.</p>
-        </noscript>
-      $:content
+      <noscript>
+        <p>Du musst JavaScript aktivieren, um diese Site nutzen zu können.</p>
+      </noscript>
+      {% block content %}{% endblock %}
     </div>
     <footer>
       <div id="footer">
@@ -66,12 +61,10 @@ $def with (content)
       </div>
     </footer>
   </div> <!--! end of #container -->
-    <script type="text/javascript" src="http://b.ok.mycdn.de/js/jquery.min.js"></script>
-    <script type="text/javascript" src="http://c.ok.mycdn.de/js/leaflet_0.3.1.min.js"></script>
-    <script type="text/javascript" src="http://a.ok.mycdn.de/js/jquery.ajaxq.js"></script>
-    <script type="text/javascript" src="/static/js/script.js"></script>
-    $if content.additional_scripts:
-        <script type="text/javascript" src="$content.additional_scripts"></script>
+  {% block endbody_script %}
+  <script type="text/javascript" src="http://b.ok.mycdn.de/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/static/js/script.js"></script>
+  {% endblock %}
 
   <!--[if lt IE 7 ]>
     <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
@@ -80,7 +73,7 @@ $def with (content)
 
   <script type="text/javascript">
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-34010656-1']);
+  _gaq.push(['_setAccount', '{{ config.ANALYTICS_ACCOUNT }}']);
   _gaq.push(['_gat._anonymizeIp']);
   _gaq.push(['_trackPageview']);
 
