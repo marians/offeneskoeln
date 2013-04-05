@@ -1,7 +1,9 @@
-$var title: API
-$var description: Für echte Offenheit braucht es offene Schnittstellen. Hier gibt es Informationen über unsere Webservice API.
-$var additional_scripts: /static/js/map.js
+{% extends "layout.html" %}
+{% block title %}API{% endblock %}
+{% block ogtitle %}API{% endblock %}
+{% block meta_description %}Für echte Offenheit braucht es offene Schnittstellen. Hier gibt es Informationen über unsere Webservice API.{% endblock %}
 
+{% block content %}
 <div class="content top">
     <h1>Die Offenes Köln API</h1>
     
@@ -717,3 +719,4 @@ $var additional_scripts: /static/js/map.js
 
     </div>
 </div>
+{% endblock %}
