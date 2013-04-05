@@ -1,6 +1,9 @@
-$var title: Disclaimer
-$var description: Ein paar Worte zur Vorsicht
-$var additional_scripts: /static/js/map.js
+{% extends "layout.html" %}
+{% block title %}Disclaimer{% endblock %}
+{% block ogtitle %}Disclaimer{% endblock %}
+{% block meta_description %}Ein paar Worte zur Vorsicht{% endblock %}
+
+{% block content %}
 
 <div class="content">
 	<h1>Wichtige Hinweise zur Datenqualität, Haftungsausschluss</h1>
@@ -11,7 +14,7 @@ $var additional_scripts: /static/js/map.js
 		
 		<p>Trotz großer Anstrengungen, korrekte und vollständige Daten zu publizieren, kann es zu <b>Fehlern</b> und <b>Lücken</b> im Datenbestand kommen.</p>
 		
-		<p>Für die Richtigkeit der Daten und Inhalte übernimmt der <a href="/kontakt/">Betreiber</a> von Offenes Köln (offeneskoeln.de) keinerlei Gewährleistung oder Garantie.</p>
+		<p>Für die Richtigkeit der Daten und Inhalte übernimmt der <a href="/ueber/">Betreiber</a> von Offenes Köln (offeneskoeln.de) keinerlei Gewährleistung oder Garantie.</p>
 		
 		<p><b>Die Nutzung von offeneskoeln.de geschieht ausschließlich auf eigene Verantwortung der Nutzerinnen und Nutzer.</b></p>
 		
@@ -32,7 +35,9 @@ $var additional_scripts: /static/js/map.js
 			</li>
 		</ul>
 		
-		<p>Sollten Dir weitere Probleme am Datenbestand auffallen, bitte <a href="/kontakt/">kontaktiere uns</a> und beschreibe das Problem. Vielen Dank!</p>
+		<p>Sollten Dir weitere Probleme am Datenbestand auffallen, bitte <a href="/ueber/">kontaktiere uns</a> und beschreibe das Problem. Vielen Dank!</p>
 		
 	</div>
 </div>
+
+{% endblock %}
