@@ -71,6 +71,7 @@
     <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
   <![endif]-->
 
+  {% if config.ANALYTICS_ACCOUNT %}
   <script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', '{{ config.ANALYTICS_ACCOUNT }}']);
@@ -83,5 +84,8 @@
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
   </script>
+  {% else %}
+  <p><b style="color: red">ACHTUNG: Google Analytics ist nicht aktiv!</b></p>
+  {% endif %}
 </body>
 </html>
