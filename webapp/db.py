@@ -73,8 +73,7 @@ def get_submissions(references, get_attachments=False,
                                     for t in range(len(res['attachments'][n]['thumbnails'][height])):
                                         res['attachments'][n]['thumbnails'][height][t]['url'] = util.thumbnail_url(
                                                 attachment_id=res['attachments'][n]['_id'], size=height,
-                                                page=res['attachments'][n]['thumbnails'][height][t]['page']
-                                            )
+                                                page=res['attachments'][n]['thumbnails'][height][t]['page'])
             if get_consultations:
                 # Verweisende agendaitems finden
                 sessions = mongo.db.sessions.find({'agendaitems.submissions.$id': res['_id']})
@@ -99,6 +98,13 @@ def get_submissions(references, get_attachments=False,
                                 session['attachments'][n]['url'] = util.attachment_url(a.id, filename=session['attachments'][n]['filename'])
                                 if get_thumbnails == False and 'thumbnails' in session['attachments'][n]:
                                     del session['attachments'][n]['thumbnails']
+                                else:
+                                    if 'thumbnails' in session['attachments'][n]:
+                                        for height in session['attachments'][n]['thumbnails'].keys():
+                                            for t in range(len(session['attachments'][n]['thumbnails'][height])):
+                                                session['attachments'][n]['thumbnails'][height][t]['url'] = util.thumbnail_url(
+                                                        attachment_id=session['attachments'][n]['_id'], size=height,
+                                                        page=session['attachments'][n]['thumbnails'][height][t]['page'])
                         res['consultations'].append(session)
             submissions[str(res['_id'])] = res
     return submissions.values()
