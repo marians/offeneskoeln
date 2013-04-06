@@ -202,7 +202,7 @@ def generate_thumbs_for_attachment(attachment_id, db):
             resizedim = resizedim.resize((width, height), Image.ANTIALIAS)
             resizedim.save(out_path)
             thumbnails[str(size)].append({
-                'page': num,
+                'page': int(num),
                 'width': width,
                 'height': height,
                 'filesize': os.path.getsize(out_path)
