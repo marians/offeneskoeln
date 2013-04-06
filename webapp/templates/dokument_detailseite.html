@@ -1,24 +1,110 @@
-$def with (reference)
-$var title: Dokumenten-Details
-$var description: Hier steht alles, was wir über einen Antrag oder ein sonstiges Dokument wissen.
-$var additional_scripts: /static/js/document_details.js
+{% extends "layout.html" %}
+{% block title %}{{ submission.title }}{% endblock %}
+{% block ogtitle %}{{ submission.title }}{% endblock %}
+{% block meta_description %}Hier steht alles, was wir über einen Antrag oder ein sonstiges Dokument wissen.{% endblock %}
 
+{% block endbody_script %}
+{{ super() }}
 <script type="text/javascript">
-var ok_document_id = '$reference';
+var ok_document_id = '{{ submission.identifier }}';
 </script>
+<script type="text/javascript" src="/static/js/document_details.js"></script>
+{% endblock %}
 
+
+{% block content %}
 <div id="docdetails">
 	<div class="content top">
-	
+		<h1>{{ submission.title }}</h1>
+		<table class="metadata">
+			<tbody>
+				<tr>
+					<td class="label">Art des Dokuments:</td>
+					<td class="value">{{ submission.type }}</td>
+				</tr>
+				<tr>
+					<td class="label">Erstellt am:</td>
+					<td class="value">{{ submission.date.strftime('%d')|int }}. {{ submission.date.strftime('%B %Y') }}</td>
+				</tr>
+				<tr>
+					<td class="label">Beraten in:</td>
+					<td class="value">
+						{% if submission.consultations|length ==  1 %}
+						1 Sitzung
+						{% else %}
+						{{ submission.consultations|length }} Sitzungen
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">Anlagen:</td>
+					<td class="value">
+						{% if submission.attachments|length ==  1 %}
+						1 Anlage
+						{% else %}
+						{{ submission.attachments|length }} Anlagen
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">Quelle:</td>
+					<td class="value">
+						<a href="{{ submission.original_url }}" target="_blank">{{ submission.original_url }}</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
-	<div class="content middle">
-		<div class="loading big outer">
-			<div class="loading big inner">
-			Dokumenten-Details werden geladen...
+	<div class="consultation content middle">
+		<h2>Beratungen in Gremien</h2>
+		<ol>
+			{% for session in submission.consultations %}
+			<li>
+				<b>{{ session.committee_name }}</b>, {{ session.date_start.strftime('%d')|int }}. {{ session.date_start.strftime('%B %Y') }}.
+				{% for agendaitem in session.agendaitems %}
+					{% if agendaitem.subject != submission.title %}
+						<br/>Thema: {{ agendaitem.subject }}
+					{% endif %}
+					{% if agendaitem.result %}
+						<br />Ergebnis: {{ agendaitem.result }}
+					{% endif %}
+					{% if agendaitem.result_note %}
+						&ndash; {{ agendaitem.result_note }}
+					{% endif %}
+				{% endfor %}
+			</li>
+			{% endfor %}
+		</ol>
+	</div>
+	<div class="attachments content middle">
+		<h2>{% if submission.attachments|length ==  1 %}
+			1 Anlage
+			{% else %}
+			{{ submission.attachments|length }} Anlagen
+			{% endif %}
+		</h2>
+		{% for attachment in submission.attachments %}
+		<div class="attachment at{{ attachment._id }}">
+			<h3>{{ attachment.name}} ({{ attachment.thumbnails.300|length }} Seiten)</h3>
+			<div class="thumbs">
+				<div class="thumbsinner" style="width: 438px; height: 310px;">
+					{% for thumbnail in attachment.thumbnails.300 %}
+					<a href="#"><img class="thumb" src="http://b.ok.mycdn.de/thumbs/6/8/231386-300-0.jpg" width="{{ thumbnail.width }}" height="300"></a>
+					{% endfor %}
+				</div>
+			</div>
+			<div class="fulltext">
+				<div class="truncated">{{ attachment.fulltext }}</div>
+			</div>
+			<div class="actions">
+				<a target="_blank" href="{{ attachment.url }}" class="awesome">Anhang öffnen</a>
+				<span class="typesize">{{ (attachment.size / 1024)|round(0)|int }} KB PDF – <a title="öffnet das PDF mit Google Docs Viewer" href="https://docs.google.com/viewer?url={{ attachment.url }}" target="_blank">Vorschau</a></span>
 			</div>
 		</div>
+		{% endfor %}
 	</div>
 	<div class="content bottom">
 	
 	</div>
 </div>
+{% endblock %}

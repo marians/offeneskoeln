@@ -31,29 +31,8 @@ $(document).ready(function(){
             if (data.status == 0) {
                 
                 // title and H1
-                var title = data.response.documents[0].title[0];
                 disqus_title = 'Dokument ' + ok_document_id;
-                $('.content.middle').remove();
-                $('title').text(title);
-                $('.content.top').append($(document.createElement('h1')).text(title));
                 
-                // Beratungsfolge
-                // TODO: Mehr Details hinzufügen, wenn verfügbar
-                var consultationdiv = $(document.createElement('div'));
-                consultationdiv.attr('class', 'consultation content middle');
-                consultationdiv.append('<h2>Sitzungen</h2>');
-                var consultation = $(document.createElement('ol'));
-                //consultation.attr('class', 'metadata consultation');
-                var num_consultations = 0;
-                for (var d in data.response.documents) {
-                    for (var c in data.response.documents[d].consultations) {
-                        var litext = data.response.documents[d].consultations[c].committee_name;
-                        litext += ', ' + (data.response.documents[d].consultations[c].date ? OffenesKoeln.formatIsoDate(data.response.documents[d].consultations[c].date) : 'Datum unbekannt');
-                        num_consultations += 1;
-                        consultation.append($(document.createElement('li')).text(litext));
-                    }
-                }
-                consultationdiv.append(consultation);
                 
                 // Anzahl Attachments
                 var num_attachments = 0;
@@ -63,42 +42,13 @@ $(document).ready(function(){
                     }
                 }
                 
-                // Link zu RIS
-                var ris_urls = [];
-                for (var d in data.response.documents) {
-                    for (var u in data.response.documents[d].original_url) {
-                        ris_urls.push(data.response.documents[d].original_url[u]);
-                    }
-                }
-                var ris_link = '';
-                if (ris_urls.length > 1) {
-                    var ris_links = [];
-                    for (var u in ris_urls) {
-                        ris_links.push('<a href="'+ ris_urls[u] +'" target="_blank">Dokument ' + (u + 1) + '</a>');
-                    }
-                    ris_link = 'Ratsinformationssystem der Stadt Köln ' + ris_links.join(', ');
-                } else {
-                    ris_link = '<a href="'+ ris_urls[0] +'" target="_blank">Ratsinformationssystem der Stadt Köln<a>';
-                }
-                
-                // document type and date
-                var metadata_table = $(document.createElement('table'));
-                metadata_table.attr('class', 'metadata');
-                metadata_table.append('<tr><td class="label">Art des Dokuments:</td><td class="value">'+ data.response.documents[0].type.join('<br />') +'</td></tr>');
-                metadata_table.append('<tr><td class="label">Erstellt am:</td><td class="value">'+ (data.response.documents[0].date[0] ? OffenesKoeln.formatIsoDate(data.response.documents[0].date[0]) : 'Datum unbekannt') +'</td></tr>');
-                metadata_table.append('<tr><td class="label">Beraten in:</td><td class="value">'+ num_consultations +' Sitzung'+ (num_consultations != 1 ? 'en' : '') +'</td></tr>');
-                metadata_table.append('<tr><td class="label">Anlagen:</td><td class="value">'+ num_attachments +' Datei'+ (num_attachments != 1 ? 'en' : '') +'</td></tr>');
-                metadata_table.append('<tr><td class="label">Quelle:</td><td class="value">'+ ris_link +'</td></tr>');
-                $('.content.top').append(metadata_table);
-                
-                $('.content.top').after(consultationdiv);
                 
                 // attachments
                 var attachments = $(document.createElement('div'));
-                attachments.attr('class', 'attachments content middle');
-                attachments.append('<h2>'+ data.response.documents[0].attachments.length +' Anlagen</h2>')
-                $('.consultation').after(attachments);
-                
+                //attachments.attr('class', 'attachments content middle');
+                //attachments.append('<h2>'+ data.response.documents[0].attachments.length +' Anlagen</h2>')
+                //$('.consultation').after(attachments);
+                /*
                 for (var a in data.response.documents[0].attachments) {
                     var attachment = data.response.documents[0].attachments[a];
                     var attachmentdiv = $(document.createElement('div'));
@@ -190,6 +140,7 @@ $(document).ready(function(){
                         }
                     }
                 }
+                */
                 
                 // Disqus
                 $('.content.bottom').append('<div class="comments"><h2>Kommentare, Fragen, Ergänzungen</h2></div>');
