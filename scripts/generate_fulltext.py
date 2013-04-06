@@ -79,7 +79,7 @@ def generate_fulltext_for_attachment(attachment_id, db):
     Generiert alle Thumbnails fuer ein bestimmtes Attachment
     """
     # temporaere Datei des Attachments anlegen
-    print "Prozessing attachment_id=%s" % (str(attachment_id))
+    print "Processing attachment_id=%s" % (str(attachment_id))
     path = store_tempfile(attachment_id, db)
 
     cmd = config.PDFTOTEXT_CMD + ' -nopgbrk -enc UTF-8 ' + path + ' -'
