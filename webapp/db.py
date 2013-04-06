@@ -67,6 +67,14 @@ def get_submissions(references, get_attachments=False,
                         if not get_thumbnails:
                             if 'thumbnails' in res['attachments'][n]:
                                 del res['attachments'][n]['thumbnails']
+                        else:
+                            if 'thumbnails' in res['attachments'][n]:
+                                for height in res['attachments'][n]['thumbnails'].keys():
+                                    for t in range(len(res['attachments'][n]['thumbnails'][height])):
+                                        res['attachments'][n]['thumbnails'][height][t]['url'] = util.thumbnail_url(
+                                                attachment_id=res['attachments'][n]['_id'], size=height,
+                                                page=res['attachments'][n]['thumbnails'][height][t]['page']
+                                            )
             if get_consultations:
                 # Verweisende agendaitems finden
                 sessions = mongo.db.sessions.find({'agendaitems.submissions.$id': res['_id']})
