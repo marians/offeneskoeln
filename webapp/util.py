@@ -1,14 +1,14 @@
 # encoding: utf-8
 
-import time
 import datetime
 import email.utils
 import calendar
 import json
 import bson
-import pprint
+#import pprint
 
 from webapp import app
+
 
 def rfc1123date(value):
     """
@@ -39,6 +39,15 @@ def attachment_url(attachment_id, filename=None, extension=None):
     if filename is not None:
         extension = filename.split('.')[-1]
     return app.config['ATTACHMENT_DOWNLOAD_URL'] % (attachment_id, extension)
+
+
+def thumbnail_url(attachment_id, size, page):
+    attachment_id = str(attachment_id)
+    url = app.config['THUMBS_URL']
+    url += attachment_id[-1] + '/' + attachment_id[-2] + '/' + attachment_id
+    url += '/' + str(size)
+    url += '/' + str(page) + '.' + app.config['THUMBNAILS_SUFFIX']
+    return url
 
 
 class MyEncoder(json.JSONEncoder):

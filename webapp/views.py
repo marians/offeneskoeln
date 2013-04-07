@@ -196,7 +196,6 @@ def dokument(identifier):
                         get_attachments=True,
                         get_consultations=True,
                         get_thumbnails=True)
-    pprint.pprint(result)
     if len(result) == 0:
         abort(404)
     return render_template('dokument_detailseite.html', submission=result[0])
@@ -209,3 +208,9 @@ def urlencode_filter(s):
     s = s.encode('utf8')
     s = urllib.quote_plus(s)
     return Markup(s)
+
+
+@app.template_filter('debug')
+def debug_filter(s):
+    pprint.pprint(s)
+    return s
