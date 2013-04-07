@@ -280,6 +280,13 @@ span.spinner {
 	background-repeat: no-repeat;
 }
 
+.smallnote {
+	font-size: 84%;
+	color: #666;
+	margin-bottom: 15px;
+	text-align: center;
+}
+
 /** a block element on mobile, but inline on larger screens **/
 .mobilerow {
     display: block;
@@ -303,7 +310,9 @@ span.spinner {
 	padding: 3px 3px 3px 0px;
 	line-height: 140%;
 }
-
+#docdetails .attachment h2 {
+	margin-bottom: 15px;
+}
 #docdetails img.thumb {
 	border: 1px solid #eee;
 	margin-bottom: 5px;

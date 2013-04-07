@@ -1,9 +1,36 @@
 $(document).ready(function(){
-    var disqus_title = '';
-    var disqus_category_id = 'dokument';
     
-    var thumbs_data = {}; // speichert Details zu den Thumbs aller Attachments
+    var thumbs_data; // speichert Details zu den Thumbs aller Attachments
     
+    /**
+     * Progressive enhancement zur Verkürzung der angezeigten texte
+     */
+    function truncateFulltext() {
+        $('.attachment').each(function(n, attachment){
+            var attachment_id = $(attachment).attr('id');
+            $(attachment).find('.fulltext').each(function(n, fulltext){
+                var fulltext_content = $('#' + attachment_id + ' .complete .text').html();
+                var truncated_html = OffenesKoeln.truncateText(fulltext_content, 350);
+                var truncated_div = $('<div class="truncated"><div class="text">' + truncated_html + '</div></div>');
+                $(fulltext).append(truncated_div);
+                $('#' + attachment_id + ' .complete').hide();
+                if (fulltext_content.length > truncated_html.length) {
+                    var expand_text_link = $(document.createElement('a')).attr('href', '#').text('Gesamten Text anzeigen');
+                    expand_text_link.click({
+                        attachment_id: attachment_id,
+                        content: fulltext_content
+                    }, function(e){
+                        e.preventDefault();
+                        // hide truncated text div (for later re-use)
+                        $('#' + e.data.attachment_id + ' .truncated').hide();
+                        $('#' + e.data.attachment_id + ' .complete').slideDown();
+                    });
+                    $('#' + attachment_id + ' .truncated').append(expand_text_link);
+                }
+            });
+        });
+    }
+
     /**
      * Zoomt die Thumbnail-Darstellung von Höhe 300 auf 800
      */
@@ -11,150 +38,106 @@ $(document).ready(function(){
         //console.log('zoomThumbs', evt.data);
         evt.preventDefault();
         // alle img src-Attribute umschreiben
-        $('.at' + evt.data.attachment_id + ' img').each(function(index){
+        $('#' + evt.data.attachment_id + ' img').each(function(index){
             var img = $(this);
             var target_height = 800;
             var target_width = thumbs_data[evt.data.attachment_id][800].images[index].width;
             img.animate({width: target_width, height: target_height}, {duration: 400, easing: 'swing'});
-            img.attr('src', img.attr('src').replace('-300', '-800'));
+            img.attr('src', img.attr('src').replace('/300/', '/800/'));
             img.parent('a').replaceWith(img);
         });
         // Breite des Thumbs-Containers zuerst setzen, ohne Animation
-        $('.at' + evt.data.attachment_id + ' .thumbsinner').css({width: thumbs_data[evt.data.attachment_id][800].width});
-        // Animation
-        $('.at' + evt.data.attachment_id + ' .thumbs').animate({height: '825px'}, {duration: 300, easing: 'swing'});
-        $('.at' + evt.data.attachment_id + ' .thumbsinner').animate({height: '810px'}, {duration: 300, easing: 'swing'});
+        $('#' + evt.data.attachment_id + ' .thumbsinner').css({width: thumbs_data[evt.data.attachment_id][800].width});
+        // Animation zur Vergroesserung des Thumbnails-Containers
+        $('#' + evt.data.attachment_id + ' .thumbs').animate({height: '825px'}, {duration: 300, easing: 'swing'});
+        $('#' + evt.data.attachment_id + ' .thumbsinner').animate({height: '810px'}, {duration: 300, easing: 'swing'});
     }
-    if (ok_document_id){
-        OffenesKoeln.documentDetails(ok_document_id, function(data){
-            //console.log(data);
-            if (data.status == 0) {
-                
-                // title and H1
-                disqus_title = 'Dokument ' + ok_document_id;
-                
-                
-                // Anzahl Attachments
-                var num_attachments = 0;
-                for (var d in data.response.documents) {
-                    if (typeof data.response.documents[d].attachments != 'undefined') {
-                        num_attachments += data.response.documents[d].attachments.length;
-                    }
+
+    /**
+     * Liest Informationen über alle Thumbnails zu allen Attachments
+     * und befüllt thumbs_data
+     */
+    function readThumbnailData(data) {
+        thumbs_data = {};
+        $.each(data.response.documents[0].attachments, function(i, attachment){
+            thumbs_data[attachment._id] = {};
+            $.each(attachment.thumbnails, function(height, heightthumbs){
+                if (height == 300 || height == 800) {
+                    thumbs_data[attachment._id][height] = {
+                        num_thumbs: 0,
+                        width: 0,
+                        images: []
+                    };
+                    $.each(attachment.thumbnails[height], function(index, thumb){
+                        thumbs_data[attachment._id][height].num_thumbs += 1;
+                        thumbs_data[attachment._id][height].width += thumb.width + 11;
+                        thumbs_data[attachment._id][height].images.push({
+                            width: thumb.width,
+                            url: thumb.url
+                        });
+                    });
                 }
-                
-                
-                // attachments
-                var attachments = $(document.createElement('div'));
-                //attachments.attr('class', 'attachments content middle');
-                //attachments.append('<h2>'+ data.response.documents[0].attachments.length +' Anlagen</h2>')
-                //$('.consultation').after(attachments);
-                /*
-                for (var a in data.response.documents[0].attachments) {
-                    var attachment = data.response.documents[0].attachments[a];
-                    var attachmentdiv = $(document.createElement('div'));
-                    attachmentdiv.attr('class', 'attachment at' + attachment.id);
-                    attachmentdiv.append('<h3>'+ attachment.role +'</h3>');
-                    attachments.append(attachmentdiv);
-                    //console.log(attachment.exclusion);
-                    if (attachment.exclusion) {
-                        var reasonhtml = '<p class="exclusionheader">Es tut uns leid, aber dieses Dokument wurde enfernt. Die Begründung:</p>';
-                        reasonhtml += '<p class="reasontext">'+ attachment.exclusion.reason_text +'</p>';
-                        reasonhtml += '<p>Weitere Informationen dazu gibt es <a href="http://blog.offeneskoeln.de/post/18377162772/abmahnung-und-selbstzensur" target="_blank">in unserem Blog</a>.</p>';
-                        attachmentdiv.append('<div class="attachmentexclusion">'+ reasonhtml +'</div>');
-                    } else {
-                        // thumbnails
-                        if (attachment.numpages) {
-                            var h3el = $('.at' + attachment.id + ' h3');
-                            //console.log(h3el, h3el.text());
-                            if (attachment.numpages > 1) {
-                                h3el.text(h3el.text() + ' ('+ attachment.numpages +' Seiten)');
-                            }
-                            attachmentdiv.append('<div class="thumbs"><div class="thumbsinner"></div></div>');
-                            var twidth = 0; // width of all thumbs side by side, including border and margins
-                            thumbs_data[attachment.id] = {};
-                            for (var t in attachment.thumbnails) {
-                                if (typeof thumbs_data[attachment.id][attachment.thumbnails[t].height] == 'undefined') {
-                                    thumbs_data[attachment.id][attachment.thumbnails[t].height] = {
-                                        num_thumbs: 0,
-                                        width: 0,
-                                        attachment_id: attachment.id,
-                                        images: []
-                                    };
-                                }
-                                var turl = OffenesKoeln.cdnify_url(attachment.thumbnails[t].url);
-                                var imgtag = '<img class="thumb" src="'+ turl +'" width="'+ attachment.thumbnails[t].width +'" height="'+ attachment.thumbnails[t].height +'" />';
-                                
-                                // Alle Thumbs strukturiert in thumbs_data ablegen
-                                if (attachment.thumbnails[t].height == 300 || attachment.thumbnails[t].height == 800) {
-                                    thumbs_data[attachment.id][attachment.thumbnails[t].height].num_thumbs += 1;
-                                    thumbs_data[attachment.id][attachment.thumbnails[t].height].width += attachment.thumbnails[t].width + 7;
-                                    thumbs_data[attachment.id][attachment.thumbnails[t].height].images.push({
-                                        tag: imgtag,
-                                        width: attachment.thumbnails[t].width,
-                                        url: OffenesKoeln.cdnify_url(attachment.thumbnails[t].url)
-                                    });
-                                }
-                                
-                                if (attachment.thumbnails[t].height == 300) {
-                                    var thumblink = $(document.createElement('a')).attr('href', '#').click({
-                                        attachment_id: attachment.id, 
-                                        height: attachment.thumbnails[t].height,
-                                        index: t
-                                    }, zoomThumbsClick);
-                                    thumblink.append(imgtag);
-                                    $('.at' + attachment.id + ' .thumbsinner').append(thumblink);
-                                    twidth += attachment.thumbnails[t].width + 7;
-                                }
-                            }
-                            $('.at' + attachment.id + ' .thumbsinner').css({'width': twidth, 'height': 310}); // inner div needs fixed width and height
-                            
-                        }
-                        // Volltextanzeige
-                        if (typeof attachment.content != 'undefined') {
-                            var fulltext_content = $.trim(attachment.content);
-                            if (fulltext_content !== '') {
-                                var truncated_html = OffenesKoeln.truncateText(fulltext_content, 200);
-                                var fulltext_div = $(document.createElement('div')).attr('class', 'fulltext');
-                                var truncated_div = $(document.createElement('div')).attr('class', 'truncated').html(truncated_html);
-                                fulltext_div.append(truncated_div);
-                                if (fulltext_content.length > truncated_html.length) {
-                                    truncated_div.append(' ');
-                                    var expand_text_link = $(document.createElement('a')).attr('href', '#').text('Gesamten Text anzeigen');
-                                    expand_text_link.click({attachment: attachment}, function(e){
-                                        e.preventDefault();
-                                        console.log(e.data.attachment);
-                                        $('.at' + e.data.attachment.id + ' .truncated').hide();
-                                        var complete_fulltext_div = $(document.createElement('div')).attr('class', 'complete').html(e.data.attachment.content);
-                                        complete_fulltext_div.hide();
-                                        $('.at' + e.data.attachment.id + ' .fulltext').append(complete_fulltext_div);
-                                        complete_fulltext_div.slideDown();
-                                    });
-                                    truncated_div.append(expand_text_link);
-                                }
-                                attachmentdiv.append(fulltext_div);
-                            }
-                        }
-                        attachmentdiv.append('<div class="actions"><a target="_blank" href="'+ attachment.url.replace('http://localhost:8080/', 'http://offeneskoeln.de/') +'" class="awesome">Anhang öffnen</a> <span class="typesize">'+ OffenesKoeln.fileSizeString(attachment.size) +'</span></div>');
-                        if (attachment.type == 'application/pdf') {
-                            $('.at' + attachment.id + ' .typesize').append(' PDF &ndash; <a title="öffnet das PDF mit Google Docs Viewer" href="https://docs.google.com/viewer?url='+ encodeURI(attachment.url.replace('http://localhost:8080/', 'http://offeneskoeln.de/')) +'" target="_blank">Vorschau</a>');
-                        }
-                    }
-                }
-                */
-                
-                // Disqus
-                $('.content.bottom').append('<div class="comments"><h2>Kommentare, Fragen, Ergänzungen</h2></div>');
-                $('.comments').append('<div id="disqus_thread"></div>');
-                
-                /* * * DON'T EDIT BELOW THIS LINE * * */
-                (function() {
-                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                })();
-            }
+            });
         });
-        
-         
     }
+
+    /**
+     * Erweitert die Vorschaubilder-Anzeige, so dass bei Klick die nächst
+     * groessere Stufe angezeigt wird.
+     */
+    function enhanceThumbnails() {
+        $('img.thumb').each(function(i, item){
+            //console.log(i, item, this);
+            var url_parts = $(item).attr('src').split('/');
+            var filename = url_parts[(url_parts.length - 1)];
+            var page = filename.split('.')[0];
+            var height = url_parts[(url_parts.length - 2)];
+            var attachment_id = url_parts[(url_parts.length - 3)];
+            $(this).wrap('<a href="#"></a>');
+            $(this).parent().click({
+                attachment_id: attachment_id,
+                height: height,
+                index: (page - 1)
+            }, zoomThumbsClick);
+        });
+    }
+
+    OffenesKoeln.documentDetails(ok_document_id, function(data){
+        //console.log(data);
+        readThumbnailData(data);
+        enhanceThumbnails();
+    });
+
+    truncateFulltext();
 });
+        
+
+/*
+// Volltextanzeige
+if (typeof attachment.content != 'undefined') {
+    var fulltext_content = $.trim(attachment.content);
+    if (fulltext_content !== '') {
+        var truncated_html = OffenesKoeln.truncateText(fulltext_content, 200);
+        var fulltext_div = $(document.createElement('div')).attr('class', 'fulltext');
+        var truncated_div = $(document.createElement('div')).attr('class', 'truncated').html(truncated_html);
+        fulltext_div.append(truncated_div);
+        if (fulltext_content.length > truncated_html.length) {
+            truncated_div.append(' ');
+            var expand_text_link = $(document.createElement('a')).attr('href', '#').text('Gesamten Text anzeigen');
+            expand_text_link.click({attachment: attachment}, function(e){
+                e.preventDefault();
+                console.log(e.data.attachment);
+                $('.at' + e.data.attachment.id + ' .truncated').hide();
+                var complete_fulltext_div = $(document.createElement('div')).attr('class', 'complete').html(e.data.attachment.content);
+                complete_fulltext_div.hide();
+                $('.at' + e.data.attachment.id + ' .fulltext').append(complete_fulltext_div);
+                complete_fulltext_div.slideDown();
+            });
+            truncated_div.append(expand_text_link);
+        }
+        attachmentdiv.append(fulltext_div);
+    }
+}
+
+*/
+

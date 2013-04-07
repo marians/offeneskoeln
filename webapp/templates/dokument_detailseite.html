@@ -5,9 +5,20 @@
 
 {% block endbody_script %}
 {{ super() }}
+{% if config.DISQUS_SHORTNAME %}
 <script type="text/javascript">
 var ok_document_id = '{{ submission.identifier }}';
+var disqus_title = '[{{ submission.identifier }}] - {{ submission.title }}';
+var disqus_category_id = 'dokument';
+var disqus_shortname = '{{ config.DISQUS_SHORTNAME }}';
+/* Disqus - DON'T EDIT BELOW THIS LINE * * */
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
 </script>
+{% endif %}
 <script type="text/javascript" src="/static/js/document_details.js"></script>
 {% endblock %}
 
@@ -76,35 +87,41 @@ var ok_document_id = '{{ submission.identifier }}';
 			{% endfor %}
 		</ol>
 	</div>
-	<div class="attachments content middle">
-		<h2>{% if submission.attachments|length ==  1 %}
-			1 Anlage
-			{% else %}
-			{{ submission.attachments|length }} Anlagen
-			{% endif %}
-		</h2>
-		{% for attachment in submission.attachments %}
-		<div class="attachment at{{ attachment._id }}">
-			<h3>{{ attachment.name}} ({{ attachment.thumbnails.300|length }} Seiten)</h3>
-			<div class="thumbs">
-				<div class="thumbsinner" style="width: 438px; height: 310px;">
-					{% for thumbnail in attachment.thumbnails.300 %}
-					<a href="#"><img class="thumb" src="http://b.ok.mycdn.de/thumbs/6/8/231386-300-0.jpg" width="{{ thumbnail.width }}" height="300"></a>
-					{% endfor %}
-				</div>
-			</div>
-			<div class="fulltext">
-				<div class="truncated">{{ attachment.fulltext }}</div>
-			</div>
-			<div class="actions">
-				<a target="_blank" href="{{ attachment.url }}" class="awesome">Anhang öffnen</a>
-				<span class="typesize">{{ (attachment.size / 1024)|round(0)|int }} KB PDF – <a title="öffnet das PDF mit Google Docs Viewer" href="https://docs.google.com/viewer?url={{ attachment.url }}" target="_blank">Vorschau</a></span>
+
+	{% for attachment in submission.attachments %}
+	{% set twidth = (attachment.thumbnails['300']|sum(attribute='width') + (11 * attachment.thumbnails['300']|length)) %}
+	<div class="attachment content middle" id="{{ attachment._id }}">
+		<h2>Anlage: {{ attachment.name|truncate(100) }} ({{ attachment.thumbnails['300']|length }} Seiten)</h2>
+		<div class="thumbs">
+			<div class="thumbsinner" style="width: {{ twidth }}px; height: 310px;">
+				{% for thumbnail in attachment.thumbnails['300'] %}
+				<img class="thumb" src="{{ thumbnail.url }}" width="{{ thumbnail.width }}" height="{{ thumbnail.height }}" />
+				{% endfor %}
 			</div>
 		</div>
-		{% endfor %}
+		{% if attachment.fulltext %}
+		<div class="fulltext">
+			<div class="complete">
+				<div class="text">{{ attachment.fulltext|trim }}</div>
+			</div>
+		</div>
+		{% else %}
+		<div class="nofulltext">
+			<div class="smallnote">Zu diesem Anhang kann leider kein Text angezeigt und durchsucht werden. Evtl. handelt es sich um den Scan einer Papiervorlage.</div>
+		</div>
+		{% endif %}
+		<div class="actions">
+			<a target="_blank" href="{{ attachment.url }}" class="awesome">Anhang öffnen</a>
+			<span class="typesize">{{ (attachment.size / 1024)|round(0)|int }} KB PDF – <a title="öffnet das PDF mit Google Docs Viewer" href="https://docs.google.com/viewer?url={{ attachment.url }}" target="_blank">Vorschau</a></span>
+		</div>
 	</div>
+	{% endfor %}
+
 	<div class="content bottom">
-	
+		<div class="comments">
+			<h2>Kommentare, Fragen, Ergänzungen</h2>
+			<div id="disqus_thread"></div>
+		</div>
 	</div>
 </div>
 {% endblock %}
