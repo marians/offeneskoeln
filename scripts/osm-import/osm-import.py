@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 """
-Importiert Knoten und Strassen aus der angegebenen OSM-Datei in MySQL.
+Importiert Knoten und Strassen aus der angegebenen OSM-Datei in MongoDB.
 Die Datenbank wird vorher geleert!
 
 Copyright (c) 2012 Marian Steinbach
@@ -27,15 +27,13 @@ im Zusammenhang mit der Software oder sonstiger Verwendung der Software
 entstanden.
 """
 
-import sys
-from imposm.parser import OSMParser
-import MySQLdb
 import config
+from imposm.parser import OSMParser
+from pymongo import MongoClient
 
 
 # Wir legen alle nodes in diesem dict ab. Das bedeutet, dass wir
-# Arbeitsspeicher brauchen und dass dieses Script nicht unbedingt
-# für größere Räume als Köln geeignet ist.
+# ausreichend Arbeitsspeicher voraussetzen.
 nodes = {}
 
 
@@ -65,14 +63,7 @@ class StreetCollector(object):
                 self.street_to_node.append((osmid, ref))
 
 if __name__ == '__main__':
-    try:
-        conn = MySQLdb.connect(host=config.DB_HOST, user=config.DB_USER, passwd=config.DB_PASS, db=config.DB_NAME)
-        cursor = conn.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("SET NAMES 'utf8'")
-        cursor.execute("SET CHARACTER SET 'utf8'")
-    except MySQLdb.Error, e:
-        print >> sys.stderr, "Error %d: %s" % (e.args[0], e.args[1])
-        sys.exit(1)
+    connection = MongoClient(config.DB_HOST, config.DB_PORT)
 
     print "Sammle nodes..."
     nodecollector = NodeCollector()
@@ -84,7 +75,8 @@ if __name__ == '__main__':
     p = OSMParser(concurrency=2, ways_callback=streetcollector.ways)
     p.parse(sys.argv[1])
 
-    # iterate through collected nodes to find the requires ones
+    # Iteriere über alle gesammelten nodes und finde die,
+    # welche von anderen Objekten referenziert werden.
     wanted_nodes = {}
     non_existing_nodes = 0
     for ref in streetcollector.wanted_nodes.keys():
@@ -93,15 +85,20 @@ if __name__ == '__main__':
         else:
             non_existing_nodes += 1
 
+    # reduziere das nodes dict auf das wesentliche
     nodes = wanted_nodes.values()
-    cursor.execute('DELETE FROM geo_nodes')
-    cursor.executemany("INSERT INTO geo_nodes (id, latitude, longitude) VALUES (%s, %s, %s)", nodes)
 
-    cursor.execute('DELETE FROM geo_objects')
-    cursor.executemany("INSERT INTO geo_objects (id, name, type, subtype) VALUES (%s, %s, %s, %s)", streetcollector.streets)
+    for (sid, sname, stype, subtype) in streetcollector.streets:
+        print (sid, sname, stype, subtype)
 
-    cursor.execute('DELETE FROM geo_objects2nodes')
-    cursor.executemany("INSERT IGNORE INTO geo_objects2nodes (object_id, node_id) VALUES (%s, %s)", streetcollector.street_to_node)
+    #cursor.execute('DELETE FROM geo_nodes')
+    #cursor.executemany("INSERT INTO geo_nodes (id, latitude, longitude) VALUES (%s, %s, %s)", nodes)
+    #
+    #cursor.execute('DELETE FROM geo_objects')
+    #cursor.executemany("INSERT INTO geo_objects (id, name, type, subtype) VALUES (%s, %s, %s, %s)", streetcollector.streets)
+    #
+    #cursor.execute('DELETE FROM geo_objects2nodes')
+    #cursor.executemany("INSERT IGNORE INTO geo_objects2nodes (object_id, node_id) VALUES (%s, %s)", streetcollector.street_to_node)
 
     print ""
     print non_existing_nodes, "referenzierte nodes wurden nicht gefunden."
