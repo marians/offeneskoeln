@@ -41,13 +41,12 @@ koeln.poly:
 
 clean:
 	rm koeln.poly
-	rm koeln-regbez.osm.bz2
-	rm koeln-regbez.osm
+	rm koeln-regbez-latest.osm
 	rm koeln.osm
 	rm osmfilter
 	rm koeln-streets.osm
 	rm -r osmosis_dir
 	rm osmosis
 	rm -r bin
-	rm -e lib
+	rm -r lib
 	rm -r config
