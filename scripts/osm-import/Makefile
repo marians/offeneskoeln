@@ -8,7 +8,7 @@
 # pip install matplotlib
 
 import: koeln-streets.osm
-	python osm-import.py
+	python osm-import.py koeln-streets.osm
 
 koeln-streets.osm: osmfilter koeln.osm
 	./osmfilter koeln.osm \
