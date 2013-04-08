@@ -34,6 +34,9 @@ sys.path.append('../../')
 import config
 from imposm.parser import OSMParser
 from pymongo import MongoClient
+from bson.son import SON
+
+import pprint
 
 
 # Wir legen alle nodes in diesem dict ab. Das bedeutet, dass wir
@@ -42,9 +45,21 @@ nodes = {}
 
 
 class NodeCollector(object):
-    def coords(self, coords):
-        for osmid, lon, lat in coords:
-            nodes[osmid] = (osmid, lat, lon)
+    #def coords(self, coords):
+    #    for osmid, lon, lat in coords:
+    #        if osmid not in nodes:
+    #            nodes[osmid] = {
+    #                'osmid': osmid
+    #            }
+    #        nodes[osmid]['lat'] = lat
+    #        nodes[osmid]['lon'] = lat
+    def nodes(self, n):
+        for osmid, tags, coords in n:
+            nodes[osmid] = {
+                'osmid': osmid,
+                'location': [coords[0], coords[1]],
+                'tags': tags
+            }
 
 
 class StreetCollector(object):
@@ -76,12 +91,14 @@ if __name__ == '__main__':
 
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
+    db.locations.remove()
     db.locations.ensure_index('osmid', unique=True)
     db.locations.ensure_index('name')
+    db.locations.ensure_index([('nodes.location', '2dsphere')])
 
     print "Sammle nodes..."
     nodecollector = NodeCollector()
-    p = OSMParser(concurrency=2, coords_callback=nodecollector.coords)
+    p = OSMParser(concurrency=2, nodes_callback=nodecollector.nodes)
     p.parse(sys.argv[1])
 
     print "Sammle Straßen..."
@@ -105,10 +122,12 @@ if __name__ == '__main__':
     for street in streetcollector.streets:
         for n in range(len(street['nodes'])):
             street['nodes'][n] = {
-                'osmid': wanted_nodes[street['nodes'][n]][0],
-                'location': (
-                    wanted_nodes[street['nodes'][n]][2],
-                    wanted_nodes[street['nodes'][n]][1]
-                )
+                'osmid': street['nodes'][n],
+                'location': SON([
+                    ('type', 'Point'),
+                    ('coordinates', wanted_nodes[street['nodes'][n]]['location'])
+                ])
             }
+            pprint.pprint(street['nodes'][n])
+        pprint.pprint(street)
         db.locations.save(street)
