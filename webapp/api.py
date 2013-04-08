@@ -150,3 +150,32 @@ def api_documents():
     response.headers['Expires'] = util.expires_date(hours=24)
     response.headers['Cache-Control'] = util.cache_max_age(hours=24)
     return response
+
+
+@app.route("/api/locations")
+def api_locations():
+    street = request.args.get('street', '')
+    if street == '':
+        abort(400)
+    result = db.get_locations_for_street(street)
+    json_output = json.dumps(result, cls=util.MyEncoder, sort_keys=True)
+    response = make_response(json_output, 200)
+    response.mimetype = 'application/json'
+    response.headers['Expires'] = util.expires_date(hours=24)
+    response.headers['Cache-Control'] = util.cache_max_age(hours=24)
+    return response
+
+
+@app.route("/api/streets")
+def api_streets():
+    lat = request.args.get('lat', '')
+    lon = request.args.get('lon', '')
+    if lat == '' or lon == '':
+        abort(400)
+    result = db.get_streets_for_location(lon, lat)
+    json_output = json.dumps(result, cls=util.MyEncoder, sort_keys=True)
+    response = make_response(json_output, 200)
+    response.mimetype = 'application/json'
+    response.headers['Expires'] = util.expires_date(hours=24)
+    response.headers['Cache-Control'] = util.cache_max_age(hours=24)
+    return response
