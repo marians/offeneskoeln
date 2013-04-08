@@ -55,39 +55,39 @@ def api_documents():
     start_time = time.time()
     ref = request.args.get('reference', '')
     references = ref.split(',')
+    if references == ['']:
+        references = None
     output = request.args.get('output', '').split(',')
     q = request.args.get('q', '*:*')
     fq = request.args.get('fq', '')
-    sort = request.args.get('sort', '')
-    start = request.args.get('start', '0')
-    docs = request.args.get('docs', '10')
+    sort = request.args.get('sort', 'score desc')
+    start = int(request.args.get('start', '0'))
+    numdocs = int(request.args.get('docs', '10'))
     date_param = request.args.get('date', '')
     get_attachments = 'attachments' in output
     get_thumbnails = 'thumbnails' in output and get_attachments
     get_consultations = 'consultations' in output
     get_facets = 'facets' in output
-    get_relations = 'relations' in output
+    #get_relations = 'relations' in output
     request_info = {}  # Info über die Anfrage
     query = False
     docs = False
+    submission_ids = []
     # TODO: entscheiden, was mit get_relations passiert
     """
     Anhand der übergebenen Parameter wird entschieden, ob eine Solr-Suche
     durchgeführt wird, oder ob die Abfrage direkt anhand von Kennungen
     (references) erfolgen kann.
     """
-    if len(references) == 1 and references[0] == '':
+    if references is None:
         # Suche wird durchgeführt
         # (References-Liste via Suchmaschine füllen)
-        abort(500)
-        # TODO
-        query = db.query_submissions(q, fq=fq, sort=sort, start=start,
-                           docs=docs, date=date_param, facets=get_facets)
-        if query['result']['numhits'] > 0:
-            references = query['ids']
+        query = db.query_submissions(q=q, fq=fq, sort=sort, start=start,
+                           docs=numdocs, date=date_param, facets=get_facets)
+        if query['numhits'] > 0:
+            submission_ids = [x['_id'] for x in query['result']]
         else:
-            references = []
-        request_info = query['params']
+            docs = []
     else:
         # Direkte Abfrage
         request_info = {
@@ -96,36 +96,17 @@ def api_documents():
     request_info['output'] = output
 
     # Abrufen der benötigten Dokumente aus der Datenbank
-    if len(references) > 0:
+    if references is not None:
         docs = db.get_submissions(references=references,
                         get_attachments=get_attachments,
                         get_consultations=get_consultations,
                         get_thumbnails=get_thumbnails)
-    """
-    Im Fall einer Suche beachten wir die richtige Reihenfolge
-    und mischen "score" und hightlights mit in die Dokumente.
-    Außerdem werden noch ein paar interne Felder entfernt.
-    """
-    if docs:
-        if query:
-            sorted_docs = []
-            for r in references:
-                if r in docs:
-                    if r in query['result']['docs']:
-                        if 'score' in query['result']['docs'][r]:
-                            docs[r]['score'] = query['result']['docs'][r]['score']
-                    if 'highlighting' in query['result'] and r in query['result']['highlighting']:
-                        docs[r]['highlighting'] = query['result']['highlighting'][r]
-                    sorted_docs.append(docs[r])
-            docs = sorted_docs
+    elif len(submission_ids) > 0:
+        docs = db.get_submissions(submission_ids=submission_ids,
+                        get_attachments=get_attachments,
+                        get_consultations=get_consultations,
+                        get_thumbnails=get_thumbnails)
 
-        for doc in docs:
-            if 'consultations' in doc and doc['consultations'] is not None:
-                for c in doc['consultations']:
-                    if 'submission_id' in c:
-                        del c['submission_id']
-                    if 'submission_id' in c:
-                        del c['request_id']
     ret = {
         'status': 0,
         'duration': int((time.time() - start_time) * 1000),
@@ -135,14 +116,19 @@ def api_documents():
     if docs:
         ret['response']['documents'] = docs
         ret['response']['numdocs'] = len(docs)
-        if query and 'maxscore' in query['result']:
-            ret['response']['maxscore'] = query['result']['maxscore']
+        if query and 'maxscore' in query:
+            ret['response']['maxscore'] = query['maxscore']
+        for n in range(len(docs)):
+            docs[n]['reference'] = docs[n]['identifier']
+            del docs[n]['identifier']
+
     if query:
-        ret['response']['numhits'] = query['result']['numhits']
-        if get_facets and 'facets' in query['result']:
-            ret['response']['facets'] = query['result']['facets']
-        if 'start' in query['result']:
-            ret['response']['start'] = query['result']['start']
+        ret['response']['numhits'] = query['numhits']
+        if get_facets and 'facets' in query:
+            ret['response']['facets'] = query['facets']
+
+    ret['response']['start'] = start
+    ret['request']['sort'] = sort
 
     json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
     response = make_response(json_output, 200)
@@ -154,11 +140,20 @@ def api_documents():
 
 @app.route("/api/locations")
 def api_locations():
+    start_time = time.time()
     street = request.args.get('street', '')
     if street == '':
         abort(400)
-    result = db.get_locations_for_street(street)
-    json_output = json.dumps(result, cls=util.MyEncoder, sort_keys=True)
+    result = db.get_locations_by_name(street)
+    ret = {
+        'status': 0,
+        'duration': round((time.time() - start_time) * 1000),
+        'request': {
+            'street': street
+        },
+        'response': result
+    }
+    json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
     response = make_response(json_output, 200)
     response.mimetype = 'application/json'
     response.headers['Expires'] = util.expires_date(hours=24)
@@ -168,12 +163,46 @@ def api_locations():
 
 @app.route("/api/streets")
 def api_streets():
-    lat = request.args.get('lat', '')
+    start_time = time.time()
     lon = request.args.get('lon', '')
+    lat = request.args.get('lat', '')
+    radius = request.args.get('radius', '1000')
     if lat == '' or lon == '':
         abort(400)
-    result = db.get_streets_for_location(lon, lat)
-    json_output = json.dumps(result, cls=util.MyEncoder, sort_keys=True)
+    lon = float(lon)
+    lat = float(lat)
+    radius = int(radius)
+    radius = min(radius, 500)
+    result = db.get_locations(lon, lat, radius)
+    ret = {
+        'status': 0,
+        'duration': round((time.time() - start_time) * 1000),
+        'request': {
+            'lon': lon,
+            'lat': lat,
+            'radius': radius
+        },
+        'response': result
+    }
+    json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
+    response = make_response(json_output, 200)
+    response.mimetype = 'application/json'
+    response.headers['Expires'] = util.expires_date(hours=24)
+    response.headers['Cache-Control'] = util.cache_max_age(hours=24)
+    return response
+
+
+@app.route("/api/proxy/geocode")
+def api_geocode():
+    start = time.time()
+    street = request.args.get('street', '')
+    if street == '':
+        abort(400)
+    obj = {
+        'result': util.geocode(street)
+    }
+    obj['duration'] = int((time.time() - start) * 1000)
+    json_output = json.dumps(obj, sort_keys=True)
     response = make_response(json_output, 200)
     response.mimetype = 'application/json'
     response.headers['Expires'] = util.expires_date(hours=24)
