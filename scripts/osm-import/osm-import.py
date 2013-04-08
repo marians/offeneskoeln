@@ -27,6 +27,10 @@ im Zusammenhang mit der Software oder sonstiger Verwendung der Software
 entstanden.
 """
 
+import sys
+
+sys.path.append('../../')
+
 import config
 from imposm.parser import OSMParser
 from pymongo import MongoClient
@@ -46,7 +50,7 @@ class NodeCollector(object):
 class StreetCollector(object):
     wanted_nodes = {}
     streets = []
-    street_to_node = []
+    #street_to_node = []
 
     def ways(self, ways):
         #global nodes
@@ -55,15 +59,25 @@ class StreetCollector(object):
                 # Wenn der way keinen "highway" tag hat oder keinen
                 # Namen, ist er für uns nicht interessant.
                 continue
-            self.streets.append((osmid, tags['name'].encode('utf-8'), 'highway', tags['highway'].encode('utf-8')))
+            street = {
+                'osmid': osmid,
+                'name': tags['name'],
+                'nodes': []
+            }
             for ref in refs:
                 if ref not in nodes:
                     continue
                 self.wanted_nodes[ref] = True
-                self.street_to_node.append((osmid, ref))
+                #self.street_to_node.append((osmid, ref))
+                street['nodes'].append(ref)
+            self.streets.append(street)
 
 if __name__ == '__main__':
+
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
+    db = connection[config.DB_NAME]
+    db.locations.ensure_index('osmid', unique=True)
+    db.locations.ensure_index('name')
 
     print "Sammle nodes..."
     nodecollector = NodeCollector()
@@ -86,22 +100,15 @@ if __name__ == '__main__':
             non_existing_nodes += 1
 
     # reduziere das nodes dict auf das wesentliche
-    nodes = wanted_nodes.values()
+    wanted_nodes.values()
 
-    for (sid, sname, stype, subtype) in streetcollector.streets:
-        print (sid, sname, stype, subtype)
-
-    #cursor.execute('DELETE FROM geo_nodes')
-    #cursor.executemany("INSERT INTO geo_nodes (id, latitude, longitude) VALUES (%s, %s, %s)", nodes)
-    #
-    #cursor.execute('DELETE FROM geo_objects')
-    #cursor.executemany("INSERT INTO geo_objects (id, name, type, subtype) VALUES (%s, %s, %s, %s)", streetcollector.streets)
-    #
-    #cursor.execute('DELETE FROM geo_objects2nodes')
-    #cursor.executemany("INSERT IGNORE INTO geo_objects2nodes (object_id, node_id) VALUES (%s, %s)", streetcollector.street_to_node)
-
-    print ""
-    print non_existing_nodes, "referenzierte nodes wurden nicht gefunden."
-    print len(nodes), "nodes importiert."
-    print len(streetcollector.streets), "Straßen (ways) importiert."
-    print len(streetcollector.street_to_node), "node-way-Beziehungen importiert."
+    for street in streetcollector.streets:
+        for n in range(len(street['nodes'])):
+            street['nodes'][n] = {
+                'osmid': wanted_nodes[street['nodes'][n]][0],
+                'location': (
+                    wanted_nodes[street['nodes'][n]][2],
+                    wanted_nodes[street['nodes'][n]][1]
+                )
+            }
+        db.locations.save(street)
