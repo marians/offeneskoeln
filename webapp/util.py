@@ -5,6 +5,9 @@ import email.utils
 import calendar
 import json
 import bson
+import re
+import urllib
+import urllib2
 #import pprint
 
 from webapp import app
@@ -48,6 +51,48 @@ def thumbnail_url(attachment_id, size, page):
     url += '/' + str(size)
     url += '/' + str(page) + '.' + app.config['THUMBNAILS_SUFFIX']
     return url
+
+
+def submission_url(identifier):
+    url = app.config['BASE_URL']
+    url += 'dokumente/' + urllib.quote_plus(identifier) + '/'
+    return url
+
+
+def geocode(location_string):
+    """
+    Löst eine Straßen- und optional PLZ-Angabe zu einer Geo-Postion
+    auf. Beispiel: "Straßenname (12345)"
+    """
+    postal = None
+    street = location_string.encode('utf-8')
+    postalre = re.compile(r'(.+)\s+\(([0-9]{5})\)')
+    postal_matching = re.match(postalre, street)
+    postal = None
+    if postal_matching is not None:
+        street = postal_matching.group(1)
+        postal = postal_matching.group(2)
+    url = 'http://open.mapquestapi.com/nominatim/v1/search.php'
+    params = {'format': 'json',  # json
+              'q': ' '.join([street, app.config['GEOCODING_DEFAULT_CITY']]),
+              'addressdetails': 1,
+              'accept-language': 'de_DE',
+              'countrycodes': app.config['GEOCODING_DEFAULT_COUNTRY']}
+    request = urllib2.urlopen(url + '?' + urllib.urlencode(params))
+    response = request.read()
+    addresses = json.loads(response)
+    addresses_out = []
+    for n in range(len(addresses)):
+        for key in addresses[n].keys():
+            if key in ['address', 'boundingbox', 'lat', 'lon']:
+                continue
+            del addresses[n][key]
+        if postal is not None:
+            if 'postcode' in addresses[n]['address'] and addresses[n]['address']['postcode'] == postal:
+                addresses_out.append(addresses[n])
+        else:
+            addresses_out.append(addresses[n])
+    return addresses_out
 
 
 class MyEncoder(json.JSONEncoder):
