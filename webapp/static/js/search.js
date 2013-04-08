@@ -135,6 +135,7 @@ $(document).ready(function(){
     }
     
     function displaySearchResult(data) {
+        //console.log(data);
         var result = $('#search .result');
         
         // headline
@@ -147,7 +148,7 @@ $(document).ready(function(){
         
         // results ol
         var resultlist = $(document.createElement('ol'));
-        resultlist.attr('start', data.response.start+1);
+        resultlist.attr('start', data.response.start + 1);
         result.append(resultlist);
         for (var i in data.response.documents) {
             var item = $(document.createElement('li')).attr('class','resultitem');
@@ -166,20 +167,19 @@ $(document).ready(function(){
      * Generate the output title and apply, if possible, search term highlighting
      */
     function itemTitle(document) {
-        if (document.title[0] != '') {
-            if (typeof document.highlighting != 'undefined' 
-                && typeof document.highlighting.title != 'undefined'
-                && typeof document.highlighting.title[0] != 'undefined') {
-                return document.highlighting.title[0];
+        if (document.title !== '') {
+            if (typeof document.highlighting != 'undefined' &&
+                typeof document.highlighting.title != 'undefined') {
+                return document.highlighting.title;
             }
-            return document.title[0];
+            return document.title;
         } else {
             return 'Dokument ohne Titel';
         }
     }
     
     function snippetText(document) {
-        return document.type + ' ' + document.reference + ' vom ' + OffenesKoeln.formatIsoDate(document.date[0]);
+        return document.type + ' ' + document.reference + ' vom ' + OffenesKoeln.formatIsoDate(document.date);
     }
     
     /**
