@@ -36,6 +36,7 @@ from flask import abort
 from flask import render_template
 from flask import make_response
 from flask import request
+from flask import session
 from flask import redirect
 from flask import Response
 
@@ -207,4 +208,29 @@ def api_geocode():
     response.mimetype = 'application/json'
     response.headers['Expires'] = util.expires_date(hours=24)
     response.headers['Cache-Control'] = util.cache_max_age(hours=24)
+    return response
+
+
+@app.route("/api/session")
+def api_session():
+    location_entry = request.args.get('location_entry', '')
+    lat = request.args.get('lat', '')
+    lon = request.args.get('lon', '')
+    if location_entry != '':
+        session['location_entry'] = location_entry.encode('utf-8')
+    if lat != '':
+        session['lat'] = lat
+    if lon != '':
+        session['lon'] = request.args.get('lon', '')
+    ret = {
+        'status': 0,
+        'response': {
+            'location_entry': (session['location_entry'] if ('location_entry' in session) else None),
+            'lat': (session['lat'] if ('lat' in session) else None),
+            'lon': (session['lon'] if ('lon' in session) else None)
+        }
+    }
+    json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
+    response = make_response(json_output, 200)
+    response.mimetype = 'application/json'
     return response
