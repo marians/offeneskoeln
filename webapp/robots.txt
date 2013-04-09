@@ -10,6 +10,8 @@
 #
 # an! Das koennte Dir Zeit und uns Server-Ressourcen sparen. :)
 
+Sitemap: /static/sitemap.xml
+
 # Suche und API sind Tabu für Robots!
 User-agent: *
 Disallow: /suche/
