@@ -21,12 +21,14 @@
 	<div class="text">
 		<h2>Lizenz</h2>
 	
-		<p>Hauptsächlich stehen die Daten unter der folgenden Lizenz:</p>
+		<p>Die Daten stehen mehrheitlich unter der folgenden Lizenz:</p>
 		
 		<p><b>Open Data Commons Open Database License (ODbL)</b><br />
 		<a href="http://opendatacommons.org/licenses/odbl/">http://opendatacommons.org/licenses/odbl/</a></p>
 		
-		<p>Ausnahmen sind die in den Datenbank-Dumps enthaltenen <b>Geodaten-Tabellen</b> mit dem Namens-Präfix <b>geo_*</b>. Diese sind Auszüge aus dem Datenbestand von <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>. Die Lizenz für diese Geodaten ist <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>. Urheber sind  OpenStreetMap und Mitwirkende.</p>
+		<p>Die enthaltenen <strong>Geodaten</strong> sind Auszüge aus dem Datenbestand von <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>. Urheber sind hier "OpenStreetMap und Mitwirkende".</p>
+
+		<p>Die <strong>Anhänge</strong> zu Dokumenten (PDF-Dateien etc.) stehen nicht unter der genannten Lizenz.</p>
 	</div>
 </div>
 <div class="content middle">
@@ -34,15 +36,26 @@
 		
 		<h2>Datenbank-Dumps</h2>
 		
-		<p>Unsere Datenbank-Exporte enthalten alle Daten zu Sitzungen, Gremien, Tagesordnungen etc.</p>
+		<p>Die Datenbank-Exporte enthalten alle strukturierten Daten zu Sitzungen, Dokumenten/Vorlagen, Anhängen sowie Geodaten.</p>
+
+		<p>Die Datei-Anhänge (PDF-Dateien etc.) sowie die Vorschaubilder zu diesen Dateien sind <strong>nicht im Export enthalten</strong>. Weiterhin nicht enthalten sind Session-Daten, die zum Betrieb der Webapplikation benötigt werden und die nutzerbezogene Informationen enthalten.</p>
+
+		<p>Die Exporte geben die Inhalte der <strong>MongoDB</strong> Datenbank wieder und sind zur Verwendung mit den entsprechenden MongoDB-Werkzeugen (<a href="http://docs.mongodb.org/manual/reference/mongorestore/" target="_blank">mongorestore oder mongoimport</a>) gedacht.</p>
 		
-		<ul>
-		{% for file in filelist %}
-			<li><a href="{{ file.name }}">{{ file.name }}</a> ({{ file.size }} MB)</li>
-		{% endfor %}
-		</ul>
+		<h3>Downloads</h3>
+
+		<table>
+			<tbody>
+				{% for file in filelist %}
+				<tr>
+					<td><a href="{{ file.name }}">{{ file.name }}</a></td>
+					<td style="padding-left: 1em">({{ file.size }} MB)</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
 		
-		<p>Die Dateiendung <b>.sql.gz</b> steht für GZip-komprimierte SQL-Dateien, <b>.csv.gz</b> steht für GZip-kompromierte CSV-Dateien (Seperator: ;, Zeilentrenner: \n, Escape-Zeichen: \, Zeichensatz: UTF-8)</p>
+		
 	</div>
 </div>
 <div class="content bottom">
