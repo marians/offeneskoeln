@@ -5,9 +5,8 @@ $(document).ready(function(){
     var markerLayerGroup = new L.LayerGroup();
     map.addLayer(markerLayerGroup);
     
-    // 'http://{s}.ok.mycdn.de/tiles/{z}/{x}/{y}.png'
     var tileUrlSchema = 'http://{s}.ok.mycdn.de/tiles/v3/{z}/{x}/{y}.png',
-        attribution = '&copy; OpenStreetMap Mitwirkende',
+        attribution = 'Geodaten &copy; OpenStreetMap Mitwirkende',
         backgroundLayer = new L.TileLayer(tileUrlSchema, {
             maxZoom: 17,
             minZoom: 8,
@@ -16,7 +15,7 @@ $(document).ready(function(){
     
     var sessionData = {}; // user session data
     
-    var lastLocationEntry = ''; // die letzte vom User eingegebene Straße
+    var lastLocationEntry = ''; // die letzte vom User eingegebene Strasse
     
     // geo bounds for cologne
     var lat_min = 50.87,
@@ -28,16 +27,17 @@ $(document).ready(function(){
     
     // set to user position, if set and within cologne
     OffenesKoeln.session({}, function(data){
-        sessionData = data.response.session;
+        sessionData = data.response;
         //console.log("sessionData:", sessionData);
-        if (typeof sessionData.location != 'undefined'
-            && typeof sessionData.location.lat != 'undefined'
-            && typeof sessionData.location.lon != 'undefined') {
-                setUserPosition(parseFloat(sessionData.location.lat), 
-                    parseFloat(sessionData.location.lon));
-            if ($('#street').val() == '' && typeof sessionData.location.location_entry != 'undefined') {
-                lastLocationEntry = sessionData.location.location_entry;
-                $('#street').val(sessionData.location.location_entry);
+        if (typeof sessionData != 'undefined' &&
+            typeof sessionData.lat != 'undefined' &&
+            typeof sessionData.lon != 'undefined' &&
+            sessionData.lat !== '' && sessionData.lon !== '') {
+                setUserPosition(parseFloat(sessionData.lat),
+                    parseFloat(sessionData.lon));
+            if ($('#street').val() === '' && typeof sessionData.location_entry != 'undefined') {
+                lastLocationEntry = sessionData.location_entry;
+                $('#street').val(sessionData.location_entry);
             }
         } else {
             /*
@@ -76,10 +76,10 @@ $(document).ready(function(){
     });
     
     
-    // Speichert die Session-Daten, aber setzt - anders als oben - 
+    // Speichert die Session-Daten, aber setzt - anders als oben -
     // die Karte nicht neu
     function handleSessionResponse(data){
-        sessionData = data.response.session;
+        sessionData = data.response;
         //console.log("sessionData after handleSessionResponse:", sessionData);
     }
     
@@ -92,20 +92,18 @@ $(document).ready(function(){
         $('#location-prompt-resultchoice').remove();
         var street = $('#street').val();
         // check if street is available
-        if (street != '') {
+        if (street !== '') {
             data = {
-                street: street,
-            }
+                street: street
+            };
             $.getJSON('/api/proxy/geocode', data, function(places){
                 $('#position-prompt .spinner').css({visibility: 'hidden'});
-                //console.log('Placefinder response: ', places);
-                if (places.ResultSet.Error != 0) {
-                    handleLocationLookupError('SYSTEM');
-                } else if (places.ResultSet.Found == 0) {
+                //console.log('Geocoding response: ', places);
+                if (places.result.length === 0) {
                     handleLocationLookupError('NOT_FOUND');
                 } else {
-                    var places_filtered = OffenesKoeln.filterPlacefinderChoices(places.ResultSet.Results);
-                    if (places_filtered.length == 0) {
+                    var places_filtered = OffenesKoeln.filterPlacefinderChoices(places.result);
+                    if (places_filtered.length === 0) {
                         handleLocationLookupError('NOT_FOUND');
                     } else if (places_filtered.length > 1) {
                         // Nutzer muss aus mehreren Optionen auswählen
@@ -116,9 +114,9 @@ $(document).ready(function(){
                         choice.append('<div><span>Bitte wähle einen der folgenden Orte:</span></div>');
                         for (var n in places_filtered) {
                             // Marker auf der Karte
-                            //console.log(places_filtered[n].woeid, places_filtered[n].latitude, places_filtered[n].longitude);
-                            var markerLocation = new L.LatLng(parseFloat(places_filtered[n].latitude), parseFloat(places_filtered[n].longitude));
-                            var marker = new L.Marker(markerLocation, {title: places_filtered[n].woeid});
+                            //console.log(places_filtered[n].lat, places_filtered[n].lon);
+                            var markerLocation = new L.LatLng(parseFloat(places_filtered[n].lat), parseFloat(places_filtered[n].lon));
+                            var marker = new L.Marker(markerLocation, {title: places_filtered[n].osm_id});
                             marker.addEventListener("mouseover", function(evt){
                                 // Achtung! ID des Highlight-Elements wird als title übergeben
                                 $('#location-prompt-resultchoice a').removeClass('highlight');
@@ -135,20 +133,20 @@ $(document).ready(function(){
                             // Auswahllinks
                             var choicelink = $(document.createElement('a')).attr('href', '#');
                             var choicetext = '';
-                            if (places_filtered[n].neighborhood != '') {
-                                choicetext = places_filtered[n].neighborhood;
+                            if (places_filtered[n].address.suburb !== '') {
+                                choicetext = places_filtered[n].address.suburb;
                             } else {
-                                choicetext = places_filtered[n].street;
+                                choicetext = places_filtered[n].address.road;
                             }
-                            if (places_filtered[n].postal != '') {
-                                choicetext += ' (' + places_filtered[n].postal + ')'
+                            if (places_filtered[n].address.postcode !== '') {
+                                choicetext += ' (' + places_filtered[n].address.postcode + ')';
                             }
                             choicelink.text(choicetext);
-                            choicelink.attr('class', 'choicelink ' + places_filtered[n].woeid);
+                            choicelink.attr('class', 'choicelink ' + places_filtered[n].osm_id);
                             choicelink.mouseover({resultObject:places_filtered[n], mapmarker: marker}, function(evt){
                                 // Marker zentrieren und anzoomen
                                 //console.log(evt.data);
-                                map.setView(new L.LatLng(parseFloat(evt.data.resultObject.latitude), parseFloat(evt.data.resultObject.longitude)), 12);
+                                map.setView(new L.LatLng(parseFloat(evt.data.resultObject.lat), parseFloat(evt.data.resultObject.lon)), 12);
                             });
                             choicelink.click({resultObject:places_filtered[n]}, function(evt){
                                 //console.log(evt);
@@ -157,21 +155,18 @@ $(document).ready(function(){
                                 $('#location-prompt-resultchoice').slideUp('fast', function(){
                                     $('#location-prompt-resultchoice').remove();
                                 });
-                                var entry_string = evt.data.resultObject.street;
-                                if (evt.data.resultObject.house != '') {
-                                    entry_string += ' ' + evt.data.resultObject.house;
-                                }
-                                if (evt.data.resultObject.postal != '') {
-                                    entry_string += ' (' + evt.data.resultObject.postal + ')';
+                                var entry_string = evt.data.resultObject.address.road;
+                                if (evt.data.resultObject.address.postcode !== '') {
+                                    entry_string += ' (' + evt.data.resultObject.address.postcode + ')';
                                 }
                                 $('#street').val(entry_string);
                                 lastLocationEntry = entry_string;
                                 sessionParams = {
-                                    'location_entry': entry_string, 
-                                    'lat': evt.data.resultObject.latitude,
-                                    'lon': evt.data.resultObject.longitude
+                                    'location_entry': entry_string,
+                                    'lat': evt.data.resultObject.lat,
+                                    'lon': evt.data.resultObject.lon
                                 };
-                                setUserPosition(parseFloat(evt.data.resultObject.latitude), parseFloat(evt.data.resultObject.longitude));
+                                setUserPosition(parseFloat(evt.data.resultObject.lat), parseFloat(evt.data.resultObject.lon));
                                 OffenesKoeln.session(sessionParams, handleSessionResponse);
                             });
                             choice.append(choicelink);
@@ -181,8 +176,12 @@ $(document).ready(function(){
                         $('#location-prompt-resultchoice').slideDown('fast');
                     } else {
                         // exakt ein Treffer
-                        setUserPosition(parseFloat(places.ResultSet.Results[0].latitude), parseFloat(places.ResultSet.Results[0].longitude));
-                        sessionParams = {'location_entry': street, 'lat': places.ResultSet.Results[0].latitude, 'lon': places.ResultSet.Results[0].longitude};
+                        setUserPosition(parseFloat(places.result[0].lat), parseFloat(places.result[0].lon));
+                        sessionParams = {
+                            'location_entry': street,
+                            'lat': places.result[0].lat,
+                            'lon': places.result[0].lon
+                        };
                         OffenesKoeln.session(sessionParams, handleSessionResponse);
                     }
                 }
@@ -223,8 +222,8 @@ $(document).ready(function(){
     function setUserPosition(lat, lon) {
         // Header-Element umbauen
         var streetString = $('#street').val();
-        if (streetString == '') {
-            streetString = sessionData.location.location_entry;
+        if (streetString === '') {
+            streetString = sessionData.location_entry;
         }
         var changeLocationLink = $(document.createElement('a')).text(streetString).attr('href', '#').click(handleChangePositionClick);
         $('#position-prompt').slideUp().after('<div id="map-claim">Das passiert rund um </div>');
@@ -302,10 +301,10 @@ $(document).ready(function(){
      */
     function setGeoPositionFromNavigator(pos){
         console.log('setGeoPositionFromNavigator:', pos);
-        if ( pos.coords.latitude > lat_min
-        && pos.coords.latitude < lat_max
-        && pos.coords.longitude > lon_min
-        && pos.coords.longitude < lon_max) {
+        if ( pos.coords.latitude > lat_min &&
+            pos.coords.latitude < lat_max &&
+            pos.coords.longitude > lon_min &&
+            pos.coords.longitude < lon_max) {
             setUserPosition(pos.coords.latitude, pos.coords.longitude);
             sessionParams = {'lat': pos.coords.latitude, 'lon': pos.coords.longitude};
             OffenesKoeln.session(sessionParams, handleSessionResponse);
