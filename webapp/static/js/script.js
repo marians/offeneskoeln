@@ -190,7 +190,8 @@ var OffenesKoeln = {
         results.sort(OffenesKoeln.qualitySort);
         ret = [];
         for (var n in results) {
-            if (results[n].address.road !== '') {
+            if (results[n].address.road !== '' &&
+                results[n].address.county == "K\u00f6ln") {
                 ret.push(results[n]);
             }
         }
