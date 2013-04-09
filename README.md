@@ -1,5 +1,14 @@
 # Offenes Köln
 
+## Aktueller Hinweis
+
+Aktuell ist Version 2 von Offenes Köln in Arbeit. Wer den aktuellsten Stand auscheckt, bekommt **keine funktionsfähige Software**, und die Funktionen passen nicht zur Dokumentation. Der letzte dokumentierte Stand ist als Version "v1.0" getaggt und kann über das Tag ausgecheckt werden.
+
+Version 2 wird grundlegende Änderungen unter der Oberfläche bieten. Die Funktionalitäten aus Nutzersicht werden weitestgehend bestehen bleiben.
+
+
+## Über dieses Repository
+
 Dies ist das github-Repository für [Offenes Köln](http://offeneskoeln.de/).
 
 Hier gibt es:
@@ -24,10 +33,3 @@ Weitere Informationen findest Du im [https://github.com/marians/offeneskoeln/wik
 ###Lizenz
 
 Der Code steht unter einer MIT-artigen [Lizenz](https://github.com/marians/offeneskoeln/blob/master/LIZENZ.txt).
-
-### Versionen / Releases
-
-Das letzte Release ist mit "v1.0" getaggt. Nur bis zu diesem Tag ist die Funktion, wie hier auf der Website
-beschrieben, gewährleistet. Die späteren Commits bringen weitreichende Änderungen mit sich, die unter anderem
-eine andere Datenbank voraussetzen. Sobald das nächste Release ansteht, werden die Informatione hier dann 
-angepasst.
