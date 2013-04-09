@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # encoding: utf-8
 
 """
@@ -45,21 +44,22 @@ nodes = {}
 
 
 class NodeCollector(object):
-    #def coords(self, coords):
-    #    for osmid, lon, lat in coords:
-    #        if osmid not in nodes:
-    #            nodes[osmid] = {
-    #                'osmid': osmid
-    #            }
-    #        nodes[osmid]['lat'] = lat
-    #        nodes[osmid]['lon'] = lat
-    def nodes(self, n):
-        for osmid, tags, coords in n:
-            nodes[osmid] = {
-                'osmid': osmid,
-                'location': [coords[0], coords[1]],
-                'tags': tags
-            }
+    def coords(self, coords):
+        for osmid, lon, lat in coords:
+            if osmid not in nodes:
+                nodes[osmid] = {
+                    'osmid': osmid,
+                    'location': [lon, lat]
+                }
+            nodes[osmid]['lat'] = lat
+            nodes[osmid]['lon'] = lat
+    #def nodes(self, n):
+    #    for osmid, tags, coords in n:
+    #        nodes[osmid] = {
+    #            'osmid': osmid,
+    #            'location': [coords[0], coords[1]],
+    #            'tags': tags
+    #        }
 
 
 class StreetCollector(object):
@@ -98,7 +98,7 @@ if __name__ == '__main__':
 
     print "Sammle nodes..."
     nodecollector = NodeCollector()
-    p = OSMParser(concurrency=2, nodes_callback=nodecollector.nodes)
+    p = OSMParser(concurrency=2, coords_callback=nodecollector.coords)
     p.parse(sys.argv[1])
 
     print "Sammle Straßen..."
@@ -128,6 +128,4 @@ if __name__ == '__main__':
                     ('coordinates', wanted_nodes[street['nodes'][n]]['location'])
                 ])
             }
-            pprint.pprint(street['nodes'][n])
-        pprint.pprint(street)
         db.locations.save(street)
