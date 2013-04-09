@@ -27,6 +27,8 @@ entstanden.
 """
 
 import sys
+sys.path.append('./')
+import config
 import os
 import json
 import urllib
@@ -69,4 +71,3 @@ if __name__ == '__main__':
                     filename = attachment['url'].split('/')[-1]
                     path = options.folder + os.sep + filename
                     urllib.urlretrieve(attachment['url'], filename)
-
