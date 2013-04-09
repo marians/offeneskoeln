@@ -8,7 +8,7 @@ import bson
 import re
 import urllib
 import urllib2
-#import pprint
+import pprint
 
 from webapp import app
 
@@ -84,7 +84,7 @@ def geocode(location_string):
     addresses_out = []
     for n in range(len(addresses)):
         for key in addresses[n].keys():
-            if key in ['address', 'boundingbox', 'lat', 'lon']:
+            if key in ['address', 'boundingbox', 'lat', 'lon', 'osm_id']:
                 continue
             del addresses[n][key]
         if postal is not None:
