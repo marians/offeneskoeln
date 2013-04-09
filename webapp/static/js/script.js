@@ -170,53 +170,41 @@ var OffenesKoeln = {
      */
     filterPlacefinderChoices: function(results){
         results = OffenesKoeln.deepCopy(results);
-        //console.log(results);
         // Alle Einträge bekommen eigenen Qualitäts-Koeffizienten
         for (var n in results) {
             results[n].okquality = 1.0;
-            // multipliziere mit quality
-            results[n].okquality *= results[n].quality;
             // verdreifache wenn neighborhood gesetzt
-            if (results[n].neighborhood != '') {
+            if (results[n].address.suburb != '') {
                 results[n].okquality *= 3.0;
             }
-            // verdopple wenn postal gesetzt
-            if (results[n].postal != '') {
+            // verdopple wenn PLZ gesetzt
+            if (results[n].address.postcode != '') {
                 results[n].okquality *= 3.0;
             }
             // keine Straße gesetzt: Punktzahl durch 10
-            if (results[n].street == '') {
+            if (results[n].address.road == '') {
                 results[n].okquality *= 0.1;
             }
         }
         // Sortieren nach 'okquality' abwärts
-        results.sort(OffenesKoeln.placefinderQualitySort);
-        // Elemente nach woeid geschlüsselt sammeln, so dass
-        // jede woeid nur einmal vertreten ist
-        results_by_woeid = {};
-        for (var n in results) {
-            var woeid = results[n].woeid;
-            if (typeof results_by_woeid[woeid] == "undefined") {
-                results_by_woeid[woeid] = results[n];
-            }
-        }
-        //console.log(results_by_woeid);
+        results.sort(OffenesKoeln.qualitySort);
         ret = [];
-        for (var woeid in results_by_woeid) {
-            if (results_by_woeid[woeid].street != '') {
-                ret.push(results_by_woeid[woeid]);
+        for (var n in results) {
+            if (results[n].address.road !== '') {
+                ret.push(results[n]);
             }
         }
-        ret.sort(OffenesKoeln.placefinderLongitudeSort);
+        // Sortieren nach Längengrad
+        ret.sort(OffenesKoeln.longitudeSort);
         return ret;
     },
     
-    placefinderQualitySort: function(a, b) {
-        return b['okquality'] - a['okquality']
+    qualitySort: function(a, b) {
+        return b.okquality - a.okquality
     },
 
-	placefinderLongitudeSort: function(a, b) {
-        return parseFloat(a['longitude']) - parseFloat(b['longitude'])
+	longitudeSort: function(a, b) {
+        return parseFloat(a.lon) - parseFloat(b.lon)
     },
 
 	cylindrics: function(phi) {
