@@ -25,14 +25,16 @@ im Zusammenhang mit der Software oder sonstiger Verwendung der Software
 entstanden.
 """
 
-import config
-import os
 import sys
+sys.path.append('./')
+
+import config
+
 from datetime import datetime
 from pymongo import MongoClient
 import pyes
-import pprint
 import json
+import bson
 
 
 class MyEncoder(json.JSONEncoder):
@@ -70,6 +72,13 @@ def index_submission(index, submission_id):
                 del submission['attachments'][n]['thumbnails']
             if 'file' in submission['attachments'][n]:
                 del submission['attachments'][n]['file']
+    # Verweisende agendaitems in sessions finden
+    committees = []
+    sessions = db.sessions.find({'agendaitems.submissions.$id': submission_id}, {'committee_name': 1})
+    for session in sessions:
+        committees.append(session['committee_name'])
+    if len(committees):
+        submission['committees'] = committees
     if 'superordinate' in submission:
         del submission['superordinate']
     if 'subordinate' in submission:
@@ -81,16 +90,41 @@ def index_submission(index, submission_id):
 if __name__ == '__main__':
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
-    es = pyes.ES('localhost:9200')
+    host = config.ES_HOST + ':' + str(config.ES_PORT)
+    es = pyes.ES(host)
 
     now = datetime.utcnow()
-    #new_index = config.ES_INDEX + '-' + now.strptime('%Y%m%d-%H%M')
-    new_index = 'offeneskoeln' + '-' + now.strftime('%Y%m%d-%H%M')
+    new_index = config.ES_INDEX_NAME_PREFIX + '-' + now.strftime('%Y%m%d-%H%M')
     try:
         es.indices.delete_index(new_index)
     except:
         pass
-    es.indices.create_index(new_index)
+
+    settings = {
+        'index': {
+            'analysis': {
+                'analyzer': {
+                    'my_simple_german_analyzer': {
+                        'type': 'custom',
+                        'tokenizer': 'standard',
+                        'filter': ['standard', 'lowercase', 'my_synonym', 'my_stop']
+                    }
+                },
+                'filter': {
+                    'my_synonym': {
+                        'type': 'synonym',
+                        'synonyms_path': config.SYNONYMS_PATH
+                    },
+                    'my_stop': {
+                        'type': 'stop',
+                        'stopwords_path': config.STOPWORDS_PATH
+                    }
+                }
+            }
+        }
+    }
+    print "Screating index %s" % new_index
+    es.indices.create_index(new_index, settings=settings)
 
     # set mapping
     mapping = {
@@ -108,12 +142,21 @@ if __name__ == '__main__':
             'attachments.fulltext': {
                 'store': False,
                 'type': 'string',
-                'indexed': 'analyzed'
+                'index_name': 'attachment_fulltext',
+                'index': 'analyzed',
+                'analyzer': 'my_simple_german_analyzer'
             },
             'attachments.name': {
                 'store': False,
                 'type': 'string',
-                'indexed': 'analyzed'
+                'index': 'analyzed',
+                'analyzer': 'my_simple_german_analyzer'
+            },
+            'committees': {
+                'store': True,
+                'type': 'string',
+                'index_name': 'committee',
+                'index': 'not_analyzed'
             },
             'date': {
                 'store': False,
@@ -123,7 +166,8 @@ if __name__ == '__main__':
                 'store': False,
                 'type': 'string',
                 'index_name': 'georeference',
-                'indexed': 'analyzed'
+                'index': 'analyzed',
+                'analyzer': 'my_simple_german_analyzer'
             },
             'georeferences_generated': {
                 'store': False,
@@ -132,7 +176,7 @@ if __name__ == '__main__':
             'identifier': {
                 'store': False,
                 'type': 'string',
-                'indexed': 'not_analyzed'
+                'index': 'not_analyzed'
             },
             'last_modified': {
                 'store': False,
@@ -145,22 +189,24 @@ if __name__ == '__main__':
             'original_url': {
                 'store': False,
                 'type': 'string',
-                'indexed': 'not_analyzed'
+                'index': 'not_analyzed'
             },
             'subject': {
                 'store': False,
                 'type': 'string',
-                'indexed': 'analyzed'
+                'index': 'analyzed',
+                'analyzer': 'my_simple_german_analyzer'
             },
             'title': {
                 'store': False,
                 'type': 'string',
-                'indexed': 'analyzed'
+                'index': 'analyzed',
+                'analyzer': 'my_simple_german_analyzer'
             },
             'type': {
-                'store': False,
+                'store': True,
                 'type': 'string',
-                'indexed': 'not_analyzed'
+                'index': 'not_analyzed'
             }
         }
     }
@@ -169,13 +215,15 @@ if __name__ == '__main__':
     index_submissions(new_index)
     # Setze nach dem Indexieren Alias auf neuen Index
     # z.B. 'offeneskoeln-20130414-1200' -> 'offeneskoeln-latest'
-    #latest_name = config.ES_INDEX + '-latest'
-    latest_name = 'offeneskoeln' + '-latest'
+    latest_name = config.ES_INDEX_NAME_PREFIX + '-latest'
     try:
-        latest_before = es.get_alias(latest_name)
+        latest_before = es.get_alias(latest_name)[0]
+        print "Aliasing index %s to '%s'" % (new_index, latest_name)
         es.change_aliases([
             ('remove', latest_before, latest_name),
             ('add', new_index, latest_name)
         ])
+        print "Deleting index %s" % latest_before
+        es.delete_index(latest_before)
     except pyes.exceptions.IndexMissingException:
         es.add_alias(latest_name, [new_index])
