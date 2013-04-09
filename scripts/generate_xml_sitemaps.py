@@ -28,74 +28,119 @@ im Zusammenhang mit der Software oder sonstiger Verwendung der Software
 entstanden.
 """
 
+import sys
+sys.path.append('./')
 import config
+
 import os
 import datetime
-from stat import *
 import subprocess
+from pymongo import MongoClient
+import urllib
 
 
-def generate_sitemaps(attachments_folder):
-    files = get_file_info(attachments_folder)
+def execute(cmd):
+    output, error = subprocess.Popen(
+        cmd.split(' '), stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE).communicate()
+    if error is not None and error.strip() != '':
+        print >> sys.stderr, "Command: " + cmd
+        print >> sys.stderr, "Error: " + error
+
+
+def attachment_url(attachment_id, filename=None, extension=None):
+    if filename is not None:
+        extension = filename.split('.')[-1]
+    return config.ATTACHMENT_DOWNLOAD_URL % (attachment_id, extension)
+
+
+def submission_url(identifier):
+    url = config.BASE_URL
+    url += 'dokumente/' + urllib.quote_plus(identifier) + '/'
+    return url
+
+
+def generate_sitemaps():
     limit = 50000
+    sitemaps = []
+    urls = []
+    # gather attachment URLs
+    for attachment in db.attachments.find():
+        fileentry = db.fs.files.find_one(attachment['file'].id)
+        thisfile = {
+            'path': attachment_url(attachment['_id'], filename=attachment['filename']),
+            'lastmod': fileentry['uploadDate']
+        }
+        #print thisfile
+        urls.append(thisfile)
+
+    # create sitemap(s) with individual attachment URLs
     sitemap_count = 1
-    while len(files) > 0:
+    while len(urls) > 0:
         shortlist = []
-        while len(shortlist) < limit and len(files) > 0:
-            shortlist.append(files.pop(0))
-        generate_sitemap(shortlist, sitemap_count)
-        #print len(shortlist)
+        # TODO: this could probably be done with slice
+        while len(shortlist) < limit and len(urls) > 0:
+            shortlist.append(urls.pop(0))
+        sitemap_name = 'attachments_%d' % sitemap_count
+        generate_sitemap(shortlist, sitemap_name)
+        sitemaps.append(sitemap_name)
         sitemap_count += 1
-    meta_sitemap_path = config.ATTACHMENTS_PATH + '/sitemap.xml'
+
+    urls = []
+    # gather submission URLs
+    for submission in db.submissions.find():
+        thisfile = {
+            'path': submission_url(submission['identifier']),
+            'lastmod': submission['last_modified']
+        }
+        #print thisfile
+        urls.append(thisfile)
+
+    # create sitemap(s) with individual attachment URLs
+    sitemap_count = 1
+    while len(urls) > 0:
+        shortlist = []
+        # TODO: this could probably be done with slice
+        while len(shortlist) < limit and len(urls) > 0:
+            shortlist.append(urls.pop(0))
+        sitemap_name = 'submissions_%d' % sitemap_count
+        generate_sitemap(shortlist, sitemap_name)
+        sitemaps.append(sitemap_name)
+        sitemap_count += 1
+
+
+    # Create meta-sitemap
+    meta_sitemap_path = config.STATIC_PATH + '/sitemap.xml'
     f = open(meta_sitemap_path, 'w')
     f.write("""<?xml version="1.0" encoding="UTF-8"?>
         <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
-    for n in range(1, sitemap_count):
+    for sitemap_name in sitemaps:
         f.write("""\n   <sitemap>
-            <loc>http://offeneskoeln.de/attachments/sitemap_%d.xml.gz</loc>
-        </sitemap>\n""" % n)
+            <loc>%s%s.xml.gz</loc>
+        </sitemap>\n""" % (config.STATIC_URL, sitemap_name))
     f.write("</sitemapindex>\n")
     f.close()
 
 
-def generate_sitemap(files, counter):
-    sitemap_path = (config.ATTACHMENTS_PATH + '/' +
-        'sitemap_' + str(counter) + '.xml')
+def generate_sitemap(files, name):
+    sitemap_path = (config.STATIC_PATH + '/' + name + '.xml')
     f = open(sitemap_path, 'w')
     f.write("""<?xml version="1.0" encoding="UTF-8"?>
         <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
     for entry in files:
         f.write("""\n<url>
-            <loc>http://offeneskoeln.de%s</loc>
+            <loc>%s</loc>
             <lastmod>%s</lastmod>
         </url>""" % (entry['path'], entry['lastmod'].strftime('%Y-%m-%d')))
     f.write("</urlset>\n")
     f.close()
     cmd = "rm %s.gz" % sitemap_path
-    output, error = subprocess.Popen(
-        cmd.split(' '), stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE).communicate()
-    #print output, error
+    execute(cmd)
     cmd = "gzip %s" % sitemap_path
-    output, error = subprocess.Popen(
-        cmd.split(' '), stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE).communicate()
-    #print output, error
+    execute(cmd)
 
-
-def get_file_info(startpath):
-    outfiles = []
-    for root, dirs, files in os.walk(startpath):
-        webroot = root[len(config.WWW_PATH):]
-        for fname in files:
-            fullpath = root + '/' + fname
-            path = webroot + '/' + fname
-            outfiles.append({
-                'path': path,
-                'lastmod': datetime.datetime.fromtimestamp(os.stat(fullpath).st_mtime)
-            })
-    return outfiles
 
 if __name__ == '__main__':
-    generate_sitemaps(config.ATTACHMENTS_PATH)
-
+    connection = MongoClient(config.DB_HOST, config.DB_PORT)
+    db = connection[config.DB_NAME]
+    generate_sitemaps()

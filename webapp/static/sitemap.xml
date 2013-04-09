@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <sitemap>
+            <loc>http://localhost:5000/static/attachments_1.xml.gz</loc>
+        </sitemap>
+
+   <sitemap>
+            <loc>http://localhost:5000/static/submissions_1.xml.gz</loc>
+        </sitemap>
+</sitemapindex>
