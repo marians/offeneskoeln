@@ -76,7 +76,8 @@ def index_submission(index, submission_id):
     committees = []
     sessions = db.sessions.find({'agendaitems.submissions.$id': submission_id}, {'committee_name': 1})
     for session in sessions:
-        committees.append(session['committee_name'])
+        if 'committee_name' in session:
+            committees.append(session['committee_name'])
     if len(committees):
         submission['committees'] = committees
     if 'superordinate' in submission:
@@ -123,7 +124,7 @@ if __name__ == '__main__':
             }
         }
     }
-    print "Screating index %s" % new_index
+    print "Creating index %s" % new_index
     es.indices.create_index(new_index, settings=settings)
 
     # set mapping
