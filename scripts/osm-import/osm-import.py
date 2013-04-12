@@ -28,7 +28,7 @@ entstanden.
 
 import sys
 
-sys.path.append('../../')
+sys.path.append('./')
 
 import config
 from imposm.parser import OSMParser
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
-    db.locations.remove()
+    db.locations.remove({'ags': config.AGS})
     db.locations.ensure_index('osmid', unique=True)
     db.locations.ensure_index('name')
     db.locations.ensure_index([('nodes.location', '2dsphere')])
@@ -122,6 +122,7 @@ if __name__ == '__main__':
     for street in streetcollector.streets:
         for n in range(len(street['nodes'])):
             street['nodes'][n] = {
+                'ags': config.AGS,
                 'osmid': street['nodes'][n],
                 'location': SON([
                     ('type', 'Point'),
