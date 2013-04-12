@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 """
-Testscript für das date_range Modul
+Testscript für das generate_relationships Modul
 
 Copyright (c) 2012 Marian Steinbach
 
