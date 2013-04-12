@@ -105,19 +105,19 @@ var OffenesKoeln = {
      * Takes an object of standard search parameters and deletes those which are default or null
      */
     processSearchParams: function(params){
-        if (typeof params['q'] == 'undefined'
+        if (typeof params['q'] === 'undefined'
             || params['q'] == null
-            || params['q'] == '' 
-            || params['q'] == '*:*') {
+            || params['q'] === ''
+            || params['q'] === '*:*') {
             delete params['q'];
         }
-        if (typeof params['fq'] == 'undefined' 
+        if (typeof params['fq'] === 'undefined'
             || params['fq'] == null
-            || params['fq'] == '' 
-            || params['fq'] == '*:*') {
+            || params['fq'] === ''
+            || params['fq'] === '*:*') {
             delete params['fq'];
         }
-        if (typeof params['num'] == 'undefined' 
+        if (typeof params['num'] == 'undefined'
             || params['num'] == null
             || params['num'] == ''
             || params['num'] <= 10) {
@@ -168,7 +168,7 @@ var OffenesKoeln = {
      * Einträge, die nicht zur Auswahl angezeigt werden sollen,
      * aus.
      */
-    filterPlacefinderChoices: function(results){
+    filterGeocodingChoices: function(results){
         results = OffenesKoeln.deepCopy(results);
         // Alle Einträge bekommen eigenen Qualitäts-Koeffizienten
         for (var n in results) {
@@ -182,18 +182,22 @@ var OffenesKoeln = {
                 results[n].okquality *= 3.0;
             }
             // keine Straße gesetzt: Punktzahl durch 10
-            if (results[n].address.road == '') {
+            if (typeof(results[n].address.road) === 'undefined') {
                 results[n].okquality *= 0.1;
             }
         }
         // Sortieren nach 'okquality' abwärts
         results.sort(OffenesKoeln.qualitySort);
-        ret = [];
-        for (var n in results) {
-            if (results[n].address.road !== '' &&
-                results[n].address.county == "K\u00f6ln") {
-                ret.push(results[n]);
+        var resultByPostCode = {};
+        var n;
+        for (n in results) {
+            if (typeof(resultByPostCode[results[n].address.postcode]) === 'undefined') {
+                resultByPostCode[results[n].address.postcode] = results[n];
             }
+        }
+        ret = [];
+        for (n in resultByPostCode) {
+            ret.push(resultByPostCode[n]);
         }
         // Sortieren nach Längengrad
         ret.sort(OffenesKoeln.longitudeSort);
@@ -269,5 +273,12 @@ var OffenesKoeln = {
         console.log(url, recoded, num, hosts[num]);
         var re = /^http[s]*:\/\/[^\/]+\/static/;
         return url.replace(re, 'http://'+hosts[num]);
+    },
+
+    /**
+     * returns true if the string ends with given suffix
+     */
+    endsWith: function(str, suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
     }
 };
