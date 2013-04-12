@@ -35,7 +35,7 @@ var disqus_shortname = '{{ config.DISQUS_SHORTNAME }}';
 				</tr>
 				<tr>
 					<td class="label">Erstellt am:</td>
-					<td class="value">{{ submission.date.strftime('%d')|int }}. {{ submission.date.strftime('%B %Y') }}</td>
+					<td class="value">{{ submission.date.strftime('%d.%m.%Y') }}</td>
 				</tr>
 				<tr>
 					<td class="label">Beraten in:</td>
@@ -71,7 +71,8 @@ var disqus_shortname = '{{ config.DISQUS_SHORTNAME }}';
 		<ol>
 			{% for session in submission.consultations %}
 			<li>
-				<b>{{ session.committee_name }}</b>, {{ session.date_start.strftime('%d')|int }}. {{ session.date_start.strftime('%B %Y') }}.
+				<b>{{ session.committee_name }}</b>,
+				{{ session.date_start.strftime('%d.%m.%Y') }}. 
 				{% for agendaitem in session.agendaitems %}
 					{% if agendaitem.subject != submission.title %}
 						<br/>Thema: {{ agendaitem.subject }}
@@ -89,9 +90,19 @@ var disqus_shortname = '{{ config.DISQUS_SHORTNAME }}';
 	</div>
 
 	{% for attachment in submission.attachments %}
+	{% if attachment.thumbnails %}
 	{% set twidth = (attachment.thumbnails['300']|sum(attribute='width') + (11 * attachment.thumbnails['300']|length)) %}
+	{% endif %}
 	<div class="attachment content middle" id="{{ attachment._id }}">
-		<h2>Anlage: {{ attachment.name|truncate(100) }} ({{ attachment.thumbnails['300']|length }} Seiten)</h2>
+		{% if attachment.thumbnails %}
+		{% set numpages = attachment.thumbnails['300']|length %}
+		{% endif %}
+		<h2>Anlage: {{ attachment.name|truncate(100) }}
+			{% if numpages %}
+			({{ numpages }} Seiten)
+			{% endif %}
+		</h2>
+		{% if attachment.thumbnails %}
 		<div class="thumbs">
 			<div class="thumbsinner" style="width: {{ twidth }}px; height: 310px;">
 				{% for thumbnail in attachment.thumbnails['300'] %}
@@ -99,6 +110,11 @@ var disqus_shortname = '{{ config.DISQUS_SHORTNAME }}';
 				{% endfor %}
 			</div>
 		</div>
+		{% else %}
+		<div class="nothumbs">
+			<div class="smallnote">Zu diesem Anhang liegen keine Vorschaubilder vor.</div>
+		</div>
+		{% endif %}
 		{% if attachment.fulltext %}
 		<div class="fulltext">
 			<div class="complete">
