@@ -3,6 +3,7 @@
 config.py
 venv/
 webapp/static/thumbs
+webapp/static/attachments*
 webapp/static/tiles
 webapp/attachments
 webapp/daten
