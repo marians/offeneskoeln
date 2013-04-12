@@ -7,6 +7,16 @@
 {{ super() }}
 <script type="text/javascript" src="/static/js/leaflet_0.4.5.js"></script>
 <script type="text/javascript" src="http://a.ok.mycdn.de/js/jquery.ajaxq.js"></script>
+<script>
+var CONF = {
+  mapStartPoint: [{{ config.MAP_START_POINT[0]|safe }}, {{ config.MAP_START_POINT[1]|safe }}],
+  mapTileUrlSchema: '{{ config.MAP_TILE_URL_SCHEMA|safe }}',
+  mapTileAttribution: '{{ config.MAP_TILE_ATTRIBUTION|safe }}',
+  mapTileMinZoom: {{ config.MAP_TILE_ZOOMLEVEL_MIN|safe }},
+  mapTileMaxZoom: {{ config.MAP_TILE_ZOOMLEVEL_MAX|safe }},
+  locationName: '{{ config.LOCATION_NAME|safe }}'
+};
+</script>
 <script type="text/javascript" src="/static/js/map.js"></script>
 {% endblock %}
 
@@ -31,13 +41,13 @@
 			<input type="text" id="qinput" name="q" value="" />
 			<a href="#" id="submit" class="awesome extrawide">Suchen</a>
 		</form>
+		{% if config.SEARCH_EXAMPLES %}
 		<div class="examples">Beispiele: 
-			<a href="/suche/?q=b%C3%BCrgerhaushalt">bürgerhaushalt</a>,
-			<a href="/suche/?q=kalkberg">kalkberg</a>,
-			<a href="/suche/?q=waldbadviertel">waldbadviertel</a>,
-			<a href="/suche/?q=sanierung+schauspielhaus">sanierung schauspielhaus</a>,
-			<a href="/suche/?q=nord+s%C3%BCd+stadtbahn">nord süd stadtbahn</a>
+			{% for example in config.SEARCH_EXAMPLES %}
+			<a href="/suche/?q={{ example|urlencode }}">{{ example }}</a>
+			{% endfor %}
 		</div>
+		{% endif %}
 	</div>
 </div>
 {% endblock %}
