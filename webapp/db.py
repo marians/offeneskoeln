@@ -205,8 +205,9 @@ def get_locations(lon, lat, radius=1000):
         lat = float(lat)
     if type(radius) != int:
         radius = int(radius)
-    earth_radius = 6371.0
-    res = mongo.db.locations.aggregate([{
+    earth_radius = 6371000.0
+    res = mongo.db.locations.aggregate([
+    {
       '$geoNear': {
         'near': [lon, lat],
         'distanceField': 'distance',
