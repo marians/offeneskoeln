@@ -87,6 +87,14 @@ def geocode(location_string):
             if key in ['address', 'boundingbox', 'lat', 'lon', 'osm_id']:
                 continue
             del addresses[n][key]
+        # skip if no road contained
+        if 'road' not in addresses[n]['address']:
+            continue
+        # skip if not in correct county
+        if 'county' not in addresses[n]['address']:
+            continue
+        if addresses[n]['address']['county'] != app.config['GEOCODING_FILTER_COUNTY']:
+            continue
         if postal is not None:
             if 'postcode' in addresses[n]['address'] and addresses[n]['address']['postcode'] == postal:
                 addresses_out.append(addresses[n])
