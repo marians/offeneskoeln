@@ -26,7 +26,7 @@ def create_dump(folder):
     """
     Drops dumps in folder/config.DB_NAME
     """
-    cmd = (config.MONGODUMP_PATH + ' --db ' + config.DB_NAME +
+    cmd = (config.MONGODUMP_CMD + ' --db ' + config.DB_NAME +
             ' --out ' + folder)
     for collection in config.DB_DUMP_COLLECTIONS:
         thiscmd = cmd + ' --collection ' + collection
