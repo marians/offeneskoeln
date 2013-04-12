@@ -5,12 +5,10 @@ $(document).ready(function(){
     var markerLayerGroup = new L.LayerGroup();
     map.addLayer(markerLayerGroup);
     
-    var tileUrlSchema = 'http://{s}.ok.mycdn.de/tiles/v3/{z}/{x}/{y}.png',
-        attribution = 'Geodaten &copy; OpenStreetMap Mitwirkende',
-        backgroundLayer = new L.TileLayer(tileUrlSchema, {
-            maxZoom: 17,
-            minZoom: 8,
-            attribution: attribution
+    var backgroundLayer = new L.TileLayer(CONF.mapTileUrlSchema, {
+            maxZoom: CONF.mapTileMaxZoom,
+            minZoom: CONF.mapTileMinZoom,
+            attribution: CONF.mapTileAttribution
         });
     
     var sessionData = {}; // user session data
@@ -23,7 +21,7 @@ $(document).ready(function(){
         lon_min = 6.8,
         lon_max = 7.1;
         
-    map.setView(new L.LatLng(50.9375, 6.944), 11).addLayer(backgroundLayer);
+    map.setView(new L.LatLng(CONF.mapStartPoint[1], CONF.mapStartPoint[0]), 11).addLayer(backgroundLayer);
     
     // set to user position, if set and within cologne
     OffenesKoeln.session({}, function(data){
@@ -98,11 +96,11 @@ $(document).ready(function(){
             };
             $.getJSON('/api/proxy/geocode', data, function(places){
                 $('#position-prompt .spinner').css({visibility: 'hidden'});
-                //console.log('Geocoding response: ', places);
+                console.log('Geocoding response: ', places);
                 if (places.result.length === 0) {
                     handleLocationLookupError('NOT_FOUND');
                 } else {
-                    var places_filtered = OffenesKoeln.filterPlacefinderChoices(places.result);
+                    var places_filtered = OffenesKoeln.filterGeocodingChoices(places.result);
                     if (places_filtered.length === 0) {
                         handleLocationLookupError('NOT_FOUND');
                     } else if (places_filtered.length > 1) {
@@ -145,7 +143,6 @@ $(document).ready(function(){
                             choicelink.attr('class', 'choicelink ' + places_filtered[n].osm_id);
                             choicelink.mouseover({resultObject:places_filtered[n], mapmarker: marker}, function(evt){
                                 // Marker zentrieren und anzoomen
-                                //console.log(evt.data);
                                 map.setView(new L.LatLng(parseFloat(evt.data.resultObject.lat), parseFloat(evt.data.resultObject.lon)), 12);
                             });
                             choicelink.click({resultObject:places_filtered[n]}, function(evt){
@@ -195,7 +192,7 @@ $(document).ready(function(){
     
     function resetMap() {
         clearMap();
-        map.setView(new L.LatLng(50.9375, 6.944), 11);
+        map.setView(new L.LatLng(CONF.mapStartPoint[1], CONF.mapStartPoint[0]), 11);
     }
     
     function handleChangePositionClick(evt) {
@@ -212,7 +209,7 @@ $(document).ready(function(){
         if (reason == 'NEED_DETAILS') {
             msg.append('Bitte gib den Ort genauer an, z.B. durch Angabe einer Hausnummer oder PLZ.');
         } else if (reason == 'NOT_FOUND') {
-            msg.append('Der angegebene Ort wurde nicht gefunden. Bist Du sicher, dass er in Köln liegt?');
+            msg.append('Der angegebene Ort wurde nicht gefunden. Bist Du sicher, dass er in '+ CONF.locationName +' liegt?');
         } else {
             msg.append('Bei der Ortssuche ist ein unbekannter Fehler ausgetreten. Bitte versuche es noch einmal.');
         }
@@ -226,46 +223,110 @@ $(document).ready(function(){
             streetString = sessionData.location_entry;
         }
         var changeLocationLink = $(document.createElement('a')).text(streetString).attr('href', '#').click(handleChangePositionClick);
-        $('#position-prompt').slideUp().after('<div id="map-claim">Das passiert rund um </div>');
+        var article = '';
+        if (OffenesKoeln.endsWith(streetString, 'straße') || OffenesKoeln.endsWith(streetString, 'gasse')) {
+            article = 'die';
+        }
+        var mapClaim = '<div id="map-claim">Das passiert rund um ' + article + ' </div>';
+        $('#position-prompt').slideUp().after(mapClaim);
         $('#map-claim').append(changeLocationLink);
         // Karte umbauen
         clearMap();
         var userLocation = new L.LatLng(lat, lon),
             radius = 500;
         map.setView(userLocation, 14);
-        circleOptions = {color: '#97c66b', opacity: 0.4},
-        circle = new L.Circle(userLocation, radius, circleOptions);
-        markerLayerGroup.addLayer(circle);
+        var circleOptions = {color: '#97c66b', opacity: 0.7, fill: false, draggable: true};
+        var outerCircle = new L.Circle(userLocation, radius, circleOptions);
+        var innerDot = new L.Circle(userLocation, 20, {fillOpacity: 0.9, fillColor: '#97c66b', stroke: false, draggable: true});
+        var positionPopup = L.popup()
+                .setLatLng(userLocation)
+                .setContent('<p>Dies ist der Suchmittelpunkt für die Umkreissuche.</p>');
+        outerCircle.on('click', function(e){
+            map.openPopup(positionPopup);
+        });
+        outerCircle.on('drag', function(e){
+            console.log(e);
+        });
+        innerDot.on('click', function(e){
+            map.openPopup(positionPopup);
+        });
+        markerLayerGroup.addLayer(outerCircle);
+        markerLayerGroup.addLayer(innerDot);
         var streets = [];
-        // Straßen aus der Umgebung abrufen
+        // Strassen aus der Umgebung abrufen
         OffenesKoeln.streetsForPosition(lat, lon, radius, function(data){
-            streets = data.response.streets;
-            // get marker positions for the surrounding streets
-            var streetnames = [];
-            for (var i in streets) {
-                streetnames.push(streets[i][0]);
-            }
-            OffenesKoeln.locationsForStreetsQueued(streetnames, function(data){
-                if (data.response.averages) {
-                    $.getJSON('/api/documents', {'fq': 'street:"'+ data.request.street +'"', 'docs': 1, 'sort': 'date desc'}, function(search){
-                        if (search.response.numhits > 0) {
-                            //console.log(search, data.response.averages[0]);
-                            var markerLocation = new L.LatLng(data.response.averages[0][0], data.response.averages[0][1]);
-                            var marker = new L.Marker(markerLocation);
-                            markerLayerGroup.addLayer(marker);
-                            var markerHtml = '<p><b><a href="/suche/?q=' + data.request.street + '">' + data.request.street + ': ' + search.response.numhits + ' Treffer</a></b>';
-                            if (search.response.documents[0].date && search.response.documents[0].date[0]) {
-                                markerHtml += '<br/>Der jüngste vom ' + OffenesKoeln.formatIsoDate(search.response.documents[0].date[0]);
-                            } else {
-                                //console.log('Kein Datum: ', search.response.documents[0]);
+            //console.log('streetsForPosition callback data: ', data);
+            
+            if (typeof data.response.streets !== 'undefined') {
+                // version 1 API response
+                var streetnames = [];
+                var streets = data.response.streets;
+                for (var i in data.response.streets) {
+                    streetnames.push(data.response.streets[i][0]);
+                }
+                // get marker positions for the surrounding streets
+                OffenesKoeln.locationsForStreetsQueued(streetnames, function(data){
+                    if (data.response.averages) {
+                        $.getJSON('/api/documents', {'fq': 'street:"'+ data.request.street +'"', 'docs': 1, 'sort': 'date desc'}, function(search){
+                            if (search.response.numhits > 0) {
+                                //console.log(search, data.response.averages[0]);
+                                var markerLocation = new L.LatLng(data.response.averages[0][0], data.response.averages[0][1]);
+                                var marker = new L.Marker(markerLocation);
+                                markerLayerGroup.addLayer(marker);
+                                var markerHtml = '<p><b><a href="/suche/?q=' + data.request.street + '">' + data.request.street + ': ' + search.response.numhits + ' Treffer</a></b>';
+                                if (search.response.documents[0].date && search.response.documents[0].date[0]) {
+                                    markerHtml += '<br/>Neuster Treffer vom ' + OffenesKoeln.formatIsoDate(search.response.documents[0].date[0]);
+                                } else {
+                                    //console.log('Kein Datum: ', search.response.documents[0]);
+                                }
+                                markerHtml += '</p>';
+                                marker.bindPopup(markerHtml);
                             }
-                            markerHtml += '</p>';
-                            marker.bindPopup(markerHtml);
+                        });
+                    }
+                });
+            } else {
+                // version 2 API response
+                streets_by_name = {};
+                var name;
+                // collect streets by name
+                for (var j in data.response) {
+                    name = data.response[j].name;
+                    if (typeof streets_by_name[name] === 'undefined') {
+                        streets_by_name[name] = [];
+                    }
+                    streets_by_name[name].push(data.response[j]);
+                }
+                // do search by name
+                $.each(streets_by_name, function(name, street) {
+                    //console.log(name, streets_by_name[name].length);
+                    $.getJSON('/api/documents', {'q': name, 'docs': 1, 'sort': 'date desc'}, function(search){
+                        if (search.response.numhits > 0) {
+                            //console.log("Search result for", name, search);
+                            //console.log("Street object", name, streets_by_name[name]);
+                            // draw path for street (experimental)
+                            $.each(streets_by_name[name], function(n, streetpart){
+                                var points = [];
+                                //console.log(streetpart);
+                                $.each(streetpart.nodes, function(n, node){
+                                    points.push(new L.LatLng(
+                                        node.location.coordinates[1], node.location.coordinates[0]
+                                    ));
+                                });
+                                var markerHtml = '<p><b><a href="/suche/?q=' + name + '">' + name + ': ' + search.response.numhits + ' Treffer</a></b>';
+                                if (search.response.documents[0].date && search.response.documents[0].date[0]) {
+                                    markerHtml += '<br/>Der jüngste vom ' + OffenesKoeln.formatIsoDate(search.response.documents[0].date);
+                                }
+                                markerHtml += '</p>';
+                                var polyline = L.polyline(points, {color: '#ff0909'});
+                                polyline.bindPopup(markerHtml);
+                                markerLayerGroup.addLayer(polyline);
+                            });
                         }
                     });
-                }
-            });
-        })
+                });
+            }
+        });
     }
     
     /*
@@ -299,6 +360,7 @@ $(document).ready(function(){
      * Callback function for navigator.geolocation.getCurrentPosition
      * in case of success
      */
+    /*
     function setGeoPositionFromNavigator(pos){
         console.log('setGeoPositionFromNavigator:', pos);
         if ( pos.coords.latitude > lat_min &&
@@ -312,4 +374,5 @@ $(document).ready(function(){
             console.log('User ist nicht in Köln :(');
         }
     }
+    */
 });
