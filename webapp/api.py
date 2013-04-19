@@ -54,6 +54,7 @@ def api_documents():
     Dokumentenabfrage anhand der Kennung(en). Ansonsten ist es eine Suche.
     """
     start_time = time.time()
+    jsonp_callback = request.args.get('callback', None)
     ref = request.args.get('reference', '')
     references = ref.split(',')
     if references == ['']:
@@ -132,6 +133,8 @@ def api_documents():
     ret['request']['sort'] = sort
 
     json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
+    if jsonp_callback is not None:
+        json_output = jsonp_callback + '(' + json_output + ')'
     response = make_response(json_output, 200)
     response.mimetype = 'application/json'
     response.headers['Expires'] = util.expires_date(hours=24)
@@ -142,6 +145,7 @@ def api_documents():
 @app.route("/api/locations")
 def api_locations():
     start_time = time.time()
+    jsonp_callback = request.args.get('callback', None)
     street = request.args.get('street', '')
     if street == '':
         abort(400)
@@ -155,6 +159,8 @@ def api_locations():
         'response': result
     }
     json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
+    if jsonp_callback is not None:
+        json_output = jsonp_callback + '(' + json_output + ')'
     response = make_response(json_output, 200)
     response.mimetype = 'application/json'
     response.headers['Expires'] = util.expires_date(hours=24)
@@ -165,6 +171,7 @@ def api_locations():
 @app.route("/api/streets")
 def api_streets():
     start_time = time.time()
+    jsonp_callback = request.args.get('callback', None)
     lon = request.args.get('lon', '')
     lat = request.args.get('lat', '')
     radius = request.args.get('radius', '1000')
@@ -186,6 +193,8 @@ def api_streets():
         'response': result
     }
     json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
+    if jsonp_callback is not None:
+        json_output = jsonp_callback + '(' + json_output + ')'
     response = make_response(json_output, 200)
     response.mimetype = 'application/json'
     response.headers['Expires'] = util.expires_date(hours=24)
@@ -196,6 +205,7 @@ def api_streets():
 @app.route("/api/proxy/geocode")
 def api_geocode():
     start = time.time()
+    jsonp_callback = request.args.get('callback', None)
     street = request.args.get('street', '')
     if street == '':
         abort(400)
@@ -204,6 +214,8 @@ def api_geocode():
     }
     obj['duration'] = int((time.time() - start) * 1000)
     json_output = json.dumps(obj, sort_keys=True)
+    if jsonp_callback is not None:
+        json_output = jsonp_callback + '(' + json_output + ')'
     response = make_response(json_output, 200)
     response.mimetype = 'application/json'
     response.headers['Expires'] = util.expires_date(hours=24)
@@ -213,6 +225,7 @@ def api_geocode():
 
 @app.route("/api/session")
 def api_session():
+    jsonp_callback = request.args.get('callback', None)
     location_entry = request.args.get('location_entry', '')
     lat = request.args.get('lat', '')
     lon = request.args.get('lon', '')
@@ -231,6 +244,8 @@ def api_session():
         }
     }
     json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
+    if jsonp_callback is not None:
+        json_output = jsonp_callback + '(' + json_output + ')'
     response = make_response(json_output, 200)
     response.mimetype = 'application/json'
     return response
