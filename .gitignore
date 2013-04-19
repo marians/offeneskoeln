@@ -6,3 +6,11 @@ webapp/static/thumbs
 webapp/static/tiles
 webapp/attachments
 webapp/daten
+webapp/static/rss/dokumente.xml
+scripts/osm-import/bin
+scripts/osm-import/lib
+scripts/osm-import/config
+scripts/osm-import/*.poly
+scripts/osm-import/*.osm
+scripts/osm-import/osmfilter
+scripts/osm-import/osmosis
