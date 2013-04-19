@@ -581,6 +581,12 @@ code {
 	background-color: #f5f8f2;
 }
 
+#api td, #api th {
+	text-align: left;
+	padding: 4px;
+	padding-right: 15px;
+}
+
 /* Buttons */
 
 /*
