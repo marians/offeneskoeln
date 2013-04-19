@@ -4,6 +4,7 @@
 {% block meta_description %}Für echte Offenheit braucht es offene Schnittstellen. Hier gibt es Informationen über unsere Webservice API.{% endblock %}
 
 {% block content %}
+<div id="api">
 <div class="content top">
     <h1>Die Offenes Köln API</h1>
     
@@ -21,18 +22,33 @@
     <div class="text">
 
     <h2>Dokumentation</h2>
+
+        <h3>Ausgabeformate</h3>
         
-        <p>Die Ausgabe der Webservice-API erfolgt aktuell ausschließlich in <b>JSON</b>.</p>
+        <p>Die API unterstützt die Ausgabe in den Formaten <b>JSON</b> und <b>JSONP</b>. Ist der URL-Parameter <code>callback</code> gesetzt, wird JSONP ausgegeben, sonst JSON.</p>
         
-        <p>Der Server unterstützt <b>GZip-Kompression</b> der Antwort. Dafür muss der Client den String <code>gzip</code> im Request-Header <code>Accept-Encoding</code> senden.</p>
+        <h3>HTTP-Methode</h3>
         
         <p>Sämtliche Anfragen an die API erfolgen mit der HTTP-Methode <b>GET</b>.</p>
         
-        <p>Alle URL-Parameter müssen mit Zeichensatz <b>UTF-8</b> sowie URL-kodiert (<a href="http://www.apps.ietf.org/rfc/rfc3986.html">RFC 3986</a>) übergeben werden. Beispiel: Der Straßenname <code>Merkensstra<b>ß</b>e</code> wird in einer URL zu <code>Merkensstra<b>%C3%9F</b>e</code>, wobei das Zeichen <code>ß</code> durch die zwei aufeinander folgenden hexadezimal-Zeichen <code>%C3</code> und <code>%9F</code> kodiert wird.</p>
+        <h3>Kompression</h3>
         
-        <p>Wenn von <b>Geo-Positionen oder Geo-Koordinaten</b> die Rede ist, ist eine Kombination aus Längen- und Breitengradangabe gemeint. Der Breitengrad wird als <code>latitude</code> oder <code>lat</code> benannt, der Längengrad als <code>longitude</code> oder <code>lon</code>. Wenn eine Webservice-Methode ein Koordinatenpaar ausgibt, ohne die beiden Werte einzeln zu benennen, steht immer als erstes der Breitengrad (lat bzw. latitude) und als zweites der Längengrad. Allerdings ist kaum eine Verwechselung möglich, da sich alle Koordinaten im Raum Köln befinden.</p>
+        <p>Der Server unterstützt <b>GZip-Kompression</b> der Antwort. Dafür muss der Client den String <code>gzip</code> im HTTP Request-Header <code>Accept-Encoding</code> senden.</p>
+        
+        <h3>Zeichkodierung von URL-Parametern</h3>
+        
+        <p>Alle URL-Parameter müssen mit Zeichensatz <b>UTF-8</b> sowie URL-kodiert (<a href="http://www.apps.ietf.org/rfc/rfc3986.html">RFC 3986</a>) übergeben werden. Beispiel: Der Straßenname <code>Hauptsstra<b>ß</b>e</code> wird in einer URL zu <code>Hauptsstra<b>%C3%9F</b>e</code>, wobei das Zeichen <code>ß</code> durch die zwei aufeinander folgenden hexadezimal-Zeichen <code>%C3</code> und <code>%9F</code> kodiert wird.</p>
+        
+        <h3>Geodaten</h3>
+        
+        <p>Geo-Koordinaten werden aus einer Kombination aus Längen- und Breitengradangabe im WGS84-System wiedergegeben. Das bedeutet, die Angaben sind kompatibel mit GPS, Google Maps und OpenStreetMap.</p>
 
-        <p>Nachfolgend werden die einzelnen Methoden/Endpunkte beschrieben. Hier der Überblick:</p>
+        <p>Wenn eine Methode ein Koordinatenpaar ausgibt, ohne die beiden Werte einzeln zu benennen, steht immer als erstes der Breitengrad (lat bzw. latitude) und als zweites der Längengrad (lon bzw. longitude). Gradangaben sind Fließkommazahlen wie z.B. <code>6.496</code>.</p>
+
+        <h3>Methoden der API</h3>
+
+        <p>Nachfolgend werden die einzelnen Methoden/Endpunkte beschrieben:</p>
+
         <ul>
             <li><a href="#documents">/api/documents</a> - Abruf von Dokumenten einschl. Suche</li>
             <li><a href="#locations">/api/locations</a> - Ausgabe von Geo-Positionen zu Straßen</li>
@@ -49,34 +65,45 @@
 
         <h3 style="font-weight: bold">/api/documents</h3>
         
-        <p>Mit dieser Methode können einzelne oder mehrere Dokumente anhand ihrer Kennung abgerufen oder anhand von weiteren Kriterien gesucht werden.</p>
+        <p>Mit dieser Methode können einzelne oder mehrere Dokumente anhand ihrer Kennung abgerufen oder anhand von weiteren Kriterien gesucht werden. Dokumente sind Beschlussvorlagen, Anträge und andere Dokumente, die im System erfasst sind, mitsamt den dazugehörigen Anhängen (PDF-Dateien etc.).</p>
         
         <p><strong>Modus-Unterscheidung zwischen Suche und Direktabruf</strong></p>
         
         <p>Bei dieser Methode gibt es zwei unterschiedliche Modi:</p>
         <ul>
             <li><strong>Direktabruf</strong>: ein Dokument (oder mehrere Dokumente) wird anhand einer Kennung (<code>reference</code>) bzw. einer Liste von Kennungen abgefragt.</li>
-            <li><strong>Suche</strong>: Ist der Parameter <code>reference</code> nicht gesetzt, handelt es sich um den Modus <b>Suche</b>.</li>
+            <li><strong>Suche</strong>: Ist der URL-Parameter <code>reference</code> nicht gesetzt, handelt es sich um den Modus <b>Suche</b>.</li>
         </ul>
         
-        <p>Einige Abfrageparameter können nur im Suchmodus verwendet werden.</p>
+        <p>Der URL-Parameter <code>reference</code> kann nur für den Direktabruf genutzt werden, ist also nicht mit Parametern der Suche kombinierbar. Einige andere URL-Parameter können nur im Suchmodus verwendet werden.</p>
         
-        <h4>Beispielhafte Abfragen:</h4>
+        <h4>Beispielhafte &raquo;Direktabrufe&laquo;:</h4>
+        
         <ul>
-            <li><code><a href="/api/documents?reference=2961/2011" target="_blank">/api/documents?reference=2961/2011</a></code>
-            <br />Ruft das Dokument mit der Kennung 2961/2011 ab (Direktabruf).</li>
-            <li><code><a href="/api/documents?reference=2961/2011&amp;output=attachments" target="_blank">/api/documents?reference=2961/2011&amp;output=attachments</a></code>
-            <br />Wie zuvor, es werden jedoch zusätzlich Daten zu Anlagen (<code>attachments</code>) ausgegeben.</li>
-            <li><code><a href="/api/documents?reference=2961/2011&amp;output=attachments,thumbnails" target="_blank">/api/documents?reference=2961/2011&amp;output=attachments,thumbnails</a></code>
-            <br />Wie zuvor, es werden jedoch zusätzlich Daten zu Vorschaubildern (<code>thumbnails</code>) ausgegeben.</li>
-            <li><code><a href="/api/documents?reference=2961/2011&amp;output=consultations" target="_blank">/api/documents?reference=2961/2011&amp;output=consultations</a></code>
-            <br />Ruft das Dokument mit der Kennung 2961/2011 ab (Direktabruf) und gibt zusätzlich die Sitzungen, in denen das Dokument beraten wurde, aus (<code>consultations</code>).</li>
+            <li><code><a href="/api/documents?reference={{ config.API_DOC_EXAMPLE_REFERENCE|urlencode }}" target="_blank">/api/documents?reference={{ config.API_DOC_EXAMPLE_REFERENCE }}</a></code>
+            <br />Direktabruf des Dokuments mit der Kennung {{ config.API_DOC_EXAMPLE_REFERENCE }}.</li>
+            
+            <li><code><a href="/api/documents?reference={{ config.API_DOC_EXAMPLE_REFERENCE|urlencode }}&amp;output=attachments" target="_blank">/api/documents?reference={{ config.API_DOC_EXAMPLE_REFERENCE }}&amp;output=attachments</a></code>
+            <br />Wie zuvor, zusätzlich werden Details zu Anhängen ausgegeben.</li>
+            
+            <li><code><a href="/api/documents?reference={{ config.API_DOC_EXAMPLE_REFERENCE|urlencode }}&amp;output=attachments,thumbnails" target="_blank">/api/documents?reference={{ config.API_DOC_EXAMPLE_REFERENCE }}&amp;output=attachments,thumbnails</a></code>
+            <br />Wie zuvor, zusätzlich werden Daten zu Vorschaubildern ausgegeben.</li>
+            
+            <li><code><a href="/api/documents?reference={{ config.API_DOC_EXAMPLE_REFERENCE|urlencode }}&amp;output=consultations" target="_blank">/api/documents?reference={{ config.API_DOC_EXAMPLE_REFERENCE }}&amp;output=consultations</a></code>
+            <br />Direktabruf, zusätzlich werden Details zu den Sitzungen, in denen das Dokument beraten wurde/wird, ausgegeben.</li>
+        </ul>
+
+        <h4>Beispielhafte &raquo;Suchabfragen&laquo;:</h4>
+        
+        <ul>  
             <li><code><a href="/api/documents" target="_blank">/api/documents</a></code>
-            <br />Ruft die 10 neusten Dokumente ab. Da der Parameter <code>reference</code> nicht gesetzt ist, handelt es sich implizit um eine Suche.</li>
+            <br />Suche ohne Suchabfrage oder Filter. Ruft die 10 neusten Dokumente ab.</li>
+            
             <li><code><a href="/api/documents?q=fahrrad" target="_blank">/api/documents?q=fahrrad</a></code>
-            <br />Suche nach Dokumenten, in denen der Begriff <code>fahrrad</code> vorkommt.</li>
-            <li><code><a href="/api/documents?fq=type:%22Antrag%22" target="_blank">/api/documents?fq=type:%22Antrag%22</a></code>
-            <br />Suche nach Dokumenten, bei denen die Eigenschaft <code>type</code> dem Wert &raquo;Antrag&laquo; entspricht.</li>
+            <br />Suche nach Dokumenten, in denen der Begriff &raquo;Fahrrad&laquo; vorkommt. Es werden auch ähnliche Schreibweisen gefunden.</li>
+            
+            <li><code><a href="/api/documents?fq=type:Antrag" target="_blank">/api/documents?fq=type:Antrag</a></code>
+            <br />Suche nach Dokumenten vom Typ &raquo;Antrag&laquo;</li>
         </ul>
         
         <h4>Parameter:</h4>
@@ -86,70 +113,131 @@
         <dl>
             <dt><code>reference</code></dt>
             <dd>
-                <p>Die Kennung eines Dokuments, z.B. <code>2961/2011</code>. Alle Dokumente und Sitzungen im Kölner Ratsinformationssystem (RIS) haben eine solche eindeutige Kennung (im Kölner RIS gelegentlich auch &raquo;Session-Nummer&laquo; genannt). In ganz wenigen Fällen teilen sich mehrere Dokumente dieselbe Kennung. Dann ist es jedoch in der Regel so, dass diese Dokumente inhaltlich zusammengehörig oder identisch sind. Hier bei Offenes Köln werden mehrere Dokumente mit derselben Kennung daher zu einem Dokument zusammen gefasst.</p>
+                <p>Die eindeutige Kennung eines Dokuments, z.B. <code>{{ config.API_DOC_EXAMPLE_REFERENCE }}</code>. Wie alle Angaben, die in den URLs übergeben werden, muss auch dieser Wert URL-kodiert sein.</p>
+
+                <p>Mehrere Kennungen können getrennt durch Komma übergeben werden, entsprechend werden mehrere Dokumente ausgegeben.</p>
                 
-                <p>Wenn der <code>reference</code>-Parameter gesetzt ist, handelt es sich bei der Abfrage um einen Direktabruf. Auf die Suche bezogene Parameter wie <code>q</code>, <code>fq</code> und <code>sort</code> können in diesem Modus nicht verwendet werden.</p>
-                
-                <p>Modus-Beschränkung: Durch Verwendung dieses Parameters wurd der Modus <em>Direktabruf</em> aktiviert. Daher ist der Prameter <em>nicht</em> im Modus <em>Suche</em> einsetzbar.</p>
+                <p><b>Modus</b>: Wenn der <code>reference</code>-Parameter gesetzt ist, handelt es sich bei der Abfrage um einen Direktabruf. Auf die Suche bezogene Parameter wie <code>q</code>, <code>fq</code>, <code>date</code>, <code>sort</code> und <code>docs</code> können in diesem Modus nicht verwendet werden.</p>
                 
             </dd>
             
             <dt><code>output</code></dt>
             <dd>
-                <p>Kann die Werte <code>attachments</code>, <code>thumbnails</code>, <code>consultations</code>, <code>facets</code> annehmen. Es können auch mehrere Werte, durch Komma getrennt, kombiniert werden.</p>
+                <p>Der Parameter bestimmt, welche Details in den ausgelieferten Dokumentendaten enthalten sein sollen. Je mehr Details aktiviert werden, desto länger dauert die Bearbeitung der Abfrage und desto umfangreicher werden die zurückgelieferten Daten.</p>
+
+                <p>Es können die Werte <code>attachments</code>, <code>thumbnails</code>, <code>consultations</code> und <code>facets</code> verwendet werden. Mehrere Werte können, durch Komma getrennt, mit einander kombiniert werden.</p>
                 
-                <p>Der Parameter bestimmt, welche zusätzlichen Details zur Dokumentenabfrage ausgegeben werden sollen. Es sollten immer nur die benötigten Details aktiviert werden, da im Hintegrund für jedes aktivierbare Detail zusätzliche Datenbankabfragen nötig sind, die die Antwort verzögern. Zweck dieses Parameters ist es, die Abfrage so schnell wie möglich und die übertragenen Daten so klein wie möglich zu halten.</p>
+                <p><code>attachments</code> aktiviert die Ausgabe von Daten zu Anhängen, die mit einem Dokument verknüpft sind. Dazu gehören im gegebenen Fall auch Information zur Sperrung bzw. Depublikation eines Anhangs (<a href="https://github.com/marians/offeneskoeln/wiki/Attachments-depublizieren" target="_blank">Details zu Depublikation im Wiki</a>).</p>
                 
-                <p><code>attachments</code> aktiviert die Ausgabe von Daten zu den Anlagen, die mit einem Dokument verknüpft sind. Dazu gehören im gegebenen Fall auch Information zur Sperrung bzw. Depublikation (<code>exclusion</code>) eines Anhangs (<a href="https://github.com/marians/offeneskoeln/wiki/Attachments-depublizieren" target="_blank">Details zu Depublikation im Wiki</a>).</p>
-                
-                <p><code>thumbnails</code> aktiviert die Ausgabe von Daten zu allen Vorschaubildern zu den Anlagen des Dokuments. Erfordert die Angabe von <code>attachments</code>.</p>
+                <p><code>thumbnails</code> aktiviert die Ausgabe von Daten zu allen Vorschaubildern zu den Anhängen des Dokuments. Damit dies funktioniert, muss auch <code>attachments</code> angegeben werden.</p>
                 
                 <p><code>consultations</code> aktiviert die Ausgabe der Beratungsfolge eines Dokuments, also die Liste der Sitzungen, in der ein Dokument vorgelegt wurde.</p>
                 
-                <p><code>facets</code> aktiviert die Ausgabe von Facetten, was nur im Modus <em>Suche</em> möglich ist. Bei einer <em>Direktabfrage</em> hat dieser Wert keine Wirkung. Facetten sind eine Zusammenfassung darüber, welche Dokumenteneigenschaften im Suchergebnis wie häufig vorkommen.</p>
+                <p><code>facets</code> aktiviert die Ausgabe von Facetten, was nur im Modus <em>Suche</em> möglich ist. Bei einer <em>Direktabfrage</em> hat dieser Wert keine Wirkung. Facetten sind eine Zusammenfassung darüber, welche Dokumenteneigenschaften im Suchergebnis wie häufig vorkommen. Sie können zum Beispiel dafür benutzt werden, um Suchen Optionen für die weitere Einschränkung des Suchergebnisses vorzuschlagen.</p>
                 
-                <p>Modus-Beschränkung: Der Parameter <code>output</code> kann unabhängig vom Modus eingesetzt werden. Der Wert <code>facets</code> ist nur im Modus <em>Suche</em> wirksam.</p>
+                <p><b>Modus</b>: Der Parameter <code>output</code> kann grundsätzlich unabhängig vom Modus (Suche oder Direktabruf) eingesetzt werden. <em>AUSNAHME:</em> Der Wert <code>facets</code> ist nur im Modus <em>Suche</em> wirksam.</p>
             </dd>
             
             <dt><code>q</code></dt>
             <dd>
-                <p>Suchbegriff(e). Ist dieser Parameter leer oder nicht gesetzt, entspricht dies einer Wildcard-Suche nach allen Dokumenten. Mehrere Suchbegriffe, durch Leerzeichen (%20) getrennt, schränken das Suchergebnis ein, denn es werden nur Dokumente zurückgegeben, die allen Suchbegriffen entsprechen. Der Parameter unterstützt <a href="http://lucene.apache.org/java/2_9_1/queryparsersyntax.html" target="_blank">Lucene Query Syntax</a>. Das bedeutet, es können komplexe Suchabfragen mit Klammerung und Operatoren wie <code>+</code> und <code>-</code>, <code>AND</code>, <code>OR</code> und <code>NOT</code> gebildet werden. Durch Kombination mit dem Parameter <code>fq</code> kann die Suche weiter eingeschränkt werden.</p>
+                <p>Dieser Parameter bestimmt eine Suchabfrage, der Name <code>q</code> steht für &raquo;Query&laquo;. Ist dieser Parameter leer oder nicht gesetzt, entspricht dies einer Wildcard-Suche nach allen Dokumenten.</p>
+
+                <p>Suchabfragen, die hier übergeben werden, werden flexibel interpretiert. Hier werden zum Beispiel Synonyme berücksichtigt (Ampel, Lichtsignalanlage und LSA sind Synonyme). Auch werden verschiedene Wortformen auf den Stamm reduziert (Fußbälle wird zu Fußball).</p>
+
+                <p><b>Mehrere Suchbegriffe</b> werden durch Leerzeichen (<code>%20</code> bzw. <code>+</code>) getrennt. Je mehr Suchbegriffe kombiniert werden, desto weniger Treffer werden generell im Ergebnis enthalten sein. Es werden nur Dokumente zurückgegeben, die allen Suchbegriffen entsprechen.</p>
+
+                <p>Suchabfragen können <a href="http://lucene.apache.org/java/2_9_1/queryparsersyntax.html" target="_blank">Lucene Query Syntax</a> enthalten. Das bedeutet, es können komplexe Suchabfragen mit Klammerung und Operatoren wie <code>+</code> und <code>-</code>, <code>AND</code>, <code>OR</code> und <code>NOT</code> gebildet werden. Durch Kombination mit dem Parameter <code>fq</code> (siehe weiter unten) kann die Suche weiter eingeschränkt werden.</p>
                 
-                <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
+                <p><b>Modus</b>: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar. Das heißt, er kann nicht mit dem Parameter <code>reference</code> kombiniert werden.</p>
             </dd>
             
             <dt><code>fq</code></dt>
             <dd>
-                <p>Einschränkung des Suchergebnisses durch zusätzliche Filter (fq steht für Filter Query). Dieser Parameter unterstützt <a href="http://lucene.apache.org/java/2_9_1/queryparsersyntax.html" target="_blank">Lucene Query Syntax</a>. Soll das Suchergebnis anhand einer exakten Dokumenteneigenschaft, z.B. dem Typ (<code>type</code>), eingeschränkt werden, ist dieser Parameter der Verwendung von <code>q</code> vorzuziehen, da die Einschränkung mit Hilfe des <code>fq</code>-Parameters oft deutlich schneller ist. Um beispielsweise alle Dokumente des Typs &raquo;Antrag&raquo; zu finden, muss der Parameter <code>fq=type:%22Antrag%22</code> lauten.</p>
+                <p>Einschränkung des Suchergebnisses durch strikte Filter (<code>fq</code> steht für &raquo;Filter Query&laquo;).</p>
+
+                <p>Beispiel: Es sollen nur Dokumente vom Typ &raquo;Antrag&laquo; gefunden werden. Hierzu wird der URL-Parameter <code>fq=type:Antrag</code> in die Abfrage eingefügt.</p>
+
+                <p>Im einfachsten Fall ist das Schema für solche Filter auf Basis von Dokumenteneigenschaften <code>eigenschaft:wert</code>. Im genannten Beispiel ist <code>type</code> der Name der Eigenschaft und <code>Antrag</code> der Wert. Der Name der Eigenschaft wird vom Wert mit Doppelpunkt (<code>:</code> bzw. <code>%3A</code>) getrennt. Werte, die <b>Leerzeichen</b> enthalten, müssen in Anführungszeichen (<code>&quot;</code> bzw. <code>%22</code>) gesetzt werden. Beispiel: <code>fq=committee_name%3A%22{{ config.API_DOC_EXAMPLE_COMMITTEE_NAME|urlencode }}%22</code></p>
+
+                <p>Komplexe Filter Queries können durch Verwendung von <a href="http://lucene.apache.org/java/2_9_1/queryparsersyntax.html" target="_blank">Lucene Query Syntax</a> formuliert werden.</p>
+
+                <p>Beispiel: <code>type:(Antrag OR Beschlussvorlage) AND committee_name:Rat</code></p>
+
+                <p>URL-kodiert: <code>fq={{ "type:(Antrag OR Beschlussvorlage) AND committee_name:Rat"|urlencode }}</code></p>
+
+                <p>Die Verwendung von Filter Queries (Parameter <code>fq</code>) zur Einschränkung des Suchergebnisses ist <b>effizienter und damit schneller</b> als die Verwendung von Queries (Parameter <code>q</code>). Das liegt zum einen daran, dass die mittels <code>fq</code> definierten Filter weniger flexibel sind. Es findet zum Beispiel keine Fehlertolerante Interpretation der Angaben statt oder Anwendung von Synonymen statt. Außerdem werden die mittels Query Filter erzeugten Suchergebnisse auf dem Server gecached, was das erneute Auffinden von Dokumenten mit der selben Einschränkung extrem beschleunigt. Wenn immer möglich, sollten daher Query Filter anstelle von Queries verwendet werden.</p>
                 
-                <p>Das Schema für solche Filter auf Basis von Dokumenteneigenschaften ist <code>eigenschaft:wert</code>. Soll der Wert hinter dem Doppelpunkt Leerzeichen enthalten können, ist dieser in Anführungszeichen (<code>&quot;</code> bzw. <code>%22</code>) zu setzen.</p>
-                
-                <p>Die zur Auswahl stehenden Dokumenteneigenschaften für derartige Filter sind: <code>title</code> (Dokumententitel), <code>term</code> (Stichworte), <code>type</code> (Art des Dokuments), <code>person</code> (Person), <code>attachment</code> (Anlage), <code>session</code> (Sitzung), <code>committee</code> (Gremium), <code>street</code> (Straße).</p>
+                <p>Die zur Auswahl stehenden Dokumenteneigenschaften für derartige Filter sind:</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Eigenschaft</th>
+                            <th>Beschreibung</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>title</code></td>
+                            <td>Dokumententitel</td>
+                        </tr>
+                        <tr>
+                            <td><code>term</code></td>
+                            <td>Stichworte</td>
+                        </tr>
+                        <tr>
+                            <td><code>type</code></td>
+                            <td>Art des Dokuments</td>
+                        </tr>
+                        <tr>
+                            <td><code>person</code></td>
+                            <td>Person</td>
+                        <tr>
+                            <td><code>attachment</code></td>
+                            <td>Anhang</td>
+                        </tr>
+                        <tr>
+                            <td><code>session</code></td>
+                            <td>Sitzung</td>
+                        </tr>
+                        <tr>
+                            <td><code>committee_name</code></td>
+                            <td>Gremium</td>
+                        </tr>
+                        <tr>
+                            <td><code>street</code></td>
+                            <td>Straße</td>
+                        </tr>
+                    </tbody>
+                </table>
+
                 
                 <p>Im Parameter <code>fq</code> können mehrere Filter mit einander kombiniert werden. Wie beim Parameter <code>q</code> kann ein Leerzeichen benutzt werden, um eine implizite UND-Verknüpfung zu erreichen. Um andere logische Verknüpfungen zu bewirken, stehen die boolschen Operatoren <code>OR</code> und <code>NOT</code> zur Auswahl.</p>
 
-                <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
+                <p><b>Modus</b>: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar. Er kann also nicht eingesetzt werden, wenn der Parameter <code>reference</code> gesetzt ist.</p>
+
+                <p>Weitere Möglichkeiten, die Treffermenge einzuschränken, bestehen über die Parameter <code>q</code> und <code>date</code>.</p>
             </dd>
             
             <dt><code>docs</code></dt>
             <dd>
                 <p>Anzahl Treffer-Dokumente, die zurück gegeben werden sollen. Standard ist 10, Maximum ist 100. Mit dem Wert 0 kann die Dokumentenausgabe unterdrückt werden. Je weniger Dokumente ausgegeben werden, desto schneller ist die Suche und desto weniger Daten werden übertragen. Dies kann nützlich sein, wenn nur die Anzahl der Treffer benötigt wird, nicht aber die Treffer selbst.</p>
                 
-                <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar. Im Modus <em>Direktabruf</em> wird die Anzahl der zurückgegebenen Dokumente durch die übergebenen Kennungen bestimmt.</p>
+                <p><b>Modus</b>: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
             </dd>
             
             <dt><code>start</code></dt>
             <dd>
                 <p>Anzahl der Dokumente, die am Anfang des Suchergebnisses ausgelassen werden sollen. Damit kann durch ein Suchergebnis &raquo;geblättert&laquo; werden. Ist der Parameter nicht gesetzt, entspricht dies <code>start=0</code>.</p>
                 
-                <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
+                <p><b>Modus</b>: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
             </dd>
             
             <dt><code>sort</code></dt>
             <dd>
                 <p>Bestimmt die Sortierung des Suchergebnisses. Wenn nicht gesetzt, wird der Standard in Abhängigkeit davon gesetzt, ob der Parameter <code>q</code> gesetzt ist oder nicht. Ist <code>q</code> gesetzt, dann ist die Standard-Sortierung <code>score desc</code>, was bedeutet &raquo;Sortierung nach Relevanz, absteigend&raquo;. Ist <code>q</code> <em>nicht</em> gesetzt, ist die Sortierung standardmäßig <code>date desc</code> (nach Datum, neuste Dokumente zuerst). Die dritte mögliche Sortierung ist <code>date asc</code> (nach Datum, älteste Dokumente zuerst).</p>
                 
-                <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
+                <p><b>Modus</b>: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
             </dd>
             
             <dt><code>date</code></dt>
@@ -168,7 +256,14 @@
                 
                 <p>Anfangs- und Enddatum müssen nicht die selbe Genauigkeit haben. Beispielsweise ist <code>date=2010-20120206</code> eine gültige Angabe.</p>
                 
-                <p>Modus-Beschränkung: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
+                <p><b>Modus</b>: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
+            </dd>
+
+            <dt><code>lastmod_date</code></dt>
+            <dd>
+                <p>Datum und Zeit der letzten Änderung des Dokuments. Funktioniert ansonsten wie <code>date</code>.
+
+                <p><b>Modus</b>: Dieser Parameter ist nur im Modus <em>Suche</em> einsetzbar.</p>
             </dd>
             
         </dl>
@@ -718,5 +813,6 @@
         <p>Bei der Methode /api/proxy/geocode handelt es sich um eine Proxy-Methode für die <a href="http://developer.yahoo.com/geo/placefinder/" target="_blank">Yahoo! Placefinder API</a>, mit deren Hilfe Ortsangaben wie z.B. Adressen in Geo-Positionen aufgelöst werden können. Wenn Du die Placefinder API nutzen möchtest, geh bitte direkt auf die entsprechende Website bei Yahoo und richte Dir dort einen eigenen App-Key ein. Das geht einfach und kostet nichts.</p>
 
     </div>
+</div>
 </div>
 {% endblock %}
