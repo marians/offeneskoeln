@@ -4,6 +4,10 @@
 Finde Straßennamen in Texten und trage Geo-Referenzen
 in die entsprechenden Dokumente ein
 
+TODO:
+- Straßen aus Datenbank lesen
+  https://github.com/marians/offeneskoeln/issues/98
+
 Copyright (c) 2012 Marian Steinbach
 
 Hiermit wird unentgeltlich jeder Person, die eine Kopie der Software und
@@ -47,7 +51,7 @@ def generate_georeferences(db):
 
 def generate_georeferences_for_submission(doc_id, db):
     """
-    Lädt die texte zu einer Submission, gleicht darin
+    Lädt die Texte zu einer Submission, gleicht darin
     Straßennamen ab und schreibt das Ergebnis in das
     Submission-Dokument in der Datenbank.
     """
@@ -77,7 +81,7 @@ def generate_georeferences_for_submission(doc_id, db):
 
 def get_attachment_fulltext(attachment_id):
     """
-
+    Gibt den Volltext zu einem attachment aus
     """
     attachment = db.attachments.find_one({'_id': attachment_id})
     if 'fulltext' in attachment:
