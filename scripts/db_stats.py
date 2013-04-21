@@ -36,6 +36,27 @@ def count_sessions():
     return db.sessions.find({'ags': config.AGS}).count()
 
 
+def count_agendaitems():
+    aggregate = db.sessions.aggregate([
+        {
+            '$project': {
+                'agendaitems.id': 1
+            }
+        },
+        {
+            '$unwind': "$agendaitems"
+        },
+        {
+            '$group': {
+                '_id': "agendaitems",
+                'count': {
+                    '$sum': 1
+                }
+            }
+        }
+    ])
+    return aggregate['result'][0]['count']
+
 def count_submissions():
     return db.submissions.find({'ags': config.AGS}).count()
 
@@ -44,11 +65,66 @@ def count_attachments():
     return db.attachments.find({'ags': config.AGS}).count()
 
 
-#def count_thumbnails():
-#    print db.attachments.aggregate([
-#        {"$unwind": "$thumbnails"},
-#        {"$group": {"_id": "$thumbnails", "count": {"$sum": 1}}}
-#    ])
+def count_thumbnails():
+    """
+    Wir zählen beispielhaft die Thumbnails für eine der Größen
+    """
+    aggregate = db.attachments.aggregate([
+        {
+            '$project': {
+                'thumbnails.150.filesize': 1
+            }
+        },
+        {
+            '$unwind': "$thumbnails.150"
+        },
+        {
+            '$group': {
+                '_id': "thumbnails",
+                'count': {
+                    '$sum': 1
+                }
+            }
+        },
+        {
+            '$group': {
+                '_id': "thumbnails",
+                'count': {
+                    '$sum': "$count"
+                }
+            }
+        }
+    ])
+    return aggregate['result'][0]['count']
+
+
+def thumbnail_size(height):
+    aggregate = db.attachments.aggregate([
+        {
+            '$project': {
+                'thumbnails.' + str(height) + '.filesize': 1
+            }
+        },
+        {
+            '$unwind': '$thumbnails.' + str(height)
+        },
+        {
+            '$group': {
+                '_id': 'filesize',
+                'size': {
+                    '$sum': '$thumbnails.' + str(height) + '.filesize'
+                }
+            }
+        }
+    ])
+    return aggregate['result'][0]['size']
+
+
+def all_thumbnails_size():
+    tsize = 0
+    for height in config.THUMBNAILS_SIZES:
+        tsize += thumbnail_size(height)
+    return tsize
 
 
 def count_files():
@@ -62,10 +138,12 @@ def count_locations():
 if __name__ == '__main__':
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
-    print "Number of sessions:    %s" % count_sessions()
-    print "Number of submissions: %s" % count_submissions()
-    print "Number of attachments: %s" % count_attachments()
-    #print "Number of thumbnails:  %s" % count_thumbnails()
-    print "Number of files:       %s" % count_files()
-    print "Number of locations:   %s" % count_locations()
+    print "Number of sessions:       %s" % count_sessions()
+    print "Number of agendaitems:    %s" % count_agendaitems()
+    print "Number of submissions:    %s" % count_submissions()
+    print "Number of attachments:    %s" % count_attachments()
+    print "Number of thumbnails:     %s" % count_thumbnails()
+    print "File size of thumbnails:  %s" % all_thumbnails_size()
+    print "Number of files in DB:    %s" % count_files()
+    print "Number of locations:      %s" % count_locations()
 
