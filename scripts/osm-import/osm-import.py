@@ -122,11 +122,11 @@ if __name__ == '__main__':
     for street in streetcollector.streets:
         for n in range(len(street['nodes'])):
             street['nodes'][n] = {
-                'ags': config.AGS,
                 'osmid': street['nodes'][n],
                 'location': SON([
                     ('type', 'Point'),
                     ('coordinates', wanted_nodes[street['nodes'][n]]['location'])
                 ])
             }
+        street['ags'] = config.AGS
         db.locations.save(street)
