@@ -102,34 +102,45 @@ var disqus_shortname = '{{ config.DISQUS_SHORTNAME }}';
 			({{ numpages }} Seiten)
 			{% endif %}
 		</h2>
-		{% if attachment.thumbnails %}
-		<div class="thumbs">
-			<div class="thumbsinner" style="width: {{ twidth }}px; height: 310px;">
-				{% for thumbnail in attachment.thumbnails['300'] %}
-				<img class="thumb" src="{{ thumbnail.url }}" width="{{ thumbnail.width }}" height="{{ thumbnail.height }}" />
-				{% endfor %}
+		{% if attachment.depublication %}
+			<div class="attachmentexclusion">
+				<p class="exclusionheader">Es tut uns leid, aber dieses Dokument wurde am {{ attachment.depublication.date.strftime('%d.%m.%Y') }} enfernt. Die Begründung:</p>
+				<p class="reasontext">
+					{{ attachment.depublication.comment }}
+				</p>
 			</div>
-		</div>
 		{% else %}
-		<div class="nothumbs">
-			<div class="smallnote">Zu diesem Anhang liegen keine Vorschaubilder vor.</div>
-		</div>
-		{% endif %}
-		{% if attachment.fulltext %}
-		<div class="fulltext">
-			<div class="complete">
-				<div class="text">{{ attachment.fulltext|trim }}</div>
+			{% if attachment.thumbnails %}
+			<div class="thumbs">
+				<div class="thumbsinner" style="width: {{ twidth }}px; height: 310px;">
+					{% for thumbnail in attachment.thumbnails['300'] %}
+					<img class="thumb" src="{{ thumbnail.url }}" width="{{ thumbnail.width }}" height="{{ thumbnail.height }}" />
+					{% endfor %}
+				</div>
 			</div>
-		</div>
-		{% else %}
-		<div class="nofulltext">
-			<div class="smallnote">Zu diesem Anhang kann leider kein Text angezeigt und durchsucht werden. Evtl. handelt es sich um den Scan einer Papiervorlage.</div>
-		</div>
-		{% endif %}
-		<div class="actions">
-			<a target="_blank" href="{{ attachment.url }}" class="awesome">Anhang öffnen</a>
-			<span class="typesize">{{ (attachment.size / 1024)|round(0)|int }} KB PDF – <a title="öffnet das PDF mit Google Docs Viewer" href="https://docs.google.com/viewer?url={{ attachment.url }}" target="_blank">Vorschau</a></span>
-		</div>
+			{% else %}
+			<div class="nothumbs">
+				<div class="smallnote">Zu diesem Anhang liegen keine Vorschaubilder vor.</div>
+			</div>
+			{% endif %}
+			{% if attachment.fulltext %}
+			<div class="fulltext">
+				<div class="complete">
+					<div class="text">{{ attachment.fulltext|trim }}</div>
+				</div>
+			</div>
+			{% else %}
+			<div class="nofulltext">
+				<div class="smallnote">Zu diesem Anhang kann leider kein Text angezeigt und durchsucht werden. Evtl. handelt es sich um den Scan einer Papiervorlage.</div>
+			</div>
+			{% endif %}
+			{% if attachment.url %}
+			<div class="actions">
+				<a target="_blank" href="{{ attachment.url }}" class="awesome">Anhang öffnen</a>
+				<span class="typesize">{{ (attachment.size / 1024)|round(0)|int }} KB PDF – <a title="öffnet das PDF mit Google Docs Viewer" href="https://docs.google.com/viewer?url={{ attachment.url }}" target="_blank">Vorschau</a></span>
+			</div>
+			{% endif %}
+		{% endif%}
 	</div>
 	{% endfor %}
 

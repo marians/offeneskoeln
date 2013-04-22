@@ -92,7 +92,8 @@ def get_submissions(references=None, submission_ids=None, get_attachments=False,
                     for n in range(len(res['attachments'])):
                         a = res['attachments'][n]
                         res['attachments'][n] = mongo.db.attachments.find_one({'_id': a.id})
-                        res['attachments'][n]['url'] = util.attachment_url(a.id, filename=res['attachments'][n]['filename'])
+                        if 'depublication' not in res['attachments'][n]:
+                            res['attachments'][n]['url'] = util.attachment_url(a.id, filename=res['attachments'][n]['filename'])
                         if not get_thumbnails:
                             if 'thumbnails' in res['attachments'][n]:
                                 del res['attachments'][n]['thumbnails']
@@ -123,7 +124,8 @@ def get_submissions(references=None, submission_ids=None, get_attachments=False,
                             for n in range(len(session['attachments'])):
                                 a = session['attachments'][n]
                                 session['attachments'][n] = mongo.db.attachments.find_one(a.id)
-                                session['attachments'][n]['url'] = util.attachment_url(a.id, filename=session['attachments'][n]['filename'])
+                                if 'depublication' not in session['attachments'][n]:
+                                    session['attachments'][n]['url'] = util.attachment_url(a.id, filename=session['attachments'][n]['filename'])
                                 if get_thumbnails == False and 'thumbnails' in session['attachments'][n]:
                                     del session['attachments'][n]['thumbnails']
                                 else:

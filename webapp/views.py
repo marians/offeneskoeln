@@ -125,6 +125,15 @@ def attachment_download(attachment_id, extension):
     proper_extension = attachment_info['filename'].split('.')[-1]
     if proper_extension != extension:
         abort(404)
+
+    # 'file' property is not set (e.g. due to depublication)
+    if 'file' not in attachment_info:
+        if 'depublication' in attachment_info:
+            abort(410)  # Gone
+        else:
+            # TODO: log this as unexplicable...
+            abort(500)
+
     # handle conditional GET
     if 'If-Modified-Since' in request.headers:
         file_date = attachment_info['file']['uploadDate'].replace(tzinfo=None)
