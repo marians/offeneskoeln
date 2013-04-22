@@ -156,4 +156,3 @@ if __name__ == '__main__':
     print "File size of thumbnails:            %s" % all_thumbnails_size()
     print "Number of files in DB:              %s" % count_files()
     print "Number of locations:                %s" % count_locations()
-
