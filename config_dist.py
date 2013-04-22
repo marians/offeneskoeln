@@ -94,6 +94,7 @@ MONGODUMP_CMD = '/Path/to/bin/mongodump'
 
 # Which collections should be contained in database dumps?
 DB_DUMP_COLLECTIONS = ['submissions', 'sessions', 'attachments', 'locations']
+DB_DUMP_TEMPFOLDER = 'datadump'
 
 ####################################################
 # Webapp configuration
