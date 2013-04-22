@@ -107,7 +107,10 @@ TIMING = True
 def generate_thumbs(db, thumbs_folder):
     """Generiert alle Thumbnails für die gesamte attachments-Collection"""
     # Attachments mit veralteten Thumbnails
-    query = {'thumbnails_generated': {'$exists': True}}
+    query = {
+        'thumbnails_generated': {'$exists': True},
+        'depublication': {'$exists': False}
+    }
     for doc in db.attachments.find(query):
         # Dateiinfo abholen
         filedoc = db.fs.files.find_one({'_id': doc['file'].id})
@@ -116,7 +119,10 @@ def generate_thumbs(db, thumbs_folder):
             STATS['attachments_with_outdated_thumbs'] += 1
             generate_thumbs_for_attachment(doc['_id'], db)
     # Attachments ohne Thumbnails
-    query = {'thumbnails': {'$exists': False}}
+    query = {
+        'thumbnails': {'$exists': False},
+        'depublication': {'$exists': False}
+    }
     for doc in db.attachments.find(query):
         if get_file_suffix(doc['filename']) in config.THUMBNAILS_VALID_TYPES:
             STATS['attachments_without_thumbs'] += 1
