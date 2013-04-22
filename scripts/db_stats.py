@@ -107,7 +107,7 @@ def count_thumbnails():
     return aggregate['result'][0]['count']
 
 
-def thumbnail_size(height):
+def thumbnail_size_for_height(height):
     aggregate = db.attachments.aggregate([
         {
             '$project': {
@@ -129,11 +129,30 @@ def thumbnail_size(height):
     return aggregate['result'][0]['size']
 
 
-def all_thumbnails_size():
+def thumbnails_size():
     tsize = 0
     for height in config.THUMBNAILS_SIZES:
-        tsize += thumbnail_size(height)
+        tsize += thumbnail_size_for_height(height)
     return tsize
+
+
+def files_size():
+    aggregate = db.fs.files.aggregate([
+        {
+            '$project': {
+                'length': 1
+            }
+        },
+        {
+            '$group': {
+                '_id': 'filesize',
+                'value': {
+                    '$sum': '$length'
+                }
+            }
+        }
+    ])
+    return aggregate['result'][0]['value']
 
 
 def count_files():
@@ -153,6 +172,7 @@ if __name__ == '__main__':
     print "Number of attachments:              %s" % count_attachments()
     print "Number of depublished attachments:  %s" % count_depublished_attachments()
     print "Number of thumbnails:               %s" % count_thumbnails()
-    print "File size of thumbnails:            %s" % all_thumbnails_size()
+    print "File size of thumbnails:            %s" % thumbnails_size()
     print "Number of files in DB:              %s" % count_files()
+    print "File size of files in DB:           %s" % files_size()
     print "Number of locations:                %s" % count_locations()
