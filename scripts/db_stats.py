@@ -57,12 +57,21 @@ def count_agendaitems():
     ])
     return aggregate['result'][0]['count']
 
+
 def count_submissions():
     return db.submissions.find({'ags': config.AGS}).count()
 
 
 def count_attachments():
     return db.attachments.find({'ags': config.AGS}).count()
+
+
+def count_depublished_attachments():
+    query = {
+        'ags': config.AGS,
+        'depublication': {'$exists': True}
+    }
+    return db.attachments.find(query).count()
 
 
 def count_thumbnails():
@@ -138,12 +147,13 @@ def count_locations():
 if __name__ == '__main__':
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
-    print "Number of sessions:       %s" % count_sessions()
-    print "Number of agendaitems:    %s" % count_agendaitems()
-    print "Number of submissions:    %s" % count_submissions()
-    print "Number of attachments:    %s" % count_attachments()
-    print "Number of thumbnails:     %s" % count_thumbnails()
-    print "File size of thumbnails:  %s" % all_thumbnails_size()
-    print "Number of files in DB:    %s" % count_files()
-    print "Number of locations:      %s" % count_locations()
+    print "Number of sessions:                 %s" % count_sessions()
+    print "Number of agendaitems:              %s" % count_agendaitems()
+    print "Number of submissions:              %s" % count_submissions()
+    print "Number of attachments:              %s" % count_attachments()
+    print "Number of depublished attachments:  %s" % count_depublished_attachments()
+    print "Number of thumbnails:               %s" % count_thumbnails()
+    print "File size of thumbnails:            %s" % all_thumbnails_size()
+    print "Number of files in DB:              %s" % count_files()
+    print "Number of locations:                %s" % count_locations()
 
