@@ -33,7 +33,7 @@ from pymongo import MongoClient
 
 
 def count_sessions():
-    return db.sessions.find({'ags': config.AGS}).count()
+    return db.sessions.find({'rs': config.RS}).count()
 
 
 def count_agendaitems():
@@ -59,16 +59,16 @@ def count_agendaitems():
 
 
 def count_submissions():
-    return db.submissions.find({'ags': config.AGS}).count()
+    return db.submissions.find({'rs': config.RS}).count()
 
 
 def count_attachments():
-    return db.attachments.find({'ags': config.AGS}).count()
+    return db.attachments.find({'rs': config.RS}).count()
 
 
 def count_depublished_attachments():
     query = {
-        'ags': config.AGS,
+        'rs': config.RS,
         'depublication': {'$exists': True}
     }
     return db.attachments.find(query).count()
@@ -160,7 +160,7 @@ def count_files():
 
 
 def count_locations():
-    return db.locations.find({'ags': config.AGS}).count()
+    return db.locations.find({'rs': config.RS}).count()
 
 
 if __name__ == '__main__':

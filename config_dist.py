@@ -43,9 +43,8 @@ STATIC_PATH = WWW_PATH + '/static'
 # Path for thumbnails
 THUMBS_PATH = STATIC_PATH + '/thumbs'
 
-# Amtlicher Gemeindeschlüssel
-# Find yours here: https://www.destatis.de/gv/
-AGS = "08222000"  # Mannheim
+# Regionalschlüssel
+RS = "082220000000"  # Mannheim
 
 # Name of the location. Use unicode if needed.
 #LOCATION_NAME = u'K\xf6ln'

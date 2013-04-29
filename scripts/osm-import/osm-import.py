@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
-    db.locations.remove({'ags': config.AGS})
+    db.locations.remove({'rs': config.RS})
     db.locations.ensure_index('osmid', unique=True)
     db.locations.ensure_index('name')
     db.locations.ensure_index([('nodes.location', '2dsphere')])
@@ -128,5 +128,5 @@ if __name__ == '__main__':
                     ('coordinates', wanted_nodes[street['nodes'][n]]['location'])
                 ])
             }
-        street['ags'] = config.AGS
+        street['rs'] = config.RS
         db.locations.save(street)
