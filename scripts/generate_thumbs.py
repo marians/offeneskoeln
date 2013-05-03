@@ -111,7 +111,7 @@ def generate_thumbs(db, thumbs_folder):
         'thumbnails_generated': {'$exists': True},
         'depublication': {'$exists': False}
     }
-    for doc in db.attachments.find(query):
+    for doc in db.attachments.find(query, timeout=False):
         # Dateiinfo abholen
         filedoc = db.fs.files.find_one({'_id': doc['file'].id})
         if filedoc['uploadDate'] > doc['thumbnails_generated']:
@@ -123,7 +123,7 @@ def generate_thumbs(db, thumbs_folder):
         'thumbnails': {'$exists': False},
         'depublication': {'$exists': False}
     }
-    for doc in db.attachments.find(query):
+    for doc in db.attachments.find(query, timeout=False):
         if get_file_suffix(doc['filename']) in config.THUMBNAILS_VALID_TYPES:
             STATS['attachments_without_thumbs'] += 1
             generate_thumbs_for_attachment(doc['_id'], db)
