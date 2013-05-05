@@ -2,6 +2,9 @@
 *.pyc
 config.py
 venv/
+git-web/
+*.komodoproject
+.komodotools
 webapp/static/thumbs
 webapp/static/tiles
 webapp/attachments
