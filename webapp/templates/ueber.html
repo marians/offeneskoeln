@@ -6,15 +6,15 @@
 {% block content %}
 
 <div class="content top">
-	<h1>Über Offenes Köln</h1>
+	<h1>{{config.APP_NAME}}</h1>
 		
-	<blockquote class="nice">Ziel von Offenes Köln ist es, Informationen, Dokumente und Daten aus der Kölner Lokalpolitik für jedermann offen zugänglich zu machen.</blockquote>
+	<blockquote class="nice">Ziel von {{config.APP_NAME}} ist es, Informationen, Dokumente und Daten aus der {{config.CITY_NAME_ER}} Lokalpolitik für jedermann offen zugänglich zu machen.</blockquote>
 	
-	<p>Dazu werden auf offeneskoeln.de Dokumente und Daten, die im <a href="http://ratsinformation.stadt-koeln.de/" target="_blank">Ratsinformationssystem (<abbr title="Ratsinformationssystem">RIS</abbr>) der Stadt Köln</a> veröffentlicht werden, gesammelt, aufbereitet und in einer nutzerfreundlichen Art und Weise dargestellt.</p>
+	<p>Dazu werden auf {{ config.BASE_HOST }} Dokumente und Daten, die im <a href="{{ config.RIS_ORIGINAL_URL }}" target="_blank">Ratsinformationssystem (<abbr title="Ratsinformationssystem">RIS</abbr>) der Stadt {{ config.CITY_NAME }}</a> veröffentlicht werden, gesammelt, aufbereitet und in einer nutzerfreundlichen Art und Weise dargestellt.</p>
 </div>
 <div class="content middle">
 		
-	<p style="text-align: center; margin: 0 5em;">Offenes Köln richtet sich an alle, die sich dafür interessieren, wie die Kölner Politik ihr Leben direkt und indirekt beeinflusst. Dabei steht hinter dem Konzept die Vermutung, dass sich dieser Kreis der Interessierten durch den Abbau von Zugriffshürden vergrößern lässt.</p>
+	<p style="text-align: center; margin: 0 5em;">{{ config.APP_NAME }} richtet sich an alle, die sich dafür interessieren, wie die {{ config.CITY_NAME_ER }} Politik ihr Leben direkt und indirekt beeinflusst. Dabei steht hinter dem Konzept die Vermutung, dass sich dieser Kreis der Interessierten durch den Abbau von Zugriffshürden vergrößern lässt.</p>
 
 </div>
 <div class="content middle">
@@ -53,7 +53,7 @@
 			<img src="/static/img/ueber/ueber-persistenteurls.jpg" width="250" height="250" alt="Screenshot" style="border: 1px solid #fff" />
 		</div>
 		<div style="float: right; width: 250px;">
-			<p><b>Persistente URLs für Anlagen</b>: Anders als im RIS der Stadt Köln kannst Du alle Anlagen (z.B. PDF-Dokumente) über einen öffentlichen, langfristig bestehenden <abbr title="Uniform Resource Locator">URL</abbr> abrufen. Dies ist eine Grundvoraussetzung, damit Du einen Favoriten/ein Lesezeichen auf die Datei setzen kannst. Oder einen Link zum Dokument per E-Mail weiter senden.</p>
+			<p><b>Persistente URLs für Anlagen</b>: Anders als im RIS der Stadt {{ config.CITY_NAME }} kannst Du alle Anlagen (z.B. PDF-Dokumente) über einen öffentlichen, langfristig bestehenden <abbr title="Uniform Resource Locator">URL</abbr> abrufen. Dies ist eine Grundvoraussetzung, damit Du einen Favoriten/ein Lesezeichen auf die Datei setzen kannst. Oder einen Link zum Dokument per E-Mail weiter senden.</p>
 		</div>
 	</div>
 </div>
@@ -63,7 +63,7 @@
 			<img src="/static/img/ueber/ueber-daten.jpg" width="250" height="250" alt="Screenshot" style="border: 1px solid #fff" />
 		</div>
 		<div style="float: left; width: 250px;">
-			<p><b>Daten-Download</b>: Die Datenbank hinter offeneskoeln.de steht zum Download zur Verfügung. <a href="/daten/">Mehr erfahren</a></p>
+			<p><b>Daten-Download</b>: Die Datenbank hinter {{ config.BASE_HOST }} steht zum Download zur Verfügung. <a href="/daten/">Mehr erfahren</a></p>
 		</div>
 	</div>
 </div>
@@ -78,11 +78,19 @@
 	</div>
 </div>
 
+<div class="content middle" id="origin">
+	<h2 class="top-nomargin">Verwendete Software</h2>
+	<div style="text-align: center; margin: 3em 5em;">
+		<p>{{ config.APP_NAME }} basiert auf der von Marian Steinbach entwickelten Software für <a href="http://offeneskoeln.de/">Offenes Köln</a>. Er hat die Software als FOSS-Software unter der GPL-Lizenz veröffentlicht, auch die verwendeten Komponenten (Flask, MongoDB, Elastic Search) sind OpenSource Software. An dieser Stelle ein herzliches Dankeschön nach Köln, ohne seine Initiative wäre diese Plattform kaum denkbar gewesen.</p>
+		<p>Wenn Du das System für Deine Stadt einrichten möchtest, schau gerne auf <a href="https://github.com/openruhr/ris-web/">unserer Github-Seite</a> vorbei.</p>
+	</div>
+</div>
+
 <div class="content middle" id="feedback">
 	<h2 class="top-nomargin">Wünsche äußern</h2>
 	<div style="text-align: center; margin: 3em 5em;">
-		<p>Die Plattform <b>Offenes Köln</b> steht mit Ihrer Veröffentlichung im Februar 2012 noch ganz am Anfang. Viele weitere Funktionen sind denkbar und wollen genauer durchdacht werden.</p>
-		<p>Wir haben eine Seite eigens zu dem Zweck, damit Du Anregungen und Verbesserungsvorschläge öffentlich äüßern kann. Du kannst außerdem Vorschläge von anderen sehen, bewerten und kommentieren.</p>
+		<p>Die Plattform <b>{{ config.APP_NAME }}</b> steht mit Ihrer Veröffentlichung im {{ config.PUBLISH_MONTH }} noch ganz am Anfang. Viele weitere Funktionen sind denkbar und wollen genauer durchdacht werden.</p>
+		<p>Offenes Köln hat eine Seite eigens zu dem Zweck, damit Du Anregungen und Verbesserungsvorschläge öffentlich äußern kann. Du kannst außerdem Vorschläge von anderen sehen, bewerten und kommentieren. Die Vorschläge werden auch hier einfließen.</p>
 		<p><a class="awesome large" href="http://offeneskoeln.uservoice.com/" target="_blank">Ideen ansehen und hinzufügen &nbsp; &rarr;</a></p>
 	</div>
 </div>
@@ -94,16 +102,16 @@
 	<div style="text-align: center; margin-top: 3em; margin-bottom: 2em">
 		<div style="overflow: auto; width: 750px; margin: 0px auto;">
 			<div style="float: left; width: 160px; margin: 0 3em;">
-				<div style="height: 82px;"><a href="http://www.facebook.com/offeneskoeln" target="_blank"><img src="/static/img/facebook-f.png" width="71" height="70" alt="Facebook" style="border: 0"/></a></div>
-				<div style="margin-top: 5px;"><a href="http://www.facebook.com/offeneskoeln" target="_blank">Facebook</a></div>
+				<div style="height: 82px;"><a href="http://www.facebook.com/openruhr" target="_blank"><img src="/static/img/facebook-f.png" width="71" height="70" alt="Facebook" style="border: 0"/></a></div>
+				<div style="margin-top: 5px;"><a href="http://www.facebook.com/openruhr" target="_blank">Facebook</a></div>
 			</div>
 			<div style="float: left; width: 160px; margin: 0 3em;">
-				<div style="height: 82px;"><a href="https://twitter.com/#!/OffenesKoeln" target="_blank"><img src="/static/img/twitter-bird.png" width="87" height="61" alt="Facebook" style="border: 0"/></a></div>
-				<div style="margin-top: 5px;"><a href="https://twitter.com/#!/OffenesKoeln" target="_blank">Twitter</a></div>
+				<div style="height: 82px;"><a href="https://twitter.com//openruhr" target="_blank"><img src="/static/img/twitter-bird.png" width="87" height="61" alt="Facebook" style="border: 0"/></a></div>
+				<div style="margin-top: 5px;"><a href="https://twitter.com/openruhr" target="_blank">Twitter</a></div>
 			</div>
 			<div style="float: left; width: 160px; margin: 0 3em;">
 				<div style="height: 82px;"><img src="/static/img/github-octocat.png" width="87" height="77" alt="Facebook" style="border: 0"/></div>
-				<div style="margin-top: 5px;"><a href="https://github.com/marians/offeneskoeln" target="_blank" title="Der Code für offeneskoeln.de">Plattform</a> und <a href="https://github.com/marians/cologne-ris-scraper" target="_blank" title="Software zum Auslesen des Kölner Ratsinformationssystems">Scraper</a> als Open Source Software auf Github</div>
+				<div style="margin-top: 5px;"><a href="https://github.com/openruhr/ris-web" target="_blank" title="Der Code für offeneskoeln.de">Plattform</a> und <a href="https://github.com/marians/cologne-ris-scraper" target="_blank" title="Software zum Auslesen des Kölner Ratsinformationssystems">Scraper</a> als Open Source Software auf Github</div>
 			</div>
 		</div>
 	</div>
@@ -120,6 +128,16 @@
 			<div style="width: 400px; float: left;">
 				Marian Steinbach hat Offenes Köln ins Leben gerufen. Als freiberuflicher Interaction Designer interessiert er sich dafür, wie man Informationen, die <em>eigentlich</em> öffentlich und zugänglich sind, <em>tatsächlich</em> zugänglich macht, so dass Menschen sie wirklich benutzen können und wollen. In der Hinsicht gibt es bei Offenes Köln genug zu tun.<br /><br />
 				Marians <a href="http://www.sendung.de/" target="_blank">Blog</a> und <a href="https://twitter.com/#!/MarianSteinbach" target="_blank">Twitter Account</a>.
+			</div>
+		</div>
+
+		<div style="overflow: auto; width: 750px; margin: 2em auto; text-align: left;">
+			<div style="width: 200px; float: left;">
+				<img src="/static/img/team/ernesto.jpg" width="150" height="150" alt="Ernesto" style="border: 0"/>
+			</div>
+			<div style="width: 400px; float: left;">
+				Ernesto Ruge ist einer der Gründer von der Initiative OpenRuhr, hat die OpenRuhr-Ratsinformations-Oberfläche auf Basis von Marians Offenes Köln eingerichtet und steuert Ergänzungen zu der Software bei. Als Student der Physik ist er eigentlich fachfremd, ist jedoch daran interessiert, Politik besser zugänglich zu machen.<br /><br />
+				Ernestos <a href="http://sectio-aurea.org/" target="_blank">Blog</a> und <a href="https://twitter.com/the_infinity" target="_blank">Twitter Account</a>.
 			</div>
 		</div>
 
@@ -154,8 +172,8 @@
 <div class="content middle" id="links">
 	<h2 class="top-nomargin">Zum Weiterklicken</h2>
 	<p>Niemand ist eine Insel, erst recht nicht im World Wide Web. Daher gibt es hier gesammelt wesentliche Links zu relevanten Ressourcen.</p>
-	<p>Das <a href="http://ratsinformation.stadt-koeln.de/infobi.asp" target="_blank">Ratsinformationssystem der Stadt Köln</a> ist die Quelle der Dokumente, dier hier auf offeneskoeln.de zu finden sind. Dieses System gibt es unter anderem, um die Gremienarbeit, so wie sie in der <a href="https://recht.nrw.de/lmi/owa/pl_text_anzeigen?v_id=2320021205103438063" target="_blank">Gemeindeordnung des Landes NRW</a> und in der <a href="http://www.stadt-koeln.de/mediaasset/content/satzungen/geschaeftsordnung-rat-und-bezirksvertretungen2010_12_14.pdf" target="_blank">Geschäftsordnung des Rates der Stadt Köln (PDF)</a> festgelegt sind.</p>
-	<p>Sowas wie Offenes Köln gibt es schon länger in Frankfurt unter dem Namen <a href="http://www.frankfurt-gestalten.de/" target="_blank">Frankfurt gestalten</a>. Interessierte, die solche und ähnliche Plattformen in anderen Städten Nordrhein-Westfalens fördern wollen, diskutieren auf der <a href="http://lists.okfn.org/mailman/listinfo/od-nrw" target="_blank">Open Data NRW Mailingliste</a>. Überregionale Anlaufstellen, um sich Mitstreiter für ein solches Projekt zu suchen, ist das <a href="http://opendata-network.org/" target="_blank">Open Data Network</a> und die <a href="http://okfn.de/" target="_blank">Open Knowledge Foundation Deutschland</a>.</p>
+	<p>Das <a href="{{ config.RIS_ORIGINAL_URL }}" target="_blank">Ratsinformationssystem der Stadt {{ config.CITY_NAME }}</a> ist die Quelle der Dokumente, dier hier auf offeneskoeln.de zu finden sind. Dieses System gibt es unter anderem, um die Gremienarbeit, so wie sie in der <a href="https://recht.nrw.de/lmi/owa/pl_text_anzeigen?v_id=2320021205103438063" target="_blank">Gemeindeordnung des Landes NRW</a> und in der <a href="{{ config.GESCHAEFTSORDNUNG_URL}}" target="_blank">Geschäftsordnung des Rates der Stadt {{ config.CITY_NAME }} (PDF)</a> festgelegt sind.</p>
+	<p>Sowas wie {{ config.APP_NAME }} gibt es schon länger in Frankfurt unter dem Namen <a href="http://www.frankfurt-gestalten.de/" target="_blank">Frankfurt gestalten</a>. Interessierte, die solche und ähnliche Plattformen in anderen Städten Nordrhein-Westfalens fördern wollen, diskutieren auf der <a href="http://lists.okfn.org/mailman/listinfo/od-nrw" target="_blank">Open Data NRW Mailingliste</a>. Überregionale Anlaufstellen, um sich Mitstreiter für ein solches Projekt zu suchen, ist das <a href="http://opendata-network.org/" target="_blank">Open Data Network</a> und die <a href="http://okfn.de/" target="_blank">Open Knowledge Foundation Deutschland</a>.</p>
 
 </div>
 
@@ -163,12 +181,12 @@
 	<h2 class="top-nomargin">Impressum und Kontakt</h2>
 
 	<p><strong>Anbieter im Sinne des Telemediengesetzes</strong></p>
-	<p>Marian Steinbach<br />
-	Scharrenbroicher Straße 61a<br />
-	51503 Rösrath</p>
+	<p>{{ config.IMPRESSUM_NAME }}<br />
+	{{ config.IMPRESSUM_STREET }}<br />
+	{{ config.IMPRESSUM_CITY }}</p>
 	
-	<p>E-Mail: <a href="mailto:kontakt@offeneskoeln.de">kontakt@offeneskoeln.de</a><br />
-	Telefon: <a href="tel:+491795917086">0179 5 91 70 86</a></p>
+	<p>E-Mail: <a href="mailto:{{ config.IMPRESSUM_MAIL }}">{{ config.IMPRESSUM_MAIL }}</a><br />
+	Telefon: <a href="tel:{{ config.IMPRESSUM_PHONE_URL }}">{{ config.IMPRESSUM_PHONE_DESCR }}</a></p>
 
 </div>
 
