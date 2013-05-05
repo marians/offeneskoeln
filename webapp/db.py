@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from webapp import mongo
+from webapp import mongo, app
 import pyes
 import util
 
@@ -9,8 +9,8 @@ import gridfs
 
 import pprint
 
-es = pyes.ES('localhost:9200')
-es.default_indices = ['offeneskoeln-latest']
+es = pyes.ES(app.config['ES_HOST']+':'+app.config['ES_PORT'])
+es.default_indices = [app.config['ES_INDEX_NAME_PREFIX']+'-latest']
 es.refresh()
 
 
