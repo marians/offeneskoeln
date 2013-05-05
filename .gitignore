@@ -7,8 +7,8 @@ git-web/
 .komodotools
 webapp/static/thumbs
 webapp/static/tiles
-webapp/attachments
-webapp/daten
+webapp/attachments/*
+webapp/daten/*
 webapp/static/rss/dokumente.xml
 scripts/osm-import/bin
 scripts/osm-import/lib

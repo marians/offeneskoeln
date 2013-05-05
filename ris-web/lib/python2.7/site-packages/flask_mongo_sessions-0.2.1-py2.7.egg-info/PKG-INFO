@@ -1,0 +1,25 @@
+Metadata-Version: 1.1
+Name: flask-mongo-sessions
+Version: 0.2.1
+Summary: Server-side sessions for Flask with MongoDB
+Home-page: https://github.com/ivanyu/flask-mongo-sessions
+Author: Ivan Yurchenko
+Author-email: ivan0yurchenko@gmail.com
+License: MIT
+Description: 
+        flask-mongo-sessions
+        ====================
+        
+        Server-side sessions for Flask with MongoDB.
+        
+        Documentation: https://flask-mongo-sessions.readthedocs.org/en/latest/
+        
+Keywords: flask mongodb pymongo flask-pymongo mongoengine flask-mongoengine
+Platform: any
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

@@ -9,7 +9,7 @@ import gridfs
 
 import pprint
 
-es = pyes.ES(app.config['ES_HOST']+':'+app.config['ES_PORT'])
+es = pyes.ES(app.config['ES_HOST']+':'+str(app.config['ES_PORT']))
 es.default_indices = [app.config['ES_INDEX_NAME_PREFIX']+'-latest']
 es.refresh()
 

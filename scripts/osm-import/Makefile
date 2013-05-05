@@ -7,20 +7,20 @@
 # pip install numpy
 # pip install matplotlib
 
-import: koeln-streets.osm
-	python osm-import.py koeln-streets.osm
+import: bochum-streets.osm
+	python osm-import.py bochum-streets.osm
 
-koeln-streets.osm: osmfilter koeln.osm
-	./osmfilter koeln.osm \
+bochum-streets.osm: osmfilter bochum.osm
+	./osmfilter bochum.osm \
 	--keep="highway=primary =secondary =tertiary =residential =unclassified =road =living-street =pedestrian" \
-	--drop-author --drop-version > koeln-streets.osm
+	--drop-author --drop-version > bochum-streets.osm
 
-koeln.osm: koeln.poly koeln-regbez-latest.osm osmosis
-	bin/osmosis --read-xml file="koeln-regbez-latest.osm" --bounding-polygon file="koeln.poly" --write-xml file="koeln.osm"
+bochum.osm: bochum.poly arnsberg-regbez-latest.osm osmosis
+	bin/osmosis --read-xml file="arnsberg-regbez-latest.osm" --bounding-polygon file="bochum.poly" --write-xml file="bochum.osm"
 
-koeln-regbez-latest.osm:
-	wget -N http://download.geofabrik.de/europe/germany/nordrhein-westfalen/koeln-regbez-latest.osm.bz2
-	bunzip2 koeln-regbez-latest.osm.bz2
+arnsberg-regbez-latest.osm:
+	wget -N http://download.geofabrik.de/europe/germany/nordrhein-westfalen/arnsberg-regbez-latest.osm.bz2
+	bunzip2 arnsberg-regbez-latest.osm.bz2
 
 osmfilter:
 	wget -O - http://m.m.i24.cc/osmfilter.c |cc -x c - -O3 -o osmfilter
@@ -36,17 +36,17 @@ osmosis:
 	rm copying.txt
 	rm changes.txt
 
-koeln.poly:
-	python -m osm.multipolygon -r 62578 -m koeln.poly
+bochum.poly:
+	python -m osm.multipolygon -r 62644 -m bochum.poly
 
 clean:
-	rm koeln.poly
-	rm koeln-regbez-latest.osm
-	rm koeln.osm
+	rm bochum.poly
+	rm arnsberg-regbez-latest.osm
+	rm bochum.osm
 	rm osmfilter
-	rm koeln-streets.osm
+	rm bochum-streets.osm
 	rm -r osmosis_dir
 	rm osmosis
 	rm -r bin
-	rm -r lib
+	rm -r lb
 	rm -r config

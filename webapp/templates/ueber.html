@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block title %}Über Offenes Köln{% endblock %}
+{% block title %}Über OpenRuhr:RIS{% endblock %}
 {% block ogtitle %}Über Offenes Köln{% endblock %}
 {% block meta_description %}Ziele und Pläne für Offenes Köln und weitere Informationen{% endblock %}
 
@@ -7,7 +7,7 @@
 
 <div class="content top">
 	<h1>{{config.APP_NAME}}</h1>
-		
+  
 	<blockquote class="nice">Ziel von {{config.APP_NAME}} ist es, Informationen, Dokumente und Daten aus der {{config.CITY_NAME_ER}} Lokalpolitik für jedermann offen zugänglich zu machen.</blockquote>
 	
 	<p>Dazu werden auf {{ config.BASE_HOST }} Dokumente und Daten, die im <a href="{{ config.RIS_ORIGINAL_URL }}" target="_blank">Ratsinformationssystem (<abbr title="Ratsinformationssystem">RIS</abbr>) der Stadt {{ config.CITY_NAME }}</a> veröffentlicht werden, gesammelt, aufbereitet und in einer nutzerfreundlichen Art und Weise dargestellt.</p>
@@ -102,16 +102,16 @@
 	<div style="text-align: center; margin-top: 3em; margin-bottom: 2em">
 		<div style="overflow: auto; width: 750px; margin: 0px auto;">
 			<div style="float: left; width: 160px; margin: 0 3em;">
-				<div style="height: 82px;"><a href="http://www.facebook.com/openruhr" target="_blank"><img src="/static/img/facebook-f.png" width="71" height="70" alt="Facebook" style="border: 0"/></a></div>
-				<div style="margin-top: 5px;"><a href="http://www.facebook.com/openruhr" target="_blank">Facebook</a></div>
+				<div style="height: 82px;"><a href="https://www.facebook.com/pages/Openruhr/565665453457389" target="_blank"><img src="/static/img/facebook-f.png" width="71" height="70" alt="Facebook" style="border: 0"/></a></div>
+				<div style="margin-top: 5px;"><a href="https://www.facebook.com/pages/Openruhr/565665453457389" target="_blank">Facebook</a></div>
 			</div>
 			<div style="float: left; width: 160px; margin: 0 3em;">
-				<div style="height: 82px;"><a href="https://twitter.com//openruhr" target="_blank"><img src="/static/img/twitter-bird.png" width="87" height="61" alt="Facebook" style="border: 0"/></a></div>
+				<div style="height: 82px;"><a href="https://twitter.com/openruhr" target="_blank"><img src="/static/img/twitter-bird.png" width="87" height="61" alt="Facebook" style="border: 0"/></a></div>
 				<div style="margin-top: 5px;"><a href="https://twitter.com/openruhr" target="_blank">Twitter</a></div>
 			</div>
 			<div style="float: left; width: 160px; margin: 0 3em;">
 				<div style="height: 82px;"><img src="/static/img/github-octocat.png" width="87" height="77" alt="Facebook" style="border: 0"/></div>
-				<div style="margin-top: 5px;"><a href="https://github.com/openruhr/ris-web" target="_blank" title="Der Code für offeneskoeln.de">Plattform</a> und <a href="https://github.com/marians/cologne-ris-scraper" target="_blank" title="Software zum Auslesen des Kölner Ratsinformationssystems">Scraper</a> als Open Source Software auf Github</div>
+				<div style="margin-top: 5px;"><a href="https://github.com/openruhr/ris-web" target="_blank" title="Der Code für offeneskoeln.de">Plattform</a> und <a href="https://github.com/openruhr/ris-scraper" target="_blank" title="Software zum Auslesen des {{ config.CITY_NAME_ER }} Ratsinformationssystems">Scraper</a> als Open Source Software auf Github</div>
 			</div>
 		</div>
 	</div>
@@ -146,7 +146,7 @@
 				<img src="/static/img/team/du.jpg" width="150" height="150" alt="Du" style="border: 0"/>
 			</div>
 			<div style="width: 400px; float: left;">
-				Hier könnte <strong>Dein Name</strong> stehen. Wenn Du an Offenes Köln mitwirken möchtest, melde Dich auf einem der vielen Wege möglichen Wege!
+				Hier könnte <strong>Dein Name</strong> stehen. Wenn Du an {{ config.APP_NAME }} mitwirken möchtest, melde Dich auf einem der vielen Wege möglichen Wege!
 			</div>
 		</div>
 
@@ -159,10 +159,10 @@
 
 		<div style="overflow: auto; width: 750px; margin: 2em auto; text-align: left;">
 			<div style="width: 260px; float: left;">
-				<img src="/static/img/sponsoring/acme-inc.png" width="218" height="42" alt="Hier könnte Dein Logo stehen" style="border: 0"/>
+				<img src="/static/img/sponsoring/acme-inc.png" width="218" height="42" alt="Linuxhotel" style="border: 0"/>
 			</div>
 			<div style="width: 450px; float: left;">
-				Hier könnte <strong>Dein Firmenlogo</strong> stehen. Offenes Köln ist offen für materielle Unterstützung, z.B. für das <strong>Hosting</strong>.
+				Das <a href="http://linuxhotel.de/">Linuxhotel</a> aus Essen finanziert den OpenRuhr Server, ohne den all dies hier nicht möglich wäre. Danke!
 			</div>
 		</div>
 
@@ -172,7 +172,7 @@
 <div class="content middle" id="links">
 	<h2 class="top-nomargin">Zum Weiterklicken</h2>
 	<p>Niemand ist eine Insel, erst recht nicht im World Wide Web. Daher gibt es hier gesammelt wesentliche Links zu relevanten Ressourcen.</p>
-	<p>Das <a href="{{ config.RIS_ORIGINAL_URL }}" target="_blank">Ratsinformationssystem der Stadt {{ config.CITY_NAME }}</a> ist die Quelle der Dokumente, dier hier auf offeneskoeln.de zu finden sind. Dieses System gibt es unter anderem, um die Gremienarbeit, so wie sie in der <a href="https://recht.nrw.de/lmi/owa/pl_text_anzeigen?v_id=2320021205103438063" target="_blank">Gemeindeordnung des Landes NRW</a> und in der <a href="{{ config.GESCHAEFTSORDNUNG_URL}}" target="_blank">Geschäftsordnung des Rates der Stadt {{ config.CITY_NAME }} (PDF)</a> festgelegt sind.</p>
+	<p>Das <a href="{{ config.RIS_ORIGINAL_URL }}" target="_blank">Ratsinformationssystem der Stadt {{ config.CITY_NAME }}</a> ist die Quelle der Dokumente, dier hier auf {{ config.BASE_HOST}} zu finden sind. Dieses System gibt es unter anderem, um die Gremienarbeit, so wie sie in der <a href="https://recht.nrw.de/lmi/owa/pl_text_anzeigen?v_id=2320021205103438063" target="_blank">Gemeindeordnung des Landes NRW</a> und in der <a href="{{ config.GESCHAEFTSORDNUNG_URL}}" target="_blank">Geschäftsordnung des Rates der Stadt {{ config.CITY_NAME }} (PDF)</a> festgelegt sind.</p>
 	<p>Sowas wie {{ config.APP_NAME }} gibt es schon länger in Frankfurt unter dem Namen <a href="http://www.frankfurt-gestalten.de/" target="_blank">Frankfurt gestalten</a>. Interessierte, die solche und ähnliche Plattformen in anderen Städten Nordrhein-Westfalens fördern wollen, diskutieren auf der <a href="http://lists.okfn.org/mailman/listinfo/od-nrw" target="_blank">Open Data NRW Mailingliste</a>. Überregionale Anlaufstellen, um sich Mitstreiter für ein solches Projekt zu suchen, ist das <a href="http://opendata-network.org/" target="_blank">Open Data Network</a> und die <a href="http://okfn.de/" target="_blank">Open Knowledge Foundation Deutschland</a>.</p>
 
 </div>
