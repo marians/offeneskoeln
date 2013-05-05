@@ -113,8 +113,6 @@ def legacy_attachment(download_path):
 def attachment_download(attachment_id, extension):
     """
     Download eines Attachments
-
-    TODO: Conditional GET berücksichtigen (If-modified-since)
     """
     attachment_info = db.get_attachment(attachment_id)
     #pprint.pprint(attachment_info)
@@ -149,6 +147,7 @@ def attachment_download(attachment_id, extension):
     handler = db.get_file(attachment_info['file']['_id'])
     response = make_response(handler.read(), 200)
     response.mimetype = attachment_info['mimetype']
+    response.headers['X-Robots-Tag'] = 'noarchive'
     response.headers['ETag'] = attachment_info['sha1']
     response.headers['Last-modified'] = util.rfc1123date(
                     attachment_info['file']['uploadDate'])
