@@ -28,12 +28,21 @@ entstanden.
 import sys
 sys.path.append('./')
 
+import os
+import inspect
+import argparse
 import config
 from pymongo import MongoClient
 
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
+
+
+
 
 def count_sessions():
-    return db.sessions.find({'rs': config.RS}).count()
+    return db.sessions.find({'rs': cityconfig.RS}).count()
 
 
 def count_agendaitems():
@@ -59,16 +68,16 @@ def count_agendaitems():
 
 
 def count_submissions():
-    return db.submissions.find({'rs': config.RS}).count()
+    return db.submissions.find({'rs': cityconfig.RS}).count()
 
 
 def count_attachments():
-    return db.attachments.find({'rs': config.RS}).count()
+    return db.attachments.find({'rs': cityconfig.RS}).count()
 
 
 def count_depublished_attachments():
     query = {
-        'rs': config.RS,
+        'rs': cityconfig.RS,
         'depublication': {'$exists': True}
     }
     return db.attachments.find(query).count()
@@ -156,14 +165,20 @@ def files_size():
 
 
 def count_files():
-    return db.fs.files.find().count()
+    return db.fs.files.find({"rs": cityconfig.RS}).count()
 
 
 def count_locations():
-    return db.locations.find({'rs': config.RS}).count()
+    return db.locations.find({'rs': cityconfig.RS}).count()
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Generate Fulltext for given City Conf File')
+    parser.add_argument(dest='city', help=("e.g. bochum"))
+    options = parser.parse_args()
+    city = options.city
+    cityconfig = __import__(city)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
     print "Number of sessions:                 %s" % count_sessions()

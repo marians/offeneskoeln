@@ -30,11 +30,7 @@ sys.path.append('./')
 
 import os
 import inspect
-
 import config
-cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
-if cmd_subfolder not in sys.path:
-    sys.path.insert(0, cmd_subfolder)
 import tempfile
 import subprocess
 from pymongo import MongoClient
@@ -42,6 +38,10 @@ import gridfs
 import datetime
 import time
 import argparse
+
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
 
 
 STATS = {
@@ -66,7 +66,7 @@ def generate_fulltext(db):
             generate_fulltext_for_attachment(doc['_id'], db)
 
     # Attachments ohne Volltext
-    query = {'fulltext_generated': {'$exists': False}}
+    query = {'fulltext_generated': {'$exists': False}, "rs" : cityconfig.RS}
     for doc in db.attachments.find(query):
         STATS['attachments_without_fulltext'] += 1
         generate_fulltext_for_attachment(doc['_id'], db)

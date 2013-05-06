@@ -32,13 +32,17 @@ sys.path.append('./')
 import config
 
 import os
+import inspect
+import argparse
 import datetime
 from webapp import date_range
 from pymongo import MongoClient
 import gridfs
-import argparse
 import subprocess
 
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
 
 def save_file(file_id, path):
     """
@@ -61,9 +65,11 @@ def create_download_package(daterange, folder):
     start = datetime.datetime(daterange[0].year, daterange[0].month, daterange[0].day, 0, 0, 0)
     end = datetime.datetime(daterange[1].year, daterange[1].month, daterange[1].day, 23, 59, 59)
     #print start, end
-    query = {'uploadDate': {
+    query = {
+        'uploadDate': {
         '$gt': start,
-        '$lt': end
+        '$lt': end,
+        "rs" : cityconfig.RS
     }}
     for afile in db.fs.files.find(query):
         fid = afile['_id']
@@ -85,6 +91,8 @@ def execute(cmd):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Create a package of attachment files for a certain date range')
+    #city
+    parser.add_argument(dest='city', help=("e.g. bochum"))
     # date range default: current month
     parser.add_argument(dest='daterange', help=("e.g. 2010-2011 or 201208-201209."))
     parser.add_argument('--verbose', '-v', action='count', default=0, dest="verbose",
@@ -93,6 +101,8 @@ if __name__ == '__main__':
     parser.add_argument('--name', '-n', dest="output_name",
         help='Name prefix for the output file. Default: %s' % output_name_default)
     options = parser.parse_args()
+    city = options.city
+    cityconfig = __import__(city)
 
     if options.output_name is None:
         options.output_name = 'attachments_' + options.daterange

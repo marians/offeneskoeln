@@ -74,8 +74,10 @@ entstanden.
 import sys
 sys.path.append('./')
 
-import config
 import os
+import inspect
+import argparse
+import config
 import tempfile
 import subprocess
 from pymongo import MongoClient
@@ -84,6 +86,10 @@ import shutil
 from PIL import Image
 import datetime
 import time
+
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
 
 
 STATS = {
@@ -109,7 +115,9 @@ def generate_thumbs(db, thumbs_folder):
     # Attachments mit veralteten Thumbnails
     query = {
         'thumbnails_generated': {'$exists': True},
-        'depublication': {'$exists': False}
+        'depublication': {'$exists': False},
+        "rs" : cityconfig.RS
+        
     }
     for doc in db.attachments.find(query, timeout=False):
         # Dateiinfo abholen
@@ -121,7 +129,8 @@ def generate_thumbs(db, thumbs_folder):
     # Attachments ohne Thumbnails
     query = {
         'thumbnails': {'$exists': False},
-        'depublication': {'$exists': False}
+        'depublication': {'$exists': False},
+        "rs" : cityconfig.RS
     }
     for doc in db.attachments.find(query, timeout=False):
         if get_file_suffix(doc['filename']) in config.THUMBNAILS_VALID_TYPES:
@@ -285,6 +294,12 @@ def print_stats():
         print "%s: %d" % (key, STATS[key])
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Generate Fulltext for given City Conf File')
+    parser.add_argument(dest='city', help=("e.g. bochum"))
+    options = parser.parse_args()
+    city = options.city
+    cityconfig = __import__(city)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
     fs = gridfs.GridFS(db)

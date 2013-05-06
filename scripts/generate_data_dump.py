@@ -27,12 +27,18 @@ entstanden.
 
 import sys
 sys.path.append('./')
+
 import os
+import inspect
+import argparse
 import config
 import subprocess
 import datetime
 import shutil
 
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
 
 def execute(cmd):
     output, error = subprocess.Popen(
@@ -46,6 +52,7 @@ def execute(cmd):
 def create_dump(folder):
     """
     Drops dumps in folder/config.DB_NAME
+    TODO: Export nur für eine Stadt
     """
     cmd = (config.MONGODUMP_CMD + ' --db ' + config.DB_NAME +
             ' --out ' + folder)
@@ -67,11 +74,15 @@ def compress_folder(folder):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Generate a database dump')
+    #TODO: Parameter Stadt ist im Moment wirklungslos
+    parser.add_argument(dest='city', help=("e.g. bochum"))
     parser.add_argument('-f', '--tempfolder', dest='folder', metavar='FOLDER', type=str,
                        help=('an integer for the accumulator. Default: %s' %
                         config.DB_DUMP_TEMPFOLDER),
                        default=config.DB_DUMP_TEMPFOLDER)
 
     args = parser.parse_args()
+    city = options.city
+    cityconfig = __import__(city)
     create_dump(args.folder)
     compress_folder(args.folder)

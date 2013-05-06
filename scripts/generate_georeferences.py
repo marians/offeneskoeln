@@ -31,19 +31,19 @@ entstanden.
 """
 
 import sys
+sys.path.append('./')
+
 import os
 import inspect
 import argparse
-sys.path.append('./')
-
 import config
-cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
-if cmd_subfolder not in sys.path:
-    sys.path.insert(0, cmd_subfolder)
 from pymongo import MongoClient
 import re
 import datetime
 
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
 
 def generate_georeferences(db):
     """Generiert Geo-Referenzen für die gesamte submissions-Collection"""
@@ -161,4 +161,4 @@ if __name__ == '__main__':
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
     streets = load_streets()
-    #generate_georeferences(db)
+    generate_georeferences(db)
