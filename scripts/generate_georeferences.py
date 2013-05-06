@@ -31,9 +31,15 @@ entstanden.
 """
 
 import sys
+import os
+import inspect
+import argparse
 sys.path.append('./')
 
 import config
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
 from pymongo import MongoClient
 import re
 import datetime
@@ -89,18 +95,22 @@ def get_attachment_fulltext(attachment_id):
     return ''
 
 
-def load_streets(path):
+def load_streets():
     """
     Lädt eine Straßenliste (ein Eintrag je Zeile UTF-8)
     in ein Dict. Dabei werden verschiedene Synonyme für
     Namen, die auf "straße" oder "platz" enden, angelegt.
     """
-    nameslist = open(path, 'r').read().strip().split("\n")
+    nameslist = []
+    query = {"rs" : cityconfig.RS }
+    for street in db.locations.find(query):
+        nameslist.extend(street['name'])
     ret = {}
     pattern1 = re.compile(".*straße$")
     pattern2 = re.compile(".*Straße$")
     pattern3 = re.compile(".*platz$")
     pattern4 = re.compile(".*Platz$")
+    nameslist = []
     for name in nameslist:
         ret[name.replace(' ', '-')] = name
         # Alternative Schreibweisen: z.B. straße => str.
@@ -142,7 +152,13 @@ def match_streets(text):
 
 
 if __name__ == '__main__':
-    streets = load_streets(config.STREETS_FILE)
+    parser = argparse.ArgumentParser(
+        description='Generate Fulltext for given City Conf File')
+    parser.add_argument(dest='city', help=("e.g. bochum"))
+    options = parser.parse_args()
+    city = options.city
+    cityconfig = __import__(city)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
-    generate_georeferences(db)
+    streets = load_streets()
+    #generate_georeferences(db)

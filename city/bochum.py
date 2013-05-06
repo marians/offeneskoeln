@@ -37,7 +37,7 @@ BASE_URL = 'http://ris-bochum/'
 BASE_HOST = 'bochum.ris.openruhr.de'
 
 # Regionalschlüssel
-RS = "082220000000"
+RS = "059110000000"
 
 # Name of the location. Use unicode if needed.
 #LOCATION_NAME = u'K\xf6ln'
