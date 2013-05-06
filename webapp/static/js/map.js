@@ -1,6 +1,6 @@
 
 $(document).ready(function(){
-    var map = new L.Map('map', {scrollWheelZoom: false});
+    var map = new L.Map('map', {/*scrollWheelZoom: false*/});
     //var maplayers = [];
     var markerLayerGroup = new L.LayerGroup();
     map.addLayer(markerLayerGroup);
@@ -223,13 +223,14 @@ $(document).ready(function(){
             streetString = sessionData.location_entry;
         }
         var changeLocationLink = $(document.createElement('a')).text(streetString).attr('href', '#').click(handleChangePositionClick);
+        var newSearchLink = $(document.createElement('a')).className('awesome extrawide').text(streetString).attr('href', '#').click(handleChangePositionClick);
         var article = '';
         if (OffenesKoeln.endsWith(streetString, 'straße') || OffenesKoeln.endsWith(streetString, 'gasse')) {
             article = 'die';
         }
         var mapClaim = '<div id="map-claim">Das passiert rund um ' + article + ' </div>';
         $('#position-prompt').slideUp().after(mapClaim);
-        $('#map-claim').append(changeLocationLink);
+        $('#map-claim').append(changeLocationLink).append(newSearchLink);
         // Karte umbauen
         clearMap();
         var userLocation = new L.LatLng(lat, lon),
