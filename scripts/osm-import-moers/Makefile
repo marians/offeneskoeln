@@ -7,25 +7,26 @@
 # pip install numpy
 # pip install matplotlib
 
-CITY=bochum
-REGBEZ=arnsberg
-OSM_RELATION=62644
+CITY=moers
+REGBEZ=duesseldorf
+OSM_RELATION=58623
 
 
-import: $(CITY)-streets.osm
-	python osm-import.py $(CITY)-streets.osm
+import: city-streets.osm
+	python osm-import.py city-streets.osm
 
-$(CITY)-streets.osm: osmfilter $(CITY).osm
-	./osmfilter $(CITY).osm \
+city-streets.osm: osmfilter city.osm
+	./osmfilter city.osm \
 	--keep="highway=primary =secondary =tertiary =residential =unclassified =road =living-street =pedestrian" \
-	--drop-author --drop-version > $(CITY)-streets.osm
+	--drop-author --drop-version > city-streets.osm
 
-$(CITY).osm: $(CITY).poly $(REGBEZ)-regbez-latest.osm osmosis
-	bin/osmosis --read-xml file="$(REGBEZ)-regbez-latest.osm" --bounding-polygon file="$(CITY).poly" --write-xml file="$(CITY).osm"
+city.osm: city.poly city-regbez-latest.osm osmosis
+	bin/osmosis --read-xml file="city-regbez-latest.osm" --bounding-polygon file="city.poly" --write-xml file="city.osm"
 
-$(REGBEZ)-regbez-latest.osm:
+city-regbez-latest.osm:
 	wget -N http://download.geofabrik.de/europe/germany/nordrhein-westfalen/$(REGBEZ)-regbez-latest.osm.bz2
 	bunzip2 $(REGBEZ)-regbez-latest.osm.bz2
+	mv $(REGBEZ)-regbez-latest.osm city-regbez-latest.osm
 
 osmfilter:
 	wget -O - http://m.m.i24.cc/osmfilter.c |cc -x c - -O3 -o osmfilter
@@ -41,11 +42,11 @@ osmosis:
 	rm copying.txt
 	rm changes.txt
 
-bochum.poly:
-	python -m osm.multipolygon -r $(OSM_RELATION) -m $(CITY).poly
+city.poly:
+	python -m osm.multipolygon -r $(OSM_RELATION) -m city.poly
 
 clean:
-	rm $(CITY).poly
+	rm city.poly
 	rm *.osm
 	rm *.pyc
 	rm -r osmfilter

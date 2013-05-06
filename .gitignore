@@ -3,6 +3,7 @@
 config.py
 venv/
 git-web/
+ris-web/
 *.komodoproject
 .komodotools
 webapp/static/thumbs
