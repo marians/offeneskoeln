@@ -43,7 +43,7 @@ def generate_georeferences(db):
     """Generiert Geo-Referenzen für die gesamte submissions-Collection"""
 
     # Submissions ohne Geo-Referenzen
-    query = {'georeferences_generated': {'$exists': False}}
+    query = {'georeferences_generated': {'$exists': False}, "rs" : cityconfig.RS}
     for doc in db.submissions.find(query):
         generate_georeferences_for_submission(doc['_id'], db)
     # TODO: Aktualisierte Dokumente berücksichtigen

@@ -28,14 +28,20 @@ entstanden.
 import sys
 sys.path.append('./')
 
-import config
 import os
+import inspect
+
+import config
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
 import tempfile
 import subprocess
 from pymongo import MongoClient
 import gridfs
 import datetime
 import time
+import argparse
 
 
 STATS = {
@@ -50,7 +56,7 @@ def generate_fulltext(db):
     """Generiert Volltexte für die gesamte attachments-Collection"""
 
     # Attachments mit veralteten Volltexten
-    query = {'fulltext_generated': {'$exists': True}}
+    query = {'fulltext_generated': {'$exists': True}, "rs" : cityconfig.RS}
     for doc in db.attachments.find(query):
         # Dateiinfo abholen
         filedoc = db.fs.files.find_one({'_id': doc['file'].id})
@@ -127,6 +133,12 @@ def print_stats():
         print "%s: %d" % (key, STATS[key])
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Generate Fulltext for given City Conf File')
+    parser.add_argument(dest='city', help=("e.g. bochum"))
+    options = parser.parse_args()
+    city = options.city
+    cityconfig = __import__(city)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
     fs = gridfs.GridFS(db)
