@@ -7,7 +7,11 @@
 # pip install numpy
 # pip install matplotlib
 
-import: bochum-streets.osm
+CITY=bochum
+REGBEZ=arnsberg
+
+
+import: $(city)-streets.osm
 	python osm-import.py bochum-streets.osm
 
 bochum-streets.osm: osmfilter bochum.osm
@@ -41,12 +45,10 @@ bochum.poly:
 
 clean:
 	rm bochum.poly
-	rm arnsberg-regbez-latest.osm
-	rm bochum.osm
-	rm osmfilter
-	rm bochum-streets.osm
-	rm -r osmosis_dir
-	rm osmosis
+	rm *.osm
+	rm *.pyc
+	rm -r osmfilter
+	rm -r osmosis
 	rm -r bin
-	rm -r lb
+	rm -r lib
 	rm -r config
