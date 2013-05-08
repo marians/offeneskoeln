@@ -58,7 +58,7 @@ APP_TAGLINE = u'Die Lokalpolitik in Moers, einfach zug\xe4nglich'
 ICON_URI = '/static/img/logo/favicon_16x16.png'
 
 # Your name
-META_PUBLISHER = 'Ernesto Ruge'
+META_PUBLISHER = 'OpenRuhr'
 META_DESCR = u'Informationen aus der Lokalpolitik des Ruhrgebietes, zug\xe4nglich dargestellt, durchsuchbar und geografisch zugeordnet.'
 
 
@@ -67,10 +67,10 @@ META_DESCR = u'Informationen aus der Lokalpolitik des Ruhrgebietes, zug\xe4nglic
 STREETS_FILE = 'data/strassen_moers.txt'
 
 # Disqus Comments shortname
-DISQUS_SHORTNAME = 'your_disqus_shortname'
+DISQUS_SHORTNAME = 'openruhr-ris-bochum'
 
 # Tracking via Piwik oder Google Analytics. Erlaubte Werte: 'PIWIK', 'ANALYTICS' oder leer '' für kein Tracking
-TRACKING = 'ANALYTICS'
+TRACKING = 'PIWIK'
 
 # Google Analytics Account
 ANALYTICS_ACCOUNT = 'UA-00000000-1'
@@ -79,7 +79,7 @@ ANALYTICS_ACCOUNT = 'UA-00000000-1'
 PIWIK_HOST = 'piwik.sectio-aurea.org'
 
 #PIWIK Site ID
-PIWIK_SITE_ID = 10
+PIWIK_SITE_ID = 35
 
 # Map view initialization point, should be center of the city
 # as Longitude, Latitude tuple
