@@ -119,17 +119,7 @@ if __name__ == '__main__':
                     'my_simple_german_analyzer': {
                         'type': 'custom',
                         'tokenizer': 'standard',
-                        'filter': ['standard', 'lowercase', 'my_synonym', 'my_stop']
-                    }
-                },
-                'filter': {
-                    'my_synonym': {
-                        'type': 'synonym',
-                        'synonyms_path': config.SYNONYMS_PATH
-                    },
-                    'my_stop': {
-                        'type': 'stop',
-                        'stopwords_path': config.STOPWORDS_PATH
+                        'filter': ['standard', 'lowercase']
                     }
                 }
             }
@@ -137,7 +127,6 @@ if __name__ == '__main__':
     }
     print "Creating index %s" % new_index
     es.indices.create_index(new_index, settings=settings)
-
     # set mapping
     mapping = {
         '_source': {'enabled': False},

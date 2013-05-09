@@ -31,7 +31,7 @@ entstanden.
 import locale
 
 # The basis for all absolute URLs on this site
-BASE_URL = 'http://ris-moers/'
+BASE_URL = 'http://infinite-ris/'
 
 # Basis Host
 BASE_HOST = 'moers.ris.openruhr.de'
@@ -61,13 +61,8 @@ ICON_URI = '/static/img/logo/favicon_16x16.png'
 META_PUBLISHER = 'OpenRuhr'
 META_DESCR = u'Informationen aus der Lokalpolitik des Ruhrgebietes, zug\xe4nglich dargestellt, durchsuchbar und geografisch zugeordnet.'
 
-
-# List of all street names in the city
-# (Should soon be obsolete. See https://github.com/marians/offeneskoeln/issues/98)
-STREETS_FILE = 'data/strassen_moers.txt'
-
 # Disqus Comments shortname
-DISQUS_SHORTNAME = 'openruhr-ris-bochum'
+DISQUS_SHORTNAME = 'openruhr-ris-moers'
 
 # Tracking via Piwik oder Google Analytics. Erlaubte Werte: 'PIWIK', 'ANALYTICS' oder leer '' für kein Tracking
 TRACKING = 'PIWIK'
@@ -86,13 +81,14 @@ PIWIK_SITE_ID = 35
 MAP_START_POINT = [6.640815, 51.451604]
 
 #Min und Max Zoom
-MAP_TILE_ZOOMLEVEL_MIN = 4
+MAP_TILE_ZOOMLEVEL_MIN = 6
 MAP_TILE_ZOOMLEVEL_MAX = 18
 
 # Location settings to be appended to all geocoding requests for street names
 GEOCODING_DEFAULT_CITY = 'Moers'
 GEOCODING_DEFAULT_COUNTRY = 'DE'
-GEOCODING_FILTER_COUNTY = 'Moers'
+# BBezeichnung irreführend, gemeint ist der Kreis
+GEOCODING_FILTER_COUNTY = 'Kreis Wesel'
 
 # Suchbeispiele
 SEARCH_EXAMPLES = [

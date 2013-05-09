@@ -78,12 +78,13 @@ def get_submissions(references=None, submission_ids=None, get_attachments=False,
     for r in keys:
         query = None
         if mode == 'references':
-            query = {'identifier': r, "rs" : app.config.RS}
+            query = {'identifier': r, "rs" : app.config['RS']}
         else:
             if type(r) != ObjectId:
                 r = ObjectId(r)
-            query = {'_id': r, "rs" : app.config.RS}
+            query = {'_id': r, "rs" : app.config['RS']}
         result = mongo.db.submissions.find(query)
+        print result
         for res in result:
             res['url'] = util.submission_url(res['identifier'])
             if get_attachments:
@@ -106,7 +107,7 @@ def get_submissions(references=None, submission_ids=None, get_attachments=False,
                                                 page=res['attachments'][n]['thumbnails'][height][t]['page'])
             if get_consultations:
                 # Verweisende agendaitems finden
-                sessions = mongo.db.sessions.find({'agendaitems.submissions.$id': res['_id'], "rs" : app.config.RS})
+                sessions = mongo.db.sessions.find({'agendaitems.submissions.$id': res['_id'], "rs" : app.config['RS']})
                 if sessions.count() > 0:
                     res['consultations'] = []
                     for session in sessions:
@@ -167,7 +168,7 @@ def get_all_submission_identifiers():
     """
     Liefert Liste mit allen Submission-Identifiern zurück
     """
-    search = mongo.db.submissions.find({"rs" : app.config.RS}, {'identifier': 1})
+    search = mongo.db.submissions.find({"rs" : app.config['RS']}, {'identifier': 1})
     if search.count():
         slist = []
         for submission in search:
@@ -190,7 +191,7 @@ def get_locations_by_name(streetname):
     """
     Liefert Location-Einträge für einen Namen zurück.
     """
-    cursor = mongo.db.locations.find({'name': streetname, "rs" : app.config.RS})
+    cursor = mongo.db.locations.find({'name': streetname, "rs" : app.config['RS']})
     streets = []
     for street in cursor:
         streets.append(street)

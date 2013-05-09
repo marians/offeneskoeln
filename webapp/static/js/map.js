@@ -23,6 +23,11 @@ $(document).ready(function(){
         
     map.setView(new L.LatLng(CONF.mapStartPoint[1], CONF.mapStartPoint[0]), 11).addLayer(backgroundLayer);
     
+    // OSM Copyright Notice
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: 'Map &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
     // set to user position, if set and within cologne
     OffenesKoeln.session({}, function(data){
         sessionData = data.response;
@@ -222,13 +227,13 @@ $(document).ready(function(){
         if (streetString === '') {
             streetString = sessionData.location_entry;
         }
-        var changeLocationLink = $(document.createElement('a')).text(streetString).attr('href', '#').click(handleChangePositionClick);
-        var newSearchLink = $(document.createElement('a')).className('awesome extrawide').text(streetString).attr('href', '#').click(handleChangePositionClick);
+        var changeLocationLink = $(document.createElement('span')).text(streetString).attr({'href': '#', 'id': 'map-claim-street'})
+        var newSearchLink = $(document.createElement('a')).text('Neue Suche').attr({'href': '#', 'class': 'awesome extrawide'}).css('margin-left', '20px').click(handleChangePositionClick);
         var article = '';
         if (OffenesKoeln.endsWith(streetString, 'straße') || OffenesKoeln.endsWith(streetString, 'gasse')) {
             article = 'die';
         }
-        var mapClaim = '<div id="map-claim">Das passiert rund um ' + article + ' </div>';
+        var mapClaim = '<div id="map-claim"><span>Das passiert rund um ' + article + ' </span></div>';
         $('#position-prompt').slideUp().after(mapClaim);
         $('#map-claim').append(changeLocationLink).append(newSearchLink);
         // Karte umbauen

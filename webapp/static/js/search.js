@@ -153,7 +153,7 @@ $(document).ready(function(){
         for (var i in data.response.documents) {
             var item = $(document.createElement('li')).attr('class','resultitem');
             resultlist.append(item);
-            var link = $(document.createElement('a')).attr('href', data.response.documents[i].url);
+            var link = $(document.createElement('a')).attr('href', data.response.documents[i].url.replace(/%2F/, '/'));
             item.append(link);
             var title = $(document.createElement('span')).attr('class','title').html(itemTitle(data.response.documents[i]));
             link.append(title);

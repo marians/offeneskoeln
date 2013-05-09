@@ -560,12 +560,13 @@ a:hover .del {
 	text-decoration: none;
 }
 
-#map-claim a {
-	padding: 2px 4px;
-	background-color: #fff;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	border-radius: 3px;
+#map-claim span {
+	position: relative;
+	margin-top: 4px;
+}
+
+#map-claim-street {
+	color: #6C9447;
 	white-space: nowrap;
 }
 
@@ -664,7 +665,7 @@ code {
 }
 .extrawide.awesome, .extrawide.awesome:visited, .extrawide.awesome:link {
 	font-size: 14px;
-	padding: 5px 30px 7px 30px;
+	padding: 7px 30px 5px 30px;
 }
 form .awesome {
 	top: -3px;

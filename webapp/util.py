@@ -99,6 +99,7 @@ def geocode(location_string):
             if 'postcode' in addresses[n]['address'] and addresses[n]['address']['postcode'] == postal:
                 addresses_out.append(addresses[n])
         else:
+            print "yay"
             addresses_out.append(addresses[n])
     return addresses_out
 

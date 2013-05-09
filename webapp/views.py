@@ -47,10 +47,6 @@ from flask import Markup
 
 from webapp import app
 
-#import webapp.date_range
-#import config
-
-
 @app.route("/")
 def index():
     return render_template('index.html')
