@@ -38,11 +38,11 @@ from bson.son import SON
 
 import pprint
 
-cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../../")))
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../../../")))
 if cmd_subfolder not in sys.path:
     sys.path.insert(0, cmd_subfolder)
 
-cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../../city")))
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../../../city")))
 if cmd_subfolder not in sys.path:
     sys.path.insert(0, cmd_subfolder)
 
