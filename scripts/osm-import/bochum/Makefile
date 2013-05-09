@@ -7,9 +7,9 @@
 # pip install numpy
 # pip install matplotlib
 
-CITY=moers
-REGBEZ=duesseldorf
-OSM_RELATION=58623
+CITY=bochum
+REGBEZ=arnsberg
+OSM_RELATION=62644
 
 
 import: city-streets.osm
