@@ -119,7 +119,17 @@ if __name__ == '__main__':
                     'my_simple_german_analyzer': {
                         'type': 'custom',
                         'tokenizer': 'standard',
-                        'filter': ['standard', 'lowercase']
+                        'filter': ['standard', 'lowercase', 'my_synonym', 'my_stop']
+                    }
+                },
+                'filter': {
+                    'my_synonym': {
+                        'type': 'synonym',
+                        'synonyms_path': config.SYNONYMS_PATH
+                    },
+                    'my_stop': {
+                        'type': 'stop',
+                        'stopwords_path': config.STOPWORDS_PATH
                     }
                 }
             }
