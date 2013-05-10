@@ -64,7 +64,7 @@ def submission_url(identifier):
 
 
 def generate_channel():
-    feed_url = cityconfig.BASE_URL + config.SUBMISSION_RSS_URL
+    feed_url = cityconfig.BASE_URL + '/static/rss/' + cityconfig.RS + '_dokumente.xml'
     root = etree.Element("rss", version="2.0", nsmap={'atom': 'http://www.w3.org/2005/Atom'})
     channel = etree.SubElement(root, "channel")
     etree.SubElement(channel, "title").text = cityconfig.APP_NAME + ': Neue Dokumente'
@@ -75,21 +75,16 @@ def generate_channel():
     etree.SubElement(channel, '{http://www.w3.org/2005/Atom}link',
         href=feed_url, rel="self", type="application/rss+xml")
 
-    #TODO: Ob das wohl exists sein sollte - und nicht 1?
     project = {
-        'identifier': 1,
-        'title': 1,
-        'last_modified': 1,
-        'date': 1,
-        'type': 1,
-        'sessions': 1,
-        'attachments': 1,
+        'identifier': {'$exists': True},
+        'title': {'$exists': True},
+        'last_modified': {'$exists': True},
         "rs" : cityconfig.RS
     }
     # use latest item lastmod date as pubDate of the feed
     pub_date = None
     # iterate items
-    for s in db.submissions.find({"rs" : cityconfig.RS}).sort('last_modified', -1).limit(LIMIT):
+    for s in db.submissions.find(project).sort('last_modified', -1).limit(LIMIT):
         if pub_date is None:
             pub_date = s['last_modified']
         url = submission_url(s['identifier'])
@@ -106,8 +101,8 @@ def generate_channel():
         etree.SubElement(item, "pubDate").text = rfc1123date(s['last_modified'])
         etree.SubElement(item, "title").text = s['title']
         etree.SubElement(item, "description").text = description
-        etree.SubElement(item, "link").text = url
-        etree.SubElement(item, "guid").text = url
+        etree.SubElement(item, "link").text = url.replace('%2F', '/')
+        etree.SubElement(item, "guid").text = url.replace('%2F', '/')
     #failback if empty
     if pub_date is None:
         pub_date = datetime.now()
@@ -122,7 +117,7 @@ def save_channel(xml):
     for cached versions to be used (conditional get etc.).
     """
     overwrite = False
-    path = config.BASE_PATH + '/' + config.SUBMISSION_RSS_URL
+    path = config.BASE_PATH + '/static/rss/' + cityconfig.RS + '_dokumente.xml'
     if not os.path.exists(path):
         overwrite = True
     else:

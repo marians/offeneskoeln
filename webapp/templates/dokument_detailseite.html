@@ -5,10 +5,11 @@
 
 {% block endbody_script %}
 {{ super() }}
+<script type="text/javascript">
+var ok_document_id = '{{ submission.identifier }}';
+</script>
 {% if config.DISQUS_SHORTNAME %}
 <script type="text/javascript">
-
-var ok_document_id = '{{ submission.identifier }}';
 var disqus_title = '[{{ submission.identifier }}] - {{ submission.title }}';
 var disqus_category_id = 'dokument';
 var disqus_shortname = '{{ config.DISQUS_SHORTNAME }}';
@@ -18,7 +19,7 @@ var disqus_shortname = '{{ config.DISQUS_SHORTNAME }}';
     dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
 })();
-</script>
+
 {% endif %}
 <script type="text/javascript" src="/static/js/document_details.js"></script>
 {% endblock %}

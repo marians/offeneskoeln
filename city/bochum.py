@@ -121,8 +121,6 @@ API_DOC_EXAMPLE_REFERENCE = 'BBR-SV108/2012'
 API_DOC_EXAMPLE_REFERENCE2 = 'A004/2013'
 API_DOC_EXAMPLE_COMMITTEE_NAME = 'Bezirksbeirat Rheinau'
 
-
-
 ### generated vars ####
 
 # Partial path to the static directory
