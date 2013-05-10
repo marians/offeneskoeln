@@ -38,6 +38,7 @@ from lxml import etree
 import email.utils
 import calendar
 import urllib
+from datetime import datetime
 
 cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
 if cmd_subfolder not in sys.path:
@@ -74,6 +75,7 @@ def generate_channel():
     etree.SubElement(channel, '{http://www.w3.org/2005/Atom}link',
         href=feed_url, rel="self", type="application/rss+xml")
 
+    #TODO: Ob das wohl exists sein sollte - und nicht 1?
     project = {
         'identifier': 1,
         'title': 1,
@@ -87,12 +89,12 @@ def generate_channel():
     # use latest item lastmod date as pubDate of the feed
     pub_date = None
     # iterate items
-    for s in db.submissions.find(project).sort('last_modified', -1).limit(LIMIT):
+    for s in db.submissions.find({"rs" : cityconfig.RS}).sort('last_modified', -1).limit(LIMIT):
         if pub_date is None:
             pub_date = s['last_modified']
         url = submission_url(s['identifier'])
         description = 'Art des Dokuments: ' + s['type'] + '<br />'
-        description += 'Erstellt am: ' + s['date'].strftime('%d. %B %Y') + '<br />'
+        description += 'Erstellt am: ' + s['date'].strftime('%d. %B %Y').decode('utf-8') + '<br />'
         description += 'Zuletzt geändert am: '.decode('utf-8') + s['last_modified'].strftime('%d. %B %Y') + '<br />'
         if 'sessions' in s:
             if len(s['sessions']) == 1:
@@ -106,6 +108,9 @@ def generate_channel():
         etree.SubElement(item, "description").text = description
         etree.SubElement(item, "link").text = url
         etree.SubElement(item, "guid").text = url
+    #failback if empty
+    if pub_date is None:
+        pub_date = datetime.now()
     etree.SubElement(channel, "pubDate").text = rfc1123date(pub_date)
     return etree.tostring(root, pretty_print=True)
 
