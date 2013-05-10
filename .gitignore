@@ -5,8 +5,9 @@ venv/
 git-web/
 ris-web/
 temp/*
+ris.wsgi
 *.komodoproject
-.komodotools
+*.komodotools
 webapp/static/thumbs
 webapp/static/tiles
 webapp/static/*.xml*
@@ -20,3 +21,4 @@ scripts/osm-import/*.poly
 scripts/osm-import/*.osm
 scripts/osm-import/osmfilter
 scripts/osm-import/osmosis
+
