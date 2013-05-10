@@ -122,7 +122,7 @@ def generate_sitemaps():
     for sitemap_name in sitemaps:
         f.write("""\n   <sitemap>
             <loc>%s%s.xml.gz</loc>
-        </sitemap>\n""" % (config.STATIC_URL, sitemap_name))
+        </sitemap>\n""" % (cityconfig.STATIC_URL, sitemap_name))
     f.write("</sitemapindex>\n")
     f.close()
 
