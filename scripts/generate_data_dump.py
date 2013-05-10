@@ -77,12 +77,12 @@ if __name__ == '__main__':
     #TODO: Parameter Stadt ist im Moment wirklungslos
     parser.add_argument(dest='city', help=("e.g. bochum"))
     parser.add_argument('-f', '--tempfolder', dest='folder', metavar='FOLDER', type=str,
-                       help=('an integer for the accumulator. Default: %s' %
+                        help=('an integer for the accumulator. Default: %s' %
                         config.DB_DUMP_TEMPFOLDER),
-                       default=config.DB_DUMP_TEMPFOLDER)
+                        default=config.DB_DUMP_TEMPFOLDER)
 
-    args = parser.parse_args()
+    options = parser.parse_args()
     city = options.city
     cityconfig = __import__(city)
-    create_dump(args.folder)
-    compress_folder(args.folder)
+    create_dump(options.folder)
+    compress_folder(options.folder)

@@ -9,6 +9,7 @@ temp/*
 .komodotools
 webapp/static/thumbs
 webapp/static/tiles
+webapp/static/*.xml*
 webapp/attachments/*
 webapp/daten/*
 webapp/static/rss/dokumente.xml
