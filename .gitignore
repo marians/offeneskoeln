@@ -13,7 +13,7 @@ webapp/static/tiles
 webapp/static/*.xml*
 webapp/attachments/*
 webapp/daten/*
-webapp/static/rss/dokumente.xml
+webapp/static/rss/*.xml
 scripts/osm-import/bin
 scripts/osm-import/lib
 scripts/osm-import/config
