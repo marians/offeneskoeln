@@ -29,9 +29,11 @@ entstanden.
 
 import sys
 sys.path.append('./')
-import config
 
 import os
+os.environ['CITY_CONF']='/opt/ris-web/city/template.py'
+
+import config
 import inspect
 import argparse
 import datetime
@@ -73,10 +75,11 @@ def create_download_package(daterange, folder):
     }}
     for afile in db.fs.files.find(query):
         fid = afile['_id']
-        path = folder + os.sep + afile['filename']
+        path = config.TMP_FOLDER + os.sep + folder + os.sep + afile['filename']
         save_file(fid, path)
-    execute('tar cjf %s.tar.bz2 %s' % (folder, folder))
-    execute('rm -r %s' % folder)
+    execute('tar cjf %s.tar.bz2 %s' % (config.TMP_FOLDER + os.sep + folder, config.TMP_FOLDER + os.sep + folder))
+    execute('rm -r %s' % config.TMP_FOLDER + os.sep + folder)
+    execute('mv %s.tar.bz2 %s.tar.bz2' % (config.TMP_FOLDER + os.sep + folder, config.ATTACHMENT_FOLDER + os.sep + folder))
 
 
 def execute(cmd):
@@ -97,22 +100,23 @@ if __name__ == '__main__':
     parser.add_argument(dest='daterange', help=("e.g. 2010-2011 or 201208-201209."))
     parser.add_argument('--verbose', '-v', action='count', default=0, dest="verbose",
         help="Give verbose output")
-    output_name_default = datetime.datetime.now().strftime('attachments_%Y-%m-%d-%H%M') + '_<daterange>'
-    parser.add_argument('--name', '-n', dest="output_name",
-        help='Name prefix for the output file. Default: %s' % output_name_default)
+    #output_name_default = datetime.datetime.now().strftime('attachments_%Y-%m-%d-%H%M') + '_<daterange>'
+    #parser.add_argument('--name', '-n', dest="output_name",
+    #    help='Name prefix for the output file. Default: %s' % output_name_default)
     options = parser.parse_args()
     city = options.city
     cityconfig = __import__(city)
 
-    if options.output_name is None:
-        options.output_name = 'attachments_' + options.daterange
-
+    #if options.output_name is None:
+    #    options.output_name = 'attachments_' + options.daterange
+    output_name = "%s_attachments_%s" % (cityconfig.RS, options.daterange)
+    
     daterange = date_range.to_dates(options.daterange)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
     fs = gridfs.GridFS(db)
 
-    tempdir = os.mkdir(options.output_name)
+    tempdir = os.mkdir(config.TMP_FOLDER + os.sep + output_name)
 
     #print (daterange, options.output_name)
-    create_download_package(daterange, options.output_name)
+    create_download_package(daterange, output_name)

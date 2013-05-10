@@ -48,7 +48,6 @@ city.poly:
 clean:
 	rm city.poly
 	rm *.osm
-	rm *.pyc
 	rm -r osmfilter
 	rm -r osmosis
 	rm -r bin

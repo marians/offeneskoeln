@@ -4,6 +4,7 @@ config.py
 venv/
 git-web/
 ris-web/
+temp/*
 *.komodoproject
 .komodotools
 webapp/static/thumbs

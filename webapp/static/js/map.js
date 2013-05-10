@@ -227,7 +227,7 @@ $(document).ready(function(){
         if (streetString === '') {
             streetString = sessionData.location_entry;
         }
-        var changeLocationLink = $(document.createElement('span')).text(streetString).attr({'href': '#', 'id': 'map-claim-street'})
+        var changeLocationLink = $(document.createElement('span')).text(streetString).attr({'id': 'map-claim-street'})
         var newSearchLink = $(document.createElement('a')).text('Neue Suche').attr({'href': '#', 'class': 'awesome extrawide'}).css('margin-left', '20px').click(handleChangePositionClick);
         var article = '';
         if (OffenesKoeln.endsWith(streetString, 'straße') || OffenesKoeln.endsWith(streetString, 'gasse')) {
