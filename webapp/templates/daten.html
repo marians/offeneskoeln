@@ -48,9 +48,9 @@
 
 		<table>
 			<tbody>
-				{% for file in filelist %}
+				{% for file in databasefilelist %}
 				<tr>
-					<td><a href="{{ file.name }}">{{ file.name }}</a></td>
+					<td><a href="/static/database/{{ file.name }}">{{ file.name }}</a></td>
 					<td style="padding-left: 1em">({{ file.size }} MB)</td>
 				</tr>
 				{% endfor %}
@@ -64,10 +64,20 @@
 	<div class="text">
 		<h2>Anlagen/Dateien zu Dokumenten</h2>
 		
-		<p>Die digitalen Anträge, Anfragen, Mitteilungen etc. liegen in Form von einzelnen Dateien vor. Zum größten Teil sind dies PDF-Dokumente, aber auch JPEG- und TIF-Bilder sowie andere Formate.</p>
+		<p>Die digitalen Anträge, Anfragen, Mitteilungen etc. liegen ebenfalls als Archiv vor. Zum größten Teil sind dies PDF-Dokumente, aber auch JPEG- und TIF-Bilder sowie andere Formate.</p>
 		
-		<p>Sämtliche dieser Dateien sind in der <a href="/attachments/">Attachments-Ordnerhierarchie</a> abgelegt. Dort können sie mit geeigneten Werkzeugen heruntergeladen werden. Es handelt sich um ca. 60.000 Dateien mit insgesamt über 13 GB Datenvolumen (Stand März 2012).</p>
-	
+		<h3>Downloads</h3>
+		
+		<table>
+			<tbody>
+				{% for file in attachmentfilelist %}
+				<tr>
+					<td><a href="/static/attachments/{{ file.name }}">{{ file.name }}</a></td>
+					<td style="padding-left: 1em">({{ file.size }} MB)</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
 	</div>
 </div>
 {% endblock %}

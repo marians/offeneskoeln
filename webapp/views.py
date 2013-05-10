@@ -68,17 +68,28 @@ def daten():
     Anzeige der /daten Seite mit Auflistung der
     Download-Dateien
     """
-    filelist = []
-    path = app.config['BASE_PATH'] + os.sep + 'daten'
+    databasefilelist = []
+    path = app.config['BASE_PATH'] + os.sep + 'static' + os.sep + 'database'
     for filename in os.listdir(path):
         filepath = path + os.sep + filename
         stat = os.lstat(filepath)
         if os.path.isfile(filepath) or os.path.islink(filepath):
-            filelist.append({
+            databasefilelist.append({
                 'name': filename,
                 'size': "%d" % (stat.st_size / 1024.0 / 1024.0),
             })
-    return render_template('daten.html', filelist=filelist)
+    attachmentfilelist = []
+    path = app.config['BASE_PATH'] + os.sep + 'static' + os.sep + 'attachments'
+    for filename in os.listdir(path):
+        if filename[0:12] == app.config['RS']:
+            filepath = path + os.sep + filename
+            stat = os.lstat(filepath)
+            if os.path.isfile(filepath) or os.path.islink(filepath):
+                attachmentfilelist.append({
+                    'name': filename,
+                    'size': "%d" % (stat.st_size / 1024.0 / 1024.0),
+                })
+    return render_template('daten.html', databasefilelist=databasefilelist, attachmentfilelist=attachmentfilelist)
 
 
 @app.route("/disclaimer/")
@@ -90,19 +101,14 @@ def disclaimer():
 def favicon():
     return ""
 
+@app.route("/data/<filename>")
+def data_download(filename):
+    return ""
 
-@app.route("/attachments/<path:download_path>")
-def legacy_attachment(download_path):
-    """
-    Download-Redirect für veraltete URLs auf offeneskoeln.de.
-    Siehe https://github.com/marians/offeneskoeln/wiki/Neue-Attachment-URLs-und-Redirects
-    """
-    new_url = db.map_download_url(download_path)
-    if new_url is None:
-        abort(404)
-        # TODO: Rendere informativere 404 Seite
-    else:
-        return redirect(new_url, 301)
+
+@app.route("/robots.txt")
+def robots_txt():
+    return render_template('robots.txt')
 
 
 @app.route("/anhang/<string:attachment_id>.<string:extension>")

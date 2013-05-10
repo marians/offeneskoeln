@@ -69,10 +69,11 @@ def create_download_package(daterange, folder):
     #print start, end
     query = {
         'uploadDate': {
-        '$gt': start,
-        '$lt': end,
+            '$gt': start,
+            '$lt': end,
+        },
         "rs" : cityconfig.RS
-    }}
+    }
     for afile in db.fs.files.find(query):
         fid = afile['_id']
         path = config.TMP_FOLDER + os.sep + folder + os.sep + afile['filename']

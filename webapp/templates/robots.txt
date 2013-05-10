@@ -1,0 +1,18 @@
+# Robots, Spider und Crawler sind willkommen!
+#
+# Bitte nur 1 Thread, dem Server und anderen Nutzern zuliebe!
+#
+# Wenn Du an strukturierten Daten interessiert bist, schau Dir
+# bitte
+#
+#    http://offeneskoeln.de/daten/
+#    http://offeneskoeln.de/api/
+#
+# an! Das koennte Dir Zeit und uns Server-Ressourcen sparen. :)
+
+Sitemap: /static/sitemap/{{config.RS}}.xml
+
+# Suche und API sind Tabu für Robots!
+User-agent: *
+Disallow: /suche/
+Disallow: /api/

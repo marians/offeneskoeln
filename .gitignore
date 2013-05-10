@@ -11,8 +11,8 @@ ris.wsgi
 webapp/static/thumbs
 webapp/static/tiles
 webapp/static/*.xml*
-webapp/attachments/*
-webapp/daten/*
+webapp/static/attachments/*
+webapp/static/database/*
 webapp/static/rss/*.xml
 scripts/osm-import/bin
 scripts/osm-import/lib
