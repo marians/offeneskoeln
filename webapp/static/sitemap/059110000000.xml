@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <sitemap>
+            <loc>http://infinite-ris/static/sitemap/059110000000_attachments_1.xml.gz</loc>
+        </sitemap>
+
+   <sitemap>
+            <loc>http://infinite-ris/static/sitemap/059110000000_submissions_1.xml.gz</loc>
+        </sitemap>
+</sitemapindex>

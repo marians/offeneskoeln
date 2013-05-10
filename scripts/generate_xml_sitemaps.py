@@ -115,20 +115,20 @@ def generate_sitemaps():
 
 
     # Create meta-sitemap
-    meta_sitemap_path = config.STATIC_PATH + '/sitemap.xml'
+    meta_sitemap_path = config.STATIC_PATH + '/sitemap/' + cityconfig.RS + '.xml'
     f = open(meta_sitemap_path, 'w')
     f.write("""<?xml version="1.0" encoding="UTF-8"?>
         <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
     for sitemap_name in sitemaps:
         f.write("""\n   <sitemap>
-            <loc>%s%s.xml.gz</loc>
-        </sitemap>\n""" % (cityconfig.STATIC_URL, sitemap_name))
+            <loc>%ssitemap/%s_%s.xml.gz</loc>
+        </sitemap>\n""" % (cityconfig.STATIC_URL, cityconfig.RS, sitemap_name))
     f.write("</sitemapindex>\n")
     f.close()
 
 
 def generate_sitemap(files, name):
-    sitemap_path = (config.STATIC_PATH + '/' + name + '.xml')
+    sitemap_path = (config.STATIC_PATH + '/sitemap/' + cityconfig.RS + '_' + name + '.xml')
     f = open(sitemap_path, 'w')
     f.write("""<?xml version="1.0" encoding="UTF-8"?>
         <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
