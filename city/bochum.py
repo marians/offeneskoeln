@@ -91,7 +91,11 @@ GEOCODING_FILTER_COUNTY = 'Bochum'
 
 # Suchbeispiele
 SEARCH_EXAMPLES = [
-    'Musikzentrum', 'Rathaus', 'Bergbaumuseum', 'Opel'
+  'Musikzentrum', 'Rathaus', 'Bergbaumuseum', 'Opel'
+]
+
+SEARCH_IGNORE_ATTACHMENTS = [
+  'Einladung', 'Niederschrift'
 ]
 
 #Ursprüngliche URL des Ratsinformationssystems

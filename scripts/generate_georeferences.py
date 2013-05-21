@@ -53,7 +53,19 @@ def generate_georeferences(db):
     query = {"rs" : cityconfig.RS}
     for doc in db.submissions.find(query):
         generate_georeferences_for_submission(doc['_id'], db)
+        #delete_georeferences_for_submission(doc['_id'], db)
     # TODO: Aktualisierte Dokumente berücksichtigen
+
+def delete_georeferences_for_submission(doc_id, db):
+    update = {
+        '$unset': {
+            'georeferences_generated': 1,
+            'georeferences': 1
+        }
+    }
+    print 'remove %s' % doc_id
+    db.submissions.update({'_id': doc_id}, update)
+
 
 
 def generate_georeferences_for_submission(doc_id, db):
@@ -63,15 +75,15 @@ def generate_georeferences_for_submission(doc_id, db):
     Submission-Dokument in der Datenbank.
     """
     submission = db.submissions.find_one({'_id': doc_id})
+    if 'title' in submission:
+        title = submission['title']
     text = ''
     if 'attachments' in submission and len(submission['attachments']) > 0:
         for a in submission['attachments']:
-            text += " " + get_attachment_fulltext(a.id)
-    if 'title' in submission:
-        text += " " + submission['title']
+            text += " " + get_attachment_fulltext(a.id, title)
     if 'subject' in submission:
         text += " " + submission['subject']
-    text = text.encode('utf-8')
+    #text = text.encode('utf-8')
     result = match_streets(text)
     now = datetime.datetime.utcnow()
     update = {
@@ -79,6 +91,7 @@ def generate_georeferences_for_submission(doc_id, db):
             'georeferences_generated': now
         }
     }
+    #print text
     if result != []:
         update['$set']['georeferences'] = result
         print ("Writing %d georeferences to submission %s" %
@@ -86,12 +99,15 @@ def generate_georeferences_for_submission(doc_id, db):
     db.submissions.update({'_id': doc_id}, update)
 
 
-def get_attachment_fulltext(attachment_id):
+def get_attachment_fulltext(attachment_id, title):
     """
     Gibt den Volltext zu einem attachment aus
     """
     attachment = db.attachments.find_one({'_id': attachment_id})
     if 'fulltext' in attachment:
+        if 'name' in attachment:
+            if any(x in attachment['name'] for x in cityconfig.SEARCH_IGNORE_ATTACHMENTS):
+                return ''
         return attachment['fulltext']
     return ''
 
@@ -111,7 +127,6 @@ def load_streets():
     pattern2 = re.compile(".*Straße$")
     pattern3 = re.compile(".*platz$")
     pattern4 = re.compile(".*Platz$")
-    nameslist = []
     for name in nameslist:
         ret[name.replace(' ', '-')] = name
         # Alternative Schreibweisen: z.B. straße => str.

@@ -77,6 +77,8 @@ def index_submission(index, submission_id):
                 del submission['attachments'][n]['thumbnails']
             if 'file' in submission['attachments'][n]:
                 del submission['attachments'][n]['file']
+            if any(x in submission['attachments'][n]['name'] for x in cityconfig.SEARCH_IGNORE_ATTACHMENTS):
+                submission['attachments'][n] = {}
     # Verweisende agendaitems in sessions finden
     committees = []
     sessions = db.sessions.find({'agendaitems.submissions.$id': submission_id, "rs" : cityconfig.RS}, {'committee_name': 1})

@@ -94,6 +94,11 @@ GEOCODING_FILTER_COUNTY = 'Kreis Wesel'
 SEARCH_EXAMPLES = [
     'Grafengalerie', 'Solimare', 'Baustelle', 'Theaterhalle'
 ]
+
+SEARCH_IGNORE_ATTACHMENTS = [
+  'Einladung', 'Niederschrift'
+]
+
 #Ursprüngliche URL des Ratsinformationssystems
 RIS_ORIGINAL_URL = 'http://buergerinfo.moers.de/'
 #URL der Geschäftsordnung

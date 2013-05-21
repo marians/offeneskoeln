@@ -40,6 +40,10 @@ var disqus_shortname = '{{ config.DISQUS_SHORTNAME }}';
 					<td class="value">{{ submission.date.strftime('%d.%m.%Y') }}</td>
 				</tr>
 				<tr>
+					<td class="label">ID:</td>
+					<td class="value">{{ submission._id }}</td>
+				</tr>
+				<tr>
 					<td class="label">Beraten in:</td>
 					<td class="value">
 						{% if submission.consultations|length ==  1 %}
