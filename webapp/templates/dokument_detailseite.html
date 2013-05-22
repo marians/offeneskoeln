@@ -41,7 +41,7 @@ var ok_document_id = '{{ submission.identifier }}';
 					<td class="label">Erstellt am:</td>
 					<td class="value">{{ submission.date.strftime('%d.%m.%Y') }}</td>
 				</tr>
-				<tr>
+				<tr class="hidden_debug">
 					<td class="label">ID:</td>
 					<td class="value">{{ submission._id }}</td>
 				</tr>
@@ -142,6 +142,14 @@ var ok_document_id = '{{ submission.identifier }}';
 				<div class="smallnote">Zu diesem Anhang kann leider kein Text angezeigt und durchsucht werden. Evtl. handelt es sich um den Scan einer Papiervorlage.</div>
 			</div>
 			{% endif %}
+		<table class="metadata, hidden_debug">
+		<tbody>
+			<tr>
+				<td class="label">ID: </td>
+				<td class="value">{{ attachment._id }}</td>
+			</tr>
+		</tbody>
+		</table>
 			{% if attachment.url %}
 			<div class="actions">
 				<a target="_blank" href="{{ attachment.url }}" class="awesome">Anhang öffnen</a>

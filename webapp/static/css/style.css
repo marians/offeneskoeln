@@ -588,6 +588,10 @@ code {
 	padding-right: 15px;
 }
 
+.hidden_debug {
+	display: none;
+}
+
 /* Buttons */
 
 /*
