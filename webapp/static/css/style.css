@@ -87,7 +87,7 @@ body {
 	margin-bottom: 15px;
 }
 header {
-	padding: 0.3em 0.7em 0.3em 0;
+	padding: 0.3em 0.7em 1.8em 0;
 	min-height: 68px;
 	margin-left: 16px;
 	overflow: auto;
@@ -96,13 +96,11 @@ header {
     float: left;
     width: 60px
 }
-#logo img {
-    width: 43px;
-    height: 35px;
-}
+
 #nametagline {
     float: left;
     width: 250px;
+		padding-top: 15px;
 }
 #name {
 	font-size: 170%;
@@ -711,10 +709,9 @@ form .awesome {
 
 @media only screen and (min-width: 480px) {
   /* Gilt auch fuer iPad im vertikalen Modus */
-  body { margin: 10px 20px; font-size: 14px;}
+  body { margin: 5px 20px; font-size: 14px;}
   header { min-height: 92px; }
-  #logo { width: 116px; }
-  #logo img { width: 86px; height: 71px; }
+  #logo { width: 220px; }
   #nametagline { width: 300px; }
   #name { font-size: 200%; }
   #map { height: 500px; }
@@ -727,7 +724,7 @@ form .awesome {
 }
 
 @media only screen and (min-width: 800px) {
-  body { margin: 10px 50px; font-size: 14px; }
+  body { margin: 5px 50px; font-size: 14px; }
   #nametagline { width: 600px; }
   #home #street { width: 22em; }
   #home #qinput { width: 22em; }
@@ -740,15 +737,15 @@ form .awesome {
 }
 @media only screen and (min-width: 1000px) {
   /*html { font-size: 110%; }*/
-  body { margin: 20px 100px; font-size: 14px; }
+  body { margin: 5px 100px; font-size: 14px; }
 }
 @media only screen and (min-width: 1200px) {
   /*html { font-size: 120%; }*/
-  body { margin: 30px 150px; }
+  body { margin: 10px 150px; }
 }
 @media only screen and (min-width: 1400px) {
   /*html { font-size: 130%; }*/
-  body { margin: 40px 200px; }
+  body { margin: 20px 200px; }
 }
 
 

@@ -10,10 +10,10 @@
   <meta name="description" content="{% block meta_description %}{% endblock %}" />
   <meta name="publisher" content="{{ config.META_PUBLISHER }}" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="icon" href="{{ config.ICON_URI }}" />
-  <link rel="shortcut icon" href="{{ config.ICON_URI }}" />
+  <link rel="icon" href="{{ config.BASE_URL }}static/img/logo/OpenRuhrFavIcon.png" />
+  <link rel="shortcut icon" href="{{ config.BASE_URL }}static/img/logo/OpenRuhrFavIcon.png" />
   <meta property="og:title" content="{% block ogtitle %}{% endblock %}"/>
-  <meta property="og:image" content="{{ config.BASE_URL }}static/img/logo/logo_header_86x71.png" />
+  <meta property="og:image" content="{{ config.BASE_URL }}static/img/logo/OpenRuhrLogo.png" />
   <link rel="stylesheet" href="/static/css/style.css"/>
   <link rel="alternate" type="application/rss+xml" title="RSS Feed mit neuen/geänderten Dokumenten" href="/static/rss/{{ config.RS }}_dokumente.xml" />
   <script>
@@ -24,7 +24,7 @@
 <body>
   <div id="container">
     <header>
-      <div id="logo"><a href="/"><img src="/static/img/logo/logo_header_86x71.png" width="86" height="71" alt="" /></a></div>
+      <div id="logo"><a href="/"><img src="/static/img/logo/OpenRuhrLogo.png" alt="" /></a></div>
       <div id="nametagline">
         <div><a id="name" href="/">{{ config.APP_NAME }}</a></div>
         <div id="tagline">{{ config.APP_TAGLINE }} <a href="/ueber/">Mehr erfahren</a></div>
