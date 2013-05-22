@@ -15,12 +15,6 @@ $(document).ready(function(){
     
     var lastLocationEntry = ''; // die letzte vom User eingegebene Strasse
     
-    // geo bounds for cologne
-    var lat_min = 50.87,
-        lat_max = 51.04,
-        lon_min = 6.8,
-        lon_max = 7.1;
-        
     map.setView(new L.LatLng(CONF.mapStartPoint[1], CONF.mapStartPoint[0]), 11).addLayer(backgroundLayer);
     
     // OSM Copyright Notice
@@ -31,11 +25,12 @@ $(document).ready(function(){
     // set to user position, if set and within cologne
     OffenesKoeln.session({}, function(data){
         sessionData = data.response;
-        //console.log("sessionData:", sessionData);
+        console.log("sessionData:", sessionData);
         if (typeof sessionData != 'undefined' &&
             typeof sessionData.lat != 'undefined' &&
             typeof sessionData.lon != 'undefined' &&
-            sessionData.lat !== '' && sessionData.lon !== '') {
+            sessionData.lat !== '' && sessionData.lon !== '' &&
+            sessionData.lat !== null && sessionData.lon !== null) {
                 setUserPosition(parseFloat(sessionData.lat),
                     parseFloat(sessionData.lon));
             if ($('#street').val() === '' && typeof sessionData.location_entry != 'undefined') {
@@ -227,7 +222,7 @@ $(document).ready(function(){
         if (streetString === '') {
             streetString = sessionData.location_entry;
         }
-        var changeLocationLink = $(document.createElement('span')).text(streetString).attr({'id': 'map-claim-street'})
+        var changeLocationLink = $(document.createElement('span')).text(streetString).attr({'id': 'map-claim-street'});
         var newSearchLink = $(document.createElement('a')).text('Neue Suche').attr({'href': '#', 'class': 'awesome extrawide'}).css('margin-left', '20px').click(handleChangePositionClick);
         var article = '';
         if (OffenesKoeln.endsWith(streetString, 'straße') || OffenesKoeln.endsWith(streetString, 'gasse')) {
