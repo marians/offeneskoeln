@@ -17,10 +17,13 @@ $(document).ready(function(){
     
     map.setView(new L.LatLng(CONF.mapStartPoint[1], CONF.mapStartPoint[0]), 11).addLayer(backgroundLayer);
     
+    /*
+    Alternative tile config. This tile-set should only be used for testing.
     // OSM Copyright Notice
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
         attribution: 'Map &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
+    */
     
     // set to user position, if set and within cologne
     OffenesKoeln.session({}, function(data){

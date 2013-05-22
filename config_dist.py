@@ -120,7 +120,7 @@ ATTACHMENT_DOWNLOAD_URL = BASE_URL + 'anhang/%s.%s'
 MAP_TILE_URL_SCHEMA = 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg'
 MAP_TILE_ZOOMLEVEL_MIN = 4
 MAP_TILE_ZOOMLEVEL_MAX = 18
-MAP_TILE_ATTRIBUTION = 'Tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>'
+MAP_TILE_ATTRIBUTION = 'Map Data © <a href="http://www.openstreetmap.org">OpenStreetMap</a> contributors, Tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>.'
 
 
 
