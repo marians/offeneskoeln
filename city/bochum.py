@@ -63,6 +63,7 @@ META_DESCR = u'Informationen aus der Lokalpolitik des Ruhrgebietes, zug\xe4nglic
 
 # Disqus Comments shortname
 DISQUS_SHORTNAME = 'openruhr-ris-bochum'
+DISQUS_CAT_DOKUMENTE = '2392348'
 
 # Tracking via Piwik oder Google Analytics. Erlaubte Werte: 'PIWIK', 'ANALYTICS' oder leer '' für kein Tracking
 TRACKING = 'PIWIK'
