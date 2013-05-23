@@ -158,6 +158,7 @@ def query_submissions(q='', fq=None, sort='score desc', start=0, docs=10, date=N
     search = pyes.query.Search(query=query, fields=[''], start=start, size=docs, sort=sort)
     search.facet.add_term_facet('type')
     search.facet.add_term_facet('rs')
+    search.facet.add_term_facet('committee')
     search.facet.add_date_facet(field='date', name='date', interval='month')
     result = es.search(search, model=lambda x, y: y)
     ret = {
