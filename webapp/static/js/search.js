@@ -5,11 +5,11 @@ $(document).ready(function(){
         //console.log("Page search settings:", ok_search_settings);
         var search_parms = OffenesKoeln.deepCopy(ok_search_settings);
         search_parms['output'] = 'facets';
-        console.log(search_parms)
+        //console.log(search_parms)
         OffenesKoeln.search(
             search_parms,
             function(data) {
-                console.log('query response:', data);
+                //console.log('query response:', data);
                 $('#search .result').empty();
                 $('#facets').remove();
                 if (data.status == 0) {
@@ -76,8 +76,11 @@ $(document).ready(function(){
             committee_facet = createSearchResultFacet('committee', facets.committee, 'Gremium', 'value', query.fq, true);
             $(targetSelector).append(committee_facet);
             // schlagwort facet
-            term_facet = createSearchResultFacet('term', facets.term, 'Stichwort', 'value', query.fq, true);
-            $(targetSelector).append(term_facet);
+            //term_facet = createSearchResultFacet('term', facets.term, 'Stichwort', 'value', query.fq, true);
+            //$(targetSelector).append(term_facet);
+            // schlagwort datum
+            date_facet = createSearchResultFacet('date', facets.date, 'Datum', '', query.fq, true);
+            $(targetSelector).append(date_facet);
         }
     }
     
@@ -101,6 +104,8 @@ $(document).ready(function(){
             var find = fq.match(re);
             if (find) {
                 var label = find[1];
+                if (name=='date')
+                    label=OffenesKoeln.monthstr[label.substr(5,7)] + " " + label.substr(0,4);
                 if (filterIds == true) {
                     label = label.replace(/^[0-9]+\s+/, '');
                 }
@@ -110,10 +115,18 @@ $(document).ready(function(){
         } else {
             for (var i in facet_data) {
                 var label = facet_data[i].key;
-                if (filterIds == true) {
+                if (filterIds == true)
                     label = label.replace(/^[0-9]+\s+/, '');
-                }
-                list.append('<li><a href="/suche/?'+ (searchQueryString({fq: name + ':' + quoteFacetValue(facet_data[i].key) })) +'"><span class="label">'+ label +'</span> <span class="num">'+ facet_data[i].value +'</span></a></li>');
+                if (name=='date')
+                    label=OffenesKoeln.monthstr[label.substr(5,7)] + " " + label.substr(0,4);
+                var sqs;
+                console.log(ok_search_settings)
+                if (!ok_search_settings['fq'])
+                    sqs = name + ':' + quoteFacetValue(facet_data[i].key);
+                else
+                    sqs = ok_search_settings['fq'] + ';' + name + ':' + quoteFacetValue(facet_data[i].key);
+                console.log(sqs)
+                list.append('<li><a href="/suche/?'+ (searchQueryString({fq: sqs })) +'"><span class="label">'+ label +'</span> <span class="num">'+ facet_data[i].value +'</span></a></li>');
             }
         }
         facet.append('<div class="header">'+ headline +'</div>');

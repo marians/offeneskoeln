@@ -156,7 +156,6 @@ var OffenesKoeln = {
     
     search: function(params, callback){
         var cleanParams = OffenesKoeln.processSearchParams(params);
-        console.log(cleanParams)
         $.getJSON('/api/documents', cleanParams, callback);
     },
     
@@ -271,7 +270,7 @@ var OffenesKoeln = {
         }
         var recoded = res.toString(hosts.length);
         var num = recoded.substr(recoded.length-1, 1);
-        console.log(url, recoded, num, hosts[num]);
+        //console.log(url, recoded, num, hosts[num]);
         var re = /^http[s]*:\/\/[^\/]+\/static/;
         return url.replace(re, 'http://'+hosts[num]);
     },
