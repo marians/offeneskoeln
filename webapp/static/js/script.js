@@ -156,6 +156,7 @@ var OffenesKoeln = {
     
     search: function(params, callback){
         var cleanParams = OffenesKoeln.processSearchParams(params);
+        console.log(cleanParams)
         $.getJSON('/api/documents', cleanParams, callback);
     },
     

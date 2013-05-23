@@ -146,8 +146,16 @@ def query_submissions(q='', fq=None, sort='score desc', start=0, docs=10, date=N
     if sort_field == 'score':
         sort_field = '_score'
     sort = {sort_field: {'order': sort_order}}
-    string_query = pyes.StringQuery(q, default_operator="AND")
-    search = pyes.query.Search(query=string_query, fields=[''], start=start, size=docs, sort=sort)
+    query = pyes.query.BoolQuery()
+    query.add_must(pyes.StringQuery(q, default_operator="AND"))
+    if fq:
+        fq = fq.split(',')
+        for q in fq:
+            (key, value) = q.split(':')
+            query.add_must(pyes.TermQuery(field=key, value=value))
+        
+        
+    search = pyes.query.Search(query=query, fields=[''], start=start, size=docs, sort=sort)
     search.facet.add_term_facet('type')
     search.facet.add_term_facet('rs')
     search.facet.add_date_facet(field='date', name='date', interval='month')

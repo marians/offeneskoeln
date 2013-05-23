@@ -131,6 +131,7 @@ def api_documents():
     
     ret['response']['start'] = start
     ret['request']['sort'] = sort
+    ret['request']['fq'] = fq
 
     json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
     if jsonp_callback is not None:
