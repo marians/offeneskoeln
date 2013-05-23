@@ -8,6 +8,7 @@ from bson import ObjectId
 import gridfs
 
 import pprint
+import urllib2
 
 es = pyes.ES(app.config['ES_HOST']+':'+str(app.config['ES_PORT']))
 es.default_indices = [app.config['ES_INDEX_NAME_PREFIX']+'-latest']
@@ -148,13 +149,36 @@ def query_submissions(q='', fq=None, sort='score desc', start=0, docs=10, date=N
     sort = {sort_field: {'order': sort_order}}
     query = pyes.query.BoolQuery()
     query.add_must(pyes.StringQuery(q, default_operator="AND"))
-    if fq:
-        fq = fq.split(',')
-        for q in fq:
-            (key, value) = q.split(':')
-            query.add_must(pyes.TermQuery(field=key, value=value))
-        
-        
+    #fq = urllib2.unquote(fq)
+    rest = True
+    x = 0
+    result = []
+    while rest:
+        y = fq.find(":", x)
+        if y == -1:
+            break
+        temp = fq[x:y]
+        x = y + 1
+        if fq[x:x+5] == "&#34;":
+            y = fq.find("&#34;", x+5)
+            if y == -1:
+                print "WTF?!"
+                break
+            result.append((temp, fq[x+5:y]))
+            x = y + 6
+            if x > len(fq):
+                break
+        else:
+            y = fq.find(";")
+            if y == -1:
+                result.append((temp, fq[x:len(fq)]))
+                break
+            else:
+                x = y + 1
+    print result
+    for sfq in result:
+        query.add_must(pyes.TermQuery(field=sfq[0], value=sfq[1]))
+    
     search = pyes.query.Search(query=query, fields=[''], start=start, size=docs, sort=sort)
     search.facet.add_term_facet('type')
     search.facet.add_term_facet('rs')

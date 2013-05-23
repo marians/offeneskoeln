@@ -81,6 +81,7 @@ def api_documents():
     durchgeführt wird, oder ob die Abfrage direkt anhand von Kennungen
     (references) erfolgen kann.
     """
+    
     if references is None:
         # Suche wird durchgeführt
         # (References-Liste via Suchmaschine füllen)

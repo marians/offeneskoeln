@@ -104,7 +104,7 @@ $(document).ready(function(){
                 if (filterIds == true) {
                     label = label.replace(/^[0-9]+\s+/, '');
                 }
-                list.append('<li class="current"><a title="Diese Einschränkung aufheben" href="/suche/?'+ (searchQueryString({fq: null })) +'"><span class="del">&#10005;</span><span class="label">'+ label +'</span></a></li>');
+                list.append('<li class="current"><a title="Diese Einschränkung aufheben" href="/suche/?'+ (searchQueryString({fq: null })) +'"><span class="del">&#10005;</span><span class="label">'+ label.replace(/&#34;/g, "") +'</span></a></li>');
             }
             
         } else {
