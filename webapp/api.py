@@ -77,7 +77,7 @@ def api_documents():
     submission_ids = []
     # TODO: entscheiden, was mit get_relations passiert
     """
-    Anhand der übergebenen Parameter wird entschieden, ob eine Solr-Suche
+    Anhand der übergebenen Parameter wird entschieden, ob eine ES-Suche
     durchgeführt wird, oder ob die Abfrage direkt anhand von Kennungen
     (references) erfolgen kann.
     """
@@ -128,7 +128,7 @@ def api_documents():
         ret['response']['numhits'] = query['numhits']
         if get_facets and 'facets' in query:
             ret['response']['facets'] = query['facets']
-
+    
     ret['response']['start'] = start
     ret['request']['sort'] = sort
 

@@ -8,7 +8,7 @@ $(document).ready(function(){
         OffenesKoeln.search(
             search_parms,
             function(data) {
-                //console.log('query response:', data);
+                console.log('query response:', data);
                 $('#search .result').empty();
                 $('#facets').remove();
                 if (data.status == 0) {
@@ -94,6 +94,8 @@ $(document).ready(function(){
         var facet_data = sortFacet(data, sortField);
         var facet = $(document.createElement('div')).attr('class', 'facet ' + name);
         var list = $(document.createElement('ul')).attr('class', 'facet');
+        if (!fq)
+            fq = Array();
         if (fq.indexOf(name) != -1) {
             // currently filtered by this facet
             var re = new RegExp(name + ':"*([^"]+)"*');

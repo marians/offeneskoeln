@@ -1,5 +1,5 @@
 import os
-os.environ['CITY_CONF']='/opt/ris-web/city/moers.py'
+os.environ['CITY_CONF']='/opt/ris-web/city/bochum.py'
 
 from webapp import app
 

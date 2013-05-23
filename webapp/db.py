@@ -148,14 +148,26 @@ def query_submissions(q='', fq=None, sort='score desc', start=0, docs=10, date=N
     sort = {sort_field: {'order': sort_order}}
     string_query = pyes.StringQuery(q, default_operator="AND")
     search = pyes.query.Search(query=string_query, fields=[''], start=start, size=docs, sort=sort)
+    search.facet.add_term_facet('type')
+    search.facet.add_term_facet('rs')
+    search.facet.add_date_facet(field='date', name='date', interval='month')
     result = es.search(search, model=lambda x, y: y)
     ret = {
         'numhits': result.total,
         'maxscore': result.max_score,
-        'result': []
+        'result': [],
+        'facets': {}
     }
     if result.max_score is not None:
         ret['maxscore'] = result.max_score
+    for key in result.facets:
+        ret['facets'][key] = {}
+        if result.facets[key]['_type'] == 'date_histogram':
+            for subval in result.facets[key]['entries']:
+                ret['facets'][key][subval['time']] = subval['count']
+        if result.facets[key]['_type'] == 'terms':
+            for subval in result.facets[key]['terms']:
+                ret['facets'][key][subval['term']] = subval['count']
     for r in result:
         ret['result'].append({
             '_id': str(r['_id']),

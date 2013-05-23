@@ -144,7 +144,7 @@ if __name__ == '__main__':
         '_source': {'enabled': False},
         '_all': {'enabled': True},
         'properties': {
-            'ags': {
+            'rs': {
                 'store': False,
                 'type': 'string'
             },
