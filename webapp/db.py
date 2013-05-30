@@ -153,10 +153,8 @@ def query_submissions(q='', fq=None, sort='score desc', start=0, docs=10, date=N
     query.add_must(pyes.StringQuery(q, default_operator="AND"))
     rest = True
     x = 0
-    counter = 0
     result = []
     while rest:
-        counter += 1
         y = fq.find(":", x)
         if y == -1:
             break
@@ -167,7 +165,7 @@ def query_submissions(q='', fq=None, sort='score desc', start=0, docs=10, date=N
             if y == -1:
                 break
             result.append((temp, fq[x+5:y]))
-            x = y + 5
+            x = y + 6
             if x > len(fq):
                 break
         else:
@@ -178,9 +176,7 @@ def query_submissions(q='', fq=None, sort='score desc', start=0, docs=10, date=N
             else:
                 result.append((temp, fq[x:y]))
                 x = y + 1
-    print result
     for sfq in result:
-        print sfq
         if sfq[0] == 'date':
             (year, month) = sfq[1].split('-')
             date_start = datetime.datetime(int(year), int(month), 1)
@@ -188,7 +184,6 @@ def query_submissions(q='', fq=None, sort='score desc', start=0, docs=10, date=N
             query.add_must(pyes.RangeQuery(qrange=pyes.ESRange('date',date_start, date_end)))
         else:
             query.add_must(pyes.TermQuery(field=sfq[0], value=sfq[1]))
-    
     search = pyes.query.Search(query=query, fields=[''], start=start, size=docs, sort=sort)
     search.facet.add_term_facet('type')
     search.facet.add_term_facet('rs')
