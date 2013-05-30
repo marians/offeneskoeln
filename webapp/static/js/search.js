@@ -112,7 +112,7 @@ $(document).ready(function(){
             //term_facet = createSearchResultFacet('term', facets.term, 'Stichwort', 'value', query.fq, true);
             //$(targetSelector).append(term_facet);
             // schlagwort datum
-            date_facet = createSearchResultFacet('date', facets.date, 'Datum', '', result, true);
+            date_facet = createSearchResultFacet('date', facets.date, 'Zeitraum', '', result, true);
             $(targetSelector).append(date_facet);
         }
     }
@@ -196,7 +196,7 @@ $(document).ready(function(){
         $('h1').text(data.response.numhits + ' gefundene Dokumente');
         if (data.response.numhits > 0) {
             var subheadline = $(document.createElement('h3'));
-            subheadline.text('Seite ' + (Math.floor(data.response.start / ok_search_settings.num)+1) + ' von ' + (Math.floor(data.response.numhits / ok_search_settings.num)+1));
+            subheadline.text('Seite ' + (Math.floor(data.response.start / ok_search_settings.num)+1) + ' von ' + (Math.ceil(data.response.numhits / ok_search_settings.num)));
             result.append(subheadline);
         }
         
