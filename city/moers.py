@@ -77,6 +77,9 @@ PIWIK_HOST = 'piwik.sectio-aurea.org'
 #PIWIK Site ID
 PIWIK_SITE_ID = 35
 
+#Google Site Verification Code, leave empty for deactivate it
+GOOGLE_SITE_VERIFICATION = "5cPBydviDSt-NQFMrBn6kXGnuVbYHqVyK3ACsYAYk8g"
+
 # Map view initialization point, should be center of the city
 # as Longitude, Latitude tuple
 MAP_START_POINT = [6.640815, 51.451604]
