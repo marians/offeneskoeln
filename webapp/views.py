@@ -205,7 +205,7 @@ def dokument(identifier):
     """
     Gibt Dokumenten-Detailseite aus
     """
-    result = db.get_submissions(references=[identifier],
+    result = db.get_submissions(references=[urllib.unquote(identifier)],
                         get_attachments=True,
                         get_consultations=True,
                         get_thumbnails=True)
