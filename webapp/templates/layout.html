@@ -14,8 +14,8 @@
   <link rel="shortcut icon" href="{{ config.BASE_URL }}static/img/logo/OpenRuhrFavIcon.png" />
   <meta property="og:title" content="{% block ogtitle %}{% endblock %}"/>
   <meta property="og:image" content="{{ config.BASE_URL }}static/img/logo/OpenRuhrLogo.png" />
-	{% if config.TRACKING == 'ANALYTICS' %}
-	<meta name="google-site-verification" content="{{config.GOOGLE_SITE_VERIFICATION}}" />
+	{% if config.GOOGLE_SITE_VERIFICATION %}
+	<meta name="google-site-verification" content="{{ config.GOOGLE_SITE_VERIFICATION }}" />
 	{% endif %}
   <link rel="stylesheet" href="/static/css/style.css"/>
   <link rel="alternate" type="application/rss+xml" title="RSS Feed mit neuen/geänderten Dokumenten" href="/static/rss/{{ config.RS }}_dokumente.xml" />
