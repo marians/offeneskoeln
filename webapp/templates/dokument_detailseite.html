@@ -153,7 +153,7 @@ var ok_document_id = '{{ submission.identifier }}';
 			{% if attachment.url %}
 			<div class="actions">
 				<a target="_blank" href="{{ attachment.url }}" class="awesome">Anhang öffnen</a>
-				<span class="typesize">{{ (attachment.size / 1024)|round(0)|int }} KB PDF – <a title="öffnet das PDF mit Google Docs Viewer" href="https://docs.google.com/viewer?url={{ attachment.url }}" target="_blank">Vorschau</a></span>
+				<span class="typesize">{{ (attachment.size / 1024)|round(0)|int }} KB PDF<!-- – <a title="öffnet das PDF mit Google Docs Viewer" href="https://docs.google.com/viewer?url={{ attachment.url }}" target="_blank">Vorschau</a></span> -->
 			</div>
 			{% endif %}
 		{% endif%}

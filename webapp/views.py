@@ -57,10 +57,13 @@ def api_home():
     return render_template('api.html')
 
 
+@app.route("/hilfe/")
+def hilfe():
+    return render_template('hilfe.html')
+
 @app.route("/ueber/")
 def ueber():
     return render_template('ueber.html')
-
 
 @app.route("/daten/")
 def daten():

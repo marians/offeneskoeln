@@ -121,7 +121,8 @@ def load_streets():
     nameslist = []
     query = {"rs" : cityconfig.RS }
     for street in db.locations.find(query):
-        nameslist.extend(street['name'])
+        print street['name']
+        nameslist.append(street['name'])
     ret = {}
     pattern1 = re.compile(".*straße$")
     pattern2 = re.compile(".*Straße$")
