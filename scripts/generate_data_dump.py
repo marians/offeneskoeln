@@ -68,7 +68,7 @@ def compress_folder(folder):
             os.sep + config.DB_NAME + os.sep)
     execute(cmd)
     shutil.rmtree(folder + os.sep + config.DB_NAME)
-    shutil.move(filename, 'webapp/daten/')
+    shutil.move(filename, 'webapp/static/database/')
 
 
 if __name__ == '__main__':
