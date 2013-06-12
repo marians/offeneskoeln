@@ -1,5 +1,6 @@
 #!/bin/bash
 # Bochum
+cd /opt/ris-web/
 sudo -u ris-web /opt/ris-web/ris-web/bin/python /opt/ris-web/scripts/export_attachments.py bochum 2013
 sudo -u ris-web /opt/ris-web/ris-web/bin/python /opt/ris-web/scripts/generate_data_dump.py bochum
 
