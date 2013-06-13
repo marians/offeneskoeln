@@ -206,7 +206,6 @@ def dokument(identifier):
     """
     Gibt Dokumenten-Detailseite aus
     """
-    print >> sys.stderr, identifier
     result = db.get_submissions(references=[identifier],
                         get_attachments=True,
                         get_consultations=True,
