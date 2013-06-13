@@ -91,7 +91,6 @@ def generate_georeferences_for_submission(doc_id, db):
             'georeferences_generated': now
         }
     }
-    #print text
     if result != []:
         update['$set']['georeferences'] = result
         print ("Writing %d georeferences to submission %s" %
@@ -121,7 +120,6 @@ def load_streets():
     nameslist = []
     query = {"rs" : cityconfig.RS }
     for street in db.locations.find(query):
-        print street['name']
         nameslist.append(street['name'])
     ret = {}
     pattern1 = re.compile(".*straße$")
