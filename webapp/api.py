@@ -195,7 +195,6 @@ def api_streets():
         },
         'response': result
     }
-    print >> sys.stderr, ret
     json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
     if jsonp_callback is not None:
         json_output = jsonp_callback + '(' + json_output + ')'

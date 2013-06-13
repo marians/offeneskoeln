@@ -114,4 +114,9 @@ class MyEncoder(json.JSONEncoder):
                 'collection': obj.collection,
                 '_id': obj.id
             }
-        return obj.__dict__
+        if getattr(obj, 0) != 0:
+            return obj.__dict__
+        else:
+            print >> sys.stderr, obj
+            print >> sys.stderr, dir(obj)
+            return str(obj)
