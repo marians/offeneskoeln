@@ -112,13 +112,13 @@ GESCHAEFTSORDNUNG_URL = 'http://www.moers.de/c1257297004f4e94/files/or10-02-gesc
 PUBLISH_DATE_MONTH = 'Mai 2013'
 
 #Impressum
+IMPRESSUM_ORGANISATION = 'Open Knowledge Foundation Deutschland e.V.'
 IMPRESSUM_NAME = 'Ernesto Ruge'
-IMPRESSUM_STREET = u'Zechenstra\xdfe 27'
-IMPRESSUM_CITY = '44791 Bochum'
-IMPRESSUM_MAIL = 'mail@ernestoruge.de'
+IMPRESSUM_STREET = 'Schlesische Str. 6'
+IMPRESSUM_CITY = '10997 Berlin'
+IMPRESSUM_MAIL = 'info@openruhr.de'
 IMPRESSUM_PHONE_URL = '+491731662174'
 IMPRESSUM_PHONE_DESCR = '0173 166 21 74'
-
 
 # Elastic Seaerch Prefix
 ES_INDEX_NAME_PREFIX = 'ris-web-moers'

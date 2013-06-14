@@ -66,6 +66,10 @@ def hilfe():
 def ueber():
     return render_template('ueber.html')
 
+@app.route("/impressum/")
+def ueber():
+    return render_template('impressum.html')
+
 @app.route("/daten/")
 def daten():
     """

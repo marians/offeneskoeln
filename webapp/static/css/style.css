@@ -92,6 +92,16 @@ header {
 	margin-left: 16px;
 	overflow: auto;
 }
+
+#topnav {
+	float: right;
+	color: #777777;
+}
+
+#topnav a {
+	color: #777777;
+}
+
 #logo {
     float: left;
     width: 60px
