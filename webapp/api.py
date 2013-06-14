@@ -195,7 +195,12 @@ def api_streets():
         },
         'response': result
     }
-    json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
+    try:
+        json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
+    except AttributeError:
+        print >> sys.stderr, ret
+        return null
+    
     if jsonp_callback is not None:
         json_output = jsonp_callback + '(' + json_output + ')'
     response = make_response(json_output, 200)
