@@ -111,10 +111,11 @@ GESCHAEFTSORDNUNG_URL = 'http://www.bochum.de/C12571A3001D56CE/vwContentByKey/N2
 PUBLISH_DATE_MONTH = 'Mai 2013'
 
 #Impressum
+IMPRESSUM_ORGANISATION = 'Open Knowledge Foundation Deutschland e.V.'
 IMPRESSUM_NAME = 'Ernesto Ruge'
-IMPRESSUM_STREET = u'Zechenstra\xdfe 27'
-IMPRESSUM_CITY = '44791 Bochum'
-IMPRESSUM_MAIL = 'mail@ernestoruge.de'
+IMPRESSUM_STREET = 'Schlesische Str. 6'
+IMPRESSUM_CITY = '10997 Berlin'
+IMPRESSUM_MAIL = 'info@openruhr.de'
 IMPRESSUM_PHONE_URL = '+491731662174'
 IMPRESSUM_PHONE_DESCR = '0173 166 21 74'
 
