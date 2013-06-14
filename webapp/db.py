@@ -87,7 +87,6 @@ def get_submissions(references=None, submission_ids=None, get_attachments=False,
                 r = ObjectId(r)
             query = {'_id': r, "rs" : app.config['RS']}
         result = mongo.db.submissions.find(query)
-        print result
         for res in result:
             res['url'] = util.submission_url(res['identifier'])
             if get_attachments:
@@ -108,6 +107,7 @@ def get_submissions(references=None, submission_ids=None, get_attachments=False,
                                         res['attachments'][n]['thumbnails'][height][t]['url'] = util.thumbnail_url(
                                                 attachment_id=res['attachments'][n]['_id'], size=height,
                                                 page=res['attachments'][n]['thumbnails'][height][t]['page'])
+                                    res['attachments'][n]['thumbnails'][height] = sorted(res['attachments'][n]['thumbnails'][height], key=lambda x: x.get('page', -1))
             if get_consultations:
                 # Verweisende agendaitems finden
                 sessions = mongo.db.sessions.find({'agendaitems.submissions.$id': res['_id'], "rs" : app.config['RS']})
