@@ -121,4 +121,5 @@ class MyEncoder(json.JSONEncoder):
             print >> sys.stderr, "Doofen Fehler gefunden:"
             print >> sys.stderr, str(obj)
             print >> sys.stderr, dir(obj)
+            print >> sys.stderr, type(obj)
             return str(obj)
