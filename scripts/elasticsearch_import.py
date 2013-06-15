@@ -78,6 +78,7 @@ def index_submission(index, submission_id):
             if 'file' in submission['attachments'][n]:
                 del submission['attachments'][n]['file']
             if any(x in submission['attachments'][n]['name'] for x in cityconfig.SEARCH_IGNORE_ATTACHMENTS):
+                print "Ignoriere " + submission['attachments'][n]['name']
                 submission['attachments'][n] = {}
     # Verweisende agendaitems in sessions finden
     committees = []
