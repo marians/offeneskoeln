@@ -152,12 +152,16 @@ var ok_document_id = '{{ submission.identifier }}';
 				<td class="label">ID: </td>
 				<td class="value">{{ attachment._id }}</td>
 			</tr>
+			<tr>
+				<td class="label">Orginal-Dateiname: </td>
+				<td class="value">{{ attachment.filename }}</td>
+			</tr>
 		</tbody>
 		</table>
 			{% if attachment.url %}
 			<div class="actions">
 				<a target="_blank" href="{{ attachment.url }}" class="awesome">Anhang öffnen</a>
-				<span class="typesize">{{ (attachment.size / 1024)|round(0)|int }} KB PDF<!-- – <a title="öffnet das PDF mit Google Docs Viewer" href="https://docs.google.com/viewer?url={{ attachment.url }}" target="_blank">Vorschau</a></span> -->
+				<span class="typesize">{{ (attachment.size / 1024)|round(0)|int }} KB PDF | <span id="attachment_{{ attachment._id }}" class="warn response">Anhang melden</span>
 			</div>
 			{% endif %}
 		{% endif%}

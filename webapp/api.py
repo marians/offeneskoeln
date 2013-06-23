@@ -257,3 +257,16 @@ def api_session():
     response = make_response(json_output, 200)
     response.mimetype = 'application/json'
     return response
+
+
+@app.route("/api/response", methods=['POST'])
+def api_response():
+    attachment_id = request.form['id']
+    name = request.form['name']
+    email = request.form['email']
+    attachment_type = request.form['attachment_type']
+    comment = request.form['comment']
+    db.response.insert({attachment_id: attachment_id, name: name, email: email, attachment_type: attachment_type, comment: comment})
+    response = make_response('1', 200)
+    response.mimetype = 'application/json'
+    return response

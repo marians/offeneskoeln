@@ -251,9 +251,10 @@ var OffenesKoeln = {
 				dz2 = (z1 - z2) * (z1 - z2),
 				R = Math.sqrt((dr2 + dz2) / (2 * (1 - cos_alpha)));
 		}
-		else R = Math.pow(a * a * b, 1/3);
-		return R * Math.acos(cos_alpha);
-	},
+		else
+        R = Math.pow(a * a * b, 1/3);
+        return R * Math.acos(cos_alpha);
+    },
 
     /**
      * Aendert eine URL, so dass sie vom Offenes Koeln CDN ausgeliefert wird.
@@ -280,5 +281,72 @@ var OffenesKoeln = {
      */
     endsWith: function(str, suffix) {
         return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    },
+    
+    send_response: function(id) {
+        alert(id);
+        return false;
     }
 };
+
+$(document).ready(function() {
+  $('span.response').each(function(){
+    $(this).click(function() {
+      //alert($(this).attr('id').substring(11));
+      $('#attachment_dialog').html(generateResponseContent($(this).attr('id').substring(11)));
+      $('#attachment_response_form').submit(function(){
+        var error = false;
+        //TODO: form handling 
+        if (!error) {
+          data = {
+            'attachment_id': $('#attachment_id').val(),
+            'name': $('#attachment_name').val(),
+            'mail': $('#attachment_mail').val(),
+            'attachment_type': $('#attachment_type').val(),
+            'comment': $('#attachment_comment').val(),
+          }
+          $.post('/api/response', data).done(function(data) {
+            alert('gesendet!');
+          });
+          $('#attachment_dialog').dialog('close');
+        }
+        return(false);
+      });
+      $('#attachment_dialog').dialog('open');
+    });
+  });
+  $('<div/>', {
+    'id': 'attachment_dialog'
+  }).appendTo('body');
+  $('#attachment_dialog').dialog({
+    autoOpen: false,
+    draggable: false,
+    width: 600,
+    modal: true,
+    title: 'Senden einer Rückmeldung zu einem Anhang'
+  });
+});
+
+function generateResponseContent(id) {
+  var html = ''
+  html += '<form id="attachment_response_form">';
+  html += '<p>Name</p>'
+  html += '<input type="text" id="attachment_name" name="attachment_name" /></p>';
+  html += '<p>E-Mail</p>'
+  html += '<input type="text" id="attachment_mail" name="attachment_mail" /></p>';
+  html += '<h3>Thema</h3>';
+  html += '<select id="attachment_type">';
+  html += '<option id="attachment_type_0" value="0">- bitte wählen -</option>';
+  html += '<option id="attachment_type_1" value="1">Das Dokument verletzt meine Urheberrechte.</option>';
+  html += '<option id="attachment_type_2" value="2">Das Dokument verletzt die Urheberrechte Dritter.</option>';
+  html += '<option id="attachment_type" value="3">Das Dokument verfälscht die Suchergebnisse.</option>';
+  html += '<option id="attachment_type_4" value="4">Ich habe eine andere Frage.</option>';
+  html += '</select>';
+  html += '<h3>Nachricht</h3>';
+  html += '<textarea id="attachment_comment"></textarea>';
+  html += '<input type="hidden" value="' + id + '" id="attachment_id" />';
+  html += '<p><input type="submit" value="senden" /></p>';
+  html += '</form>';
+  
+  return(html);
+}
