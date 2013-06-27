@@ -55,7 +55,13 @@
     }
     #topbarinner {
     	padding: 10px;
-    	overflow: auto;
+    }
+    #footer {
+        height: 60px;
+    }
+    #footerinner {
+        padding: 10px;
+        overflow: auto;
     }
     #topbarinner .header {
     	float: left;
@@ -218,12 +224,47 @@
     <script type="text/javascript">
     google.load("visualization", "1.0", {packages:["imagechart"]});
     </script>
+    <script src="js/jquery_1.7.4.min.js"></script>
+    <script type="text/javascript" src="js/jquery.socialshareprivacy.min.autoload.js"></script>
+    <script type="application/x-social-share-privacy-settings">
+    {
+        "path_prefix": "./panzi-SocialSharePrivacy/",
+        "layout": "line",
+        "services": {
+            "buffer":{"status":false},
+            "delicious":{"status":false},
+            "disqus":{"status":false},
+            "flattr":{"status":false},
+            "hackernews":{"status":false},
+            "linkedin":{"status":false},
+            "mail":{"status":false},
+            "reddit":{"status":false},
+            "stumbleupon":{"status":false},
+            "tumblr":{"status":false},
+            "xing":{"status":false},
+            "facebook" : {
+                "perma_option": "off"
+            }, 
+            "twitter": {
+                "perma_option": "off",
+                "txt_info": "Diese Anwendung per Twitter teilen",
+                "tweet_text": "Datenvisualisierung: Unfallkarte für Köln von @OffenesKoeln @MarianSteinbach"
+            },
+            "gplus": {
+                "perma_option": "off"
+            },
+            "pinterest": {
+                "perma_option": "off"
+            }
+        },
+    }
+    </script>
 </head>
 <body>
 	<div id="topbar">
 		<div id="topbarinner">
 			<h1>Unfallkarte für Köln</h1>
-			<a id="infolink" href="#">Info/Legende</a>
+			<a id="infolink" href="#">&Uuml;ber diese Anwendung</a>
 			<div id="search">
 				<label for="searchinput">Suche</label>: <input id="searchinput" type="text" size="30" />
 			</div>
@@ -265,7 +306,7 @@
     		<p><b>Irrtümer vorbehalten</b></p>
 
             <div style="overflow: auto">
-                <div style="float: left; width: 60px"><a href="/" target="_blank"><img src="http://offeneskoeln.de/static/img/logo/logo_50x42.png" width="50" heigth="42" alt="Offenes Köln" border="0" /></a></div>
+                <div style="float: left; width: 60px"><a href="/" target="_blank"><img src="logo_50x42.png" width="50" heigth="42" alt="Offenes Köln" border="0" /></a></div>
                 <div>Die Unfallkarte ist ein Projekt<br />von <a href="/" target="_blank">Offenes Köln</a>.</div>
             </div>
         </div>
@@ -273,8 +314,12 @@
             <a href="#" class="closeinfo">Info ausblenden</a>
         </div>
 	</div>
+    <div id="footer">
+        <div id="footerinner">
+            <div data-social-share-privacy="true"></div>
+        </div>
+    </div>
 	<img id="ogimage" src="ogimage.png" width="200" height="200" alt="" />
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script src="leaflet/leaflet.js"></script>
     <script src="chroma/chroma.min.js"></script>
     <script type="text/javascript">
@@ -315,17 +360,18 @@
 
     function adaptToWindowSize(e) {
     	var th = $('#topbar').height();
-    	var wh = $(window).height();
+    	var fh = $('#footer').height();
+        var wh = $(window).height();
     	var ww = $(window).width();
     	//console.log("th:", th, "wh:", wh);
     	if ((wh + th) != $('#mapcanvas').height()) {
     		if ((wh + th) > minHeight) {
     			//console.log('Changing height to ' + wh);
-    			$('#mapcanvas').css({height: wh - th});
-    			$('#filter').css({'top': wh - 60});
+    			$('#mapcanvas').css({height: wh - th - fh});
+    			$('#filter').css({'top': wh - 60 - fh});
     		} else {
-    			$('#mapcanvas').css({height: minHeight - th});
-    			$('#filter').css({'top': minHeight - 60});
+    			$('#mapcanvas').css({height: minHeight - th - fh});
+    			$('#filter').css({'top': minHeight - 60 - fh});
     		}
     	}
     	var iw = $('#info').width();
