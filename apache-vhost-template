@@ -1,0 +1,35 @@
+<VirtualHost *>
+        ServerAdmin mail@ernestoruge.de
+        ServerName bochum.ris.openruhr.de
+        DocumentRoot /srv/www/ris-web/httpdocs
+        ErrorLog /var/log/apache2/bochum.error.log
+        CustomLog /var/log/apache2/bochum.access.log combined
+
+        Alias /static/ /opt/ris-web/webapp/static/
+        <Directory /opt/ris-web/webapp/static>
+                Order deny,allow
+                Allow from all
+                <IfModule mod_expires.c>
+                        ExpiresActive On
+                        ExpiresDefault "access plus 7 days"
+                </IfModule>
+        </Directory>
+
+        WSGIDaemonProcess ris-bochum user=ris-web group=ris-web threads=5
+        WSGIScriptAlias / /srv/www/ris-web/httpdocs/bochum.wsgi
+        <Directory /srv/www/ris-web/httpdocs>
+                Order deny,allow
+                Allow from all
+                AllowOverride None
+                <IfModule mod_deflate.c>
+                        AddOutputFilterByType DEFLATE text/html text/plain text/xml application/json text/css text/javascript application/javascript
+                </IfModule>
+        </Directory>
+</VirtualHost>
+
+
+<VirtualHost *>
+        ServerName www.bochum.ris.openruhr.de
+        RewriteEngine On
+        RewriteRule ^(.*)$ http://bochum.ris.openruhr.de/$1 [R=301]
+</VirtualHost>
