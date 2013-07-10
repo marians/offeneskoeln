@@ -30,22 +30,18 @@ entstanden.
 
 import locale
 
-LOCALE = 'de_DE'
+LOCALE = 'de_DE.UTF8'
 
 locale.setlocale(locale.LC_ALL, LOCALE)
 
 # Absolute path to webapp folder
-WWW_PATH = '/Users/marian/github/offeneskoeln/webapp'
+WWW_PATH = '/opt/ris-web/webapp'
 
 # Path for static files
 STATIC_PATH = WWW_PATH + '/static'
 
 # Path for thumbnails
 THUMBS_PATH = STATIC_PATH + '/thumbs'
-
-# Name of the location. Use unicode if needed.
-#LOCATION_NAME = u'K\xf6ln'
-LOCATION_NAME = 'Mannheim'
 
 # Type of database. Currently, only "mongodb" is supported
 DB_TYPE = 'mongodb'
@@ -67,13 +63,13 @@ THUMBNAILS_SIZES = [800, 300, 150]
 THUMBNAILS_SUFFIX = 'jpg'
 
 # Path to GPL Ghostscript executable
-GS_CMD = '/Path/to/bin/gs'
+GS_CMD = '/usr/bin/gs'
 
 # Path to pdftotext executable
-PDFTOTEXT_CMD = '/Path/to/bin/pdftotext'
+PDFTOTEXT_CMD = '/usr/bin/pdftotext'
 
 # Word lists paths for ElasticSearch
-ES_PATH_BASE = '/Path/to/offeneskoeln/config/'
+ES_PATH_BASE = '/opt/ris-web/config/'
 STOPWORDS_PATH_GLOBAL = ES_PATH_BASE + 'stopwords_de_global.txt'
 SYNONYMS_PATH_GLOBAL = ES_PATH_BASE + 'synonyms_global.txt'
 
@@ -82,30 +78,23 @@ ES_HOST = 'localhost'
 ES_PORT = 9200
 
 # Path to mongodump executable
-MONGODUMP_CMD = '/Path/to/bin/mongodump'
+MONGODUMP_CMD = '/usr/bin/mongodump'
 
 # Which collections should be contained in database dumps?
 DB_DUMP_COLLECTIONS = ['submissions', 'sessions', 'attachments', 'locations']
-DB_DUMP_TEMPFOLDER = 'datadump'
+DB_DUMP_TEMPFOLDER = 'temp'
+
+TMP_FOLDER = 'temp'
+ATTACHMENT_FOLDER = 'webapp/static/attachments'
 
 ####################################################
 # Webapp configuration
 
 # Absolute path to the webapp folder in the file system
-BASE_PATH = '/Path/to/offeneskoeln/webapp'
-
-
-# Partial path to the static directory
-STATIC_URL = BASE_URL + 'static/'
-
-# Partial path to the thumbs directory
-THUMBS_URL = BASE_URL + 'static/thumbs/'
+BASE_PATH = '/opt/ris-web/webapp'
 
 # Partial path to the submissions RSS feed
 SUBMISSION_RSS_URL = 'static/rss/dokumente.xml'
-
-# Disqus Comments shortname
-DISQUS_SHORTNAME = 'your_disqus_shortname'
 
 # This has to be False for production!
 DEBUG = True
@@ -114,13 +103,8 @@ MONGO_HOST = DB_HOST
 MONGO_PORT = DB_PORT
 MONGO_DBNAME = DB_NAME
 
-# Attachment URL pattern
-ATTACHMENT_DOWNLOAD_URL = BASE_URL + 'anhang/%s.%s'
-
 MAP_TILE_URL_SCHEMA = 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg'
 MAP_TILE_ZOOMLEVEL_MIN = 4
 MAP_TILE_ZOOMLEVEL_MAX = 18
 MAP_TILE_ATTRIBUTION = 'Map Data © <a href="http://www.openstreetmap.org">OpenStreetMap</a> contributors, Tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>.'
-
-
 

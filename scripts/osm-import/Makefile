@@ -10,7 +10,7 @@
 # Aufruf mit Laden der Config: make `cat bochum.cfg`
 
 import: city-streets.osm
-	python ../osm-import.py city-streets.osm $(CITY)
+	python osm-import.py city-streets.osm $(CITY)
 
 city-streets.osm: osmfilter city.osm
 	./osmfilter city.osm \
@@ -46,10 +46,10 @@ city.poly:
 	python -m osm.multipolygon -r $(OSM_RELATION) -m city.poly
 
 clean:
-	rm city.poly
-	rm *.osm
-	rm -r osmfilter
-	rm -r osmosis
-	rm -r bin
-	rm -r lib
-	rm -r config
+	rm -f city.poly
+	rm -f *.osm
+	rm -rf osmfilter
+	rm -rf osmosis
+	rm -rf bin
+	rm -rf lib
+	rm -rf config
