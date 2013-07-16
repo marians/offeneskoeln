@@ -1,0 +1,121 @@
+Installation der Weboberfläche + API auf einem Ubuntu 12.04 Server
+
+# Installation einer Reihe von Paketen via apt-get
+
+# Basics
+apt-get install git python-virtualenv
+
+# PDF-Bearbeitung
+apt-get install ghostscript poppler-utils
+
+# Bild-Bearbeitung incl. Bugfix nach http://www.sandersnewmedia.com/why/2012/04/16/installing-pil-virtualenv-ubuntu-1204-precise-pangolin/
+sudo apt-get build-dep python-imaging libjpeg62
+sudo ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
+sudo ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
+sudo ln -s /usr/lib/`uname -i`-linux-gnu/libz.so /usr/lib/
+
+# Scraper
+apt-get install libxml2-dev libxslt1-dev build-essential python-dev
+
+# OSM Import
+apt-get install libpq-dev protobuf-compiler libtokyocabinet-dev libprotobuf-dev libgeos-dev cython python-imposm python-imposm-parser python-matplotlib
+
+# Elasticsearch
+apt-get install openjdk-7-jre 
+
+# Webserver
+apt-get install apache2 libapache2-mod-wsgi
+
+
+# Scraper: Systemnutzer und Arbeits- und Logverzeichnis erstellen
+adduser ris-scraper
+mkdir /opt/ris-scraper
+mkdir /var/log/ris-scraper
+chown ris-scraper:ris-scraper /opt/ris-scraper
+chown ris-scraper:ris-scraper /var/log/ris-scraper
+
+# Nutzer und Verzeichnis wechseln, OpenRuhr Scraper Software herunterladen
+sudo -i -u ris-scraper
+cd /opt/ris-scraper
+git clone git clone https://github.com/OpenRuhr/ris-scraper.git ./
+
+# Virtuelle Python-Umgebung erstellen, dort hinein wechseln, relevante Pakete installieren
+virtualenv --no-site-packages ris-scraper
+source ris-scraper/bin/activate
+pip install -r requirements.txt
+exit
+
+
+# Web: Systemnutzer und Arbeitsverzeichnis erstellen
+adduser ris-web
+mkdir /opt/ris-web
+chown ris-web:ris-web /opt/ris-web
+
+sudo -i -u ris-web
+# Nutzer und Verzeichnis wechseln, OpenRuhr Scraper Software herunterladen
+cd /opt/ris-web
+git clone git clone https://github.com/OpenRuhr/ris-web.git ./
+
+# OSM Import vorbereiten
+pip install pymongo
+pip install git+git://github.com/werner2101/python-osm.git
+
+# Virtuelle Python-Umgebung erstellen, dort hinein wechseln, relevante Pakete installieren
+virtualenv --no-site-packages ris-scraper
+source ris-scraper/bin/activate
+pip install -r requirements.txt
+exit
+
+# MongoDB installieren (Version aus den Ubuntu Quellen ist zu alt) und einrichten
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
+echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/10gen.list
+sudo apt-get update
+sudo apt-get install mongodb-10gen
+vim /etc/mongodb.conf # Hier den Wert bind_ip so einstellen, dass man von außen nicht drauf zugreifen kann. Wenn alles auf einem Server ist:
+bind_ip = 127.0.0.1
+
+#ElasticSearch installieren und einrichten
+wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.2.deb
+dpkg -i elasticsearch-0.90.2.deb
+vim /etc/elasticsearch/elasticsearch.yml #Hier die Werte network.bind_host und network.publish_host so einstellen, das man von außen nicht drauf zugreifen kann. Wenn alles auf einem Server ist:
+network.bind_host: 127.0.0.1
+network.publish_host: 127.0.0.1
+
+# Apache 2 einrichten
+cp /opt/ris-web/apache-vhost-template /etc/apache2/sites-avaiable/ris-meinestadt
+a2enmod mod_wsgi
+vim /etc/apache2/sites-avaiable/ris-meinestadt # Die Werte ServerAdmin, ServerName (2x), DocumentRoot, ErrorLog, CustomLog, WSGIDaemonProcess, WSGIScriptAlias sowie die <Directory>s an die eigene Stadt anpassen
+cp /opt/ris-web/template.wsgi /opt/ris-web/meinestadt.wsgi
+vim /opt/ris-web/meinestadt.wsgi # Pfad zum Stadt-Config-File (os.environ['CITY_CONF']) anpassen
+a2enmod ris-meinestadt
+service apache2 reload
+
+# Konfiguration erstellen
+sudo -i -u ris-web
+cd /opt/ris-web/
+cp config_example.py config.py
+vim config.py # Die Konfiguration an die Installation anpassen. Die Voreinstellungen dürften für Ubuntu 12.04 LTS weitestgehend richtig sein.
+cd city
+cp bochum.py meinestadt.py
+vim meinestadt.py # Die Konfiguration an die eigene Stadt anpassen. Den Regionalschlüssel RS gibt es hier: 
+exit
+
+
+# OSM Straßen importieren
+sudo -i -u ris-web
+cd /opt/ris-web/scripts/osm-import/
+cp bochum.cfg meinestadt.cfg
+vim meinestadt.cfg # Config anpassen. CITY ist die Stadt (frei wählbar ohne Leer- / Sonderzeichen), REGBEZ der Regierungsbezirk (Quelle: http://download.geofabrik.de/europe/germany/, bei Städten außerhalb von NRW muss das Makefile noch angepasst werden), OSM_RELATION die OSM Relation (ID von http://wiki.openstreetmap.org/wiki/WikiProject_Germany/Grenzen )
+make `cat meinestadt.cfg` # Die ` sind wichtig, so laden wir das richtige Config File
+make clean #Aufräumen
+exit
+
+# Einrichten des Scrapers
+sudo -i -u ris-scraper
+cd /opt/ris-scraper/
+source ris-scraper/bin/activate
+cp config/bochum.py config/meinestadt.py
+vim config/meinestadt.py # Anpassung der des Scrapers. Es macht Sinn, sich eine Stadt mit ähnlicher RIS Version als Vorlage zu nehmen, da die Scraper-Logik im unteren Bereich des Config-Files sehr komplex werden kann.
+python main.py -q -v -c duisburg --start 2013-04 --end 2013-12
+
+# Wenn man ein eigenes Repository aufbaut, macht es Sinn, den Upstream regelmäßig einzupflegen. Wie das geht steht auf https://help.github.com/articles/fork-a-repo

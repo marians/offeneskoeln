@@ -121,7 +121,7 @@ IMPRESSUM_PHONE_URL = '+491731662174'
 IMPRESSUM_PHONE_DESCR = '0173 166 21 74'
 
 # Elastic Seaerch Prefix
-ES_INDEX_NAME_PREFIX = 'ris-web-moers'
+ES_INDEX_NAME_PREFIX = 'ris-web-duisburg'
 
 ############  Configuration for the API documentation page ###############
 
