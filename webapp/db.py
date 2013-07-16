@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from webapp import mongo
+from webapp import mongo, app
 import pyes
 import util
 
@@ -8,9 +8,12 @@ from bson import ObjectId
 import gridfs
 
 import pprint
+import urllib2
+import datetime
+import dateutil.relativedelta
 
-es = pyes.ES('localhost:9200')
-es.default_indices = ['offeneskoeln-latest']
+es = pyes.ES(app.config['ES_HOST']+':'+str(app.config['ES_PORT']))
+es.default_indices = [app.config['ES_INDEX_NAME_PREFIX']+'-latest']
 es.refresh()
 
 
@@ -78,11 +81,11 @@ def get_submissions(references=None, submission_ids=None, get_attachments=False,
     for r in keys:
         query = None
         if mode == 'references':
-            query = {'identifier': r}
+            query = {'identifier': r, "rs" : app.config['RS']}
         else:
             if type(r) != ObjectId:
                 r = ObjectId(r)
-            query = {'_id': r}
+            query = {'_id': r, "rs" : app.config['RS']}
         result = mongo.db.submissions.find(query)
         for res in result:
             res['url'] = util.submission_url(res['identifier'])
@@ -104,9 +107,10 @@ def get_submissions(references=None, submission_ids=None, get_attachments=False,
                                         res['attachments'][n]['thumbnails'][height][t]['url'] = util.thumbnail_url(
                                                 attachment_id=res['attachments'][n]['_id'], size=height,
                                                 page=res['attachments'][n]['thumbnails'][height][t]['page'])
+                                    res['attachments'][n]['thumbnails'][height] = sorted(res['attachments'][n]['thumbnails'][height], key=lambda x: x.get('page', -1))
             if get_consultations:
                 # Verweisende agendaitems finden
-                sessions = mongo.db.sessions.find({'agendaitems.submissions.$id': res['_id']})
+                sessions = mongo.db.sessions.find({'agendaitems.submissions.$id': res['_id'], "rs" : app.config['RS']})
                 if sessions.count() > 0:
                     res['consultations'] = []
                     for session in sessions:
@@ -145,16 +149,63 @@ def query_submissions(q='', fq=None, sort='score desc', start=0, docs=10, date=N
     if sort_field == 'score':
         sort_field = '_score'
     sort = {sort_field: {'order': sort_order}}
-    string_query = pyes.StringQuery(q, default_operator="AND")
-    search = pyes.query.Search(query=string_query, fields=[''], start=start, size=docs, sort=sort)
+    query = pyes.query.BoolQuery()
+    query.add_must(pyes.StringQuery(q, default_operator="AND"))
+    rest = True
+    x = 0
+    result = []
+    while rest:
+        y = fq.find(":", x)
+        if y == -1:
+            break
+        temp = fq[x:y]
+        x = y + 1
+        if fq[x:x+5] == "&#34;":
+            y = fq.find("&#34;", x+5)
+            if y == -1:
+                break
+            result.append((temp, fq[x+5:y]))
+            x = y + 6
+            if x > len(fq):
+                break
+        else:
+            y = fq.find(";", x)
+            if y == -1:
+                result.append((temp, fq[x:len(fq)]))
+                break
+            else:
+                result.append((temp, fq[x:y]))
+                x = y + 1
+    for sfq in result:
+        if sfq[0] == 'date':
+            (year, month) = sfq[1].split('-')
+            date_start = datetime.datetime(int(year), int(month), 1)
+            date_end = date_start + dateutil.relativedelta.relativedelta(months=+1,seconds=-1)
+            query.add_must(pyes.RangeQuery(qrange=pyes.ESRange('date',date_start, date_end)))
+        else:
+            query.add_must(pyes.TermQuery(field=sfq[0], value=sfq[1]))
+    search = pyes.query.Search(query=query, fields=[''], start=start, size=docs, sort=sort)
+    search.facet.add_term_facet('type')
+    search.facet.add_term_facet('rs')
+    search.facet.add_term_facet('committee')
+    search.facet.add_date_facet(field='date', name='date', interval='month')
     result = es.search(search, model=lambda x, y: y)
     ret = {
         'numhits': result.total,
         'maxscore': result.max_score,
-        'result': []
+        'result': [],
+        'facets': {}
     }
     if result.max_score is not None:
         ret['maxscore'] = result.max_score
+    for key in result.facets:
+        ret['facets'][key] = {}
+        if result.facets[key]['_type'] == 'date_histogram':
+            for subval in result.facets[key]['entries']:
+                ret['facets'][key][datetime.datetime.fromtimestamp(int(subval['time'])/1000).strftime('%Y-%m')] = subval['count']
+        if result.facets[key]['_type'] == 'terms':
+            for subval in result.facets[key]['terms']:
+                ret['facets'][key][subval['term']] = subval['count']
     for r in result:
         ret['result'].append({
             '_id': str(r['_id']),
@@ -167,7 +218,7 @@ def get_all_submission_identifiers():
     """
     Liefert Liste mit allen Submission-Identifiern zurück
     """
-    search = mongo.db.submissions.find({}, {'identifier': 1})
+    search = mongo.db.submissions.find({"rs" : app.config['RS']}, {'identifier': 1})
     if search.count():
         slist = []
         for submission in search:
@@ -190,7 +241,7 @@ def get_locations_by_name(streetname):
     """
     Liefert Location-Einträge für einen Namen zurück.
     """
-    cursor = mongo.db.locations.find({'name': streetname})
+    cursor = mongo.db.locations.find({'name': streetname, "rs" : app.config['RS']})
     streets = []
     for street in cursor:
         streets.append(street)

@@ -7,23 +7,29 @@
 # pip install numpy
 # pip install matplotlib
 
-import: koeln-streets.osm
-	python osm-import.py koeln-streets.osm
+# Aufruf mit Laden der Config: make `cat bochum.cfg`
 
-koeln-streets.osm: osmfilter koeln.osm
-	./osmfilter koeln.osm \
+import: city-streets.osm
+	python osm-import.py city-streets.osm $(CITY)
+
+city-streets.osm: osmfilter city.osm
+	./osmfilter city.osm \
 	--keep="highway=primary =secondary =tertiary =residential =unclassified =road =living-street =pedestrian" \
-	--drop-author --drop-version > koeln-streets.osm
+	--drop-author --drop-version > city-streets.osm
 
-koeln.osm: koeln.poly koeln-regbez-latest.osm osmosis
-	bin/osmosis --read-xml file="koeln-regbez-latest.osm" --bounding-polygon file="koeln.poly" --write-xml file="koeln.osm"
+city.osm: city.poly city-regbez-latest.osm osmosis
+	bin/osmosis --read-xml file="city-regbez-latest.osm" --bounding-polygon file="city.poly" --write-xml file="city.osm"
 
-koeln-regbez-latest.osm:
-	wget -N http://download.geofabrik.de/europe/germany/nordrhein-westfalen/koeln-regbez-latest.osm.bz2
-	bunzip2 koeln-regbez-latest.osm.bz2
+city-regbez-latest.osm:
+	wget -N http://download.geofabrik.de/europe/germany/nordrhein-westfalen/$(REGBEZ)-regbez-latest.osm.bz2
+	bunzip2 $(REGBEZ)-regbez-latest.osm.bz2
+	mv $(REGBEZ)-regbez-latest.osm city-regbez-latest.osm
 
-osmfilter:
+osmfilter: loadconf
 	wget -O - http://m.m.i24.cc/osmfilter.c |cc -x c - -O3 -o osmfilter
+
+loadconf:
+	cat $(CITY).cfg
 
 osmosis:
 	wget -N http://bretth.dev.openstreetmap.org/osmosis-build/osmosis-latest.tgz
@@ -36,17 +42,14 @@ osmosis:
 	rm copying.txt
 	rm changes.txt
 
-koeln.poly:
-	python -m osm.multipolygon -r 62578 -m koeln.poly
+city.poly:
+	python -m osm.multipolygon -r $(OSM_RELATION) -m city.poly
 
 clean:
-	rm koeln.poly
-	rm koeln-regbez-latest.osm
-	rm koeln.osm
-	rm osmfilter
-	rm koeln-streets.osm
-	rm -r osmosis_dir
-	rm osmosis
-	rm -r bin
-	rm -r lib
-	rm -r config
+	rm -f city.poly
+	rm -f *.osm
+	rm -rf osmfilter
+	rm -rf osmosis
+	rm -rf bin
+	rm -rf lib
+	rm -rf config

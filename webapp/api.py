@@ -30,6 +30,7 @@ import util
 import db
 import datetime
 import time
+import sys
 
 from flask import Flask
 from flask import abort
@@ -77,10 +78,11 @@ def api_documents():
     submission_ids = []
     # TODO: entscheiden, was mit get_relations passiert
     """
-    Anhand der übergebenen Parameter wird entschieden, ob eine Solr-Suche
+    Anhand der übergebenen Parameter wird entschieden, ob eine ES-Suche
     durchgeführt wird, oder ob die Abfrage direkt anhand von Kennungen
     (references) erfolgen kann.
     """
+    
     if references is None:
         # Suche wird durchgeführt
         # (References-Liste via Suchmaschine füllen)
@@ -128,9 +130,10 @@ def api_documents():
         ret['response']['numhits'] = query['numhits']
         if get_facets and 'facets' in query:
             ret['response']['facets'] = query['facets']
-
+    
     ret['response']['start'] = start
     ret['request']['sort'] = sort
+    ret['request']['fq'] = fq
 
     json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
     if jsonp_callback is not None:
@@ -192,7 +195,12 @@ def api_streets():
         },
         'response': result
     }
-    json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
+    try:
+        json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
+    except AttributeError:
+        print >> sys.stderr, ret
+        return null
+    
     if jsonp_callback is not None:
         json_output = jsonp_callback + '(' + json_output + ')'
     response = make_response(json_output, 200)
@@ -247,5 +255,18 @@ def api_session():
     if jsonp_callback is not None:
         json_output = jsonp_callback + '(' + json_output + ')'
     response = make_response(json_output, 200)
+    response.mimetype = 'application/json'
+    return response
+
+
+@app.route("/api/response", methods=['POST'])
+def api_response():
+    attachment_id = request.form['id']
+    name = request.form['name']
+    email = request.form['email']
+    attachment_type = request.form['attachment_type']
+    comment = request.form['comment']
+    db.response.insert({attachment_id: attachment_id, name: name, email: email, attachment_type: attachment_type, comment: comment})
+    response = make_response('1', 200)
     response.mimetype = 'application/json'
     return response

@@ -30,14 +30,19 @@ entstanden.
 
 import sys
 sys.path.append('./')
-import config
 
+import config
 import os
+import inspect
+import argparse
 import datetime
 import subprocess
 from pymongo import MongoClient
 import urllib
 
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
 
 def execute(cmd):
     output, error = subprocess.Popen(
@@ -51,11 +56,11 @@ def execute(cmd):
 def attachment_url(attachment_id, filename=None, extension=None):
     if filename is not None:
         extension = filename.split('.')[-1]
-    return config.ATTACHMENT_DOWNLOAD_URL % (attachment_id, extension)
+    return cityconfig.ATTACHMENT_DOWNLOAD_URL % (attachment_id, extension)
 
 
 def submission_url(identifier):
-    url = config.BASE_URL
+    url = cityconfig.BASE_URL
     url += 'dokumente/' + urllib.quote_plus(identifier) + '/'
     return url
 
@@ -65,7 +70,7 @@ def generate_sitemaps():
     sitemaps = []
     urls = []
     # gather attachment URLs
-    for attachment in db.attachments.find():
+    for attachment in db.attachments.find({"rs" : cityconfig.RS}):
         fileentry = db.fs.files.find_one(attachment['file'].id)
         thisfile = {
             'path': attachment_url(attachment['_id'], filename=attachment['filename']),
@@ -110,20 +115,20 @@ def generate_sitemaps():
 
 
     # Create meta-sitemap
-    meta_sitemap_path = config.STATIC_PATH + '/sitemap.xml'
+    meta_sitemap_path = config.STATIC_PATH + '/sitemap/' + cityconfig.RS + '.xml'
     f = open(meta_sitemap_path, 'w')
     f.write("""<?xml version="1.0" encoding="UTF-8"?>
         <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
     for sitemap_name in sitemaps:
         f.write("""\n   <sitemap>
-            <loc>%s%s.xml.gz</loc>
-        </sitemap>\n""" % (config.STATIC_URL, sitemap_name))
+            <loc>%ssitemap/%s_%s.xml.gz</loc>
+        </sitemap>\n""" % (cityconfig.STATIC_URL, cityconfig.RS, sitemap_name))
     f.write("</sitemapindex>\n")
     f.close()
 
 
 def generate_sitemap(files, name):
-    sitemap_path = (config.STATIC_PATH + '/' + name + '.xml')
+    sitemap_path = (config.STATIC_PATH + '/sitemap/' + cityconfig.RS + '_' + name + '.xml')
     f = open(sitemap_path, 'w')
     f.write("""<?xml version="1.0" encoding="UTF-8"?>
         <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
@@ -141,6 +146,12 @@ def generate_sitemap(files, name):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Generate Fulltext for given City Conf File')
+    parser.add_argument(dest='city', help=("e.g. bochum"))
+    options = parser.parse_args()
+    city = options.city
+    cityconfig = __import__(city)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
     generate_sitemaps()

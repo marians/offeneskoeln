@@ -28,14 +28,21 @@ entstanden.
 
 import sys
 sys.path.append('./')
-import config
 
+import config
+import os
+import inspect
+import argparse
 from pymongo import MongoClient
 from lxml import etree
 import email.utils
 import calendar
 import urllib
-import os
+from datetime import datetime
+
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
 
 # max Number of items
 LIMIT = 100
@@ -51,41 +58,38 @@ def rfc1123date(value):
 
 
 def submission_url(identifier):
-    url = config.BASE_URL
+    url = cityconfig.BASE_URL
     url += 'dokumente/' + urllib.quote_plus(identifier) + '/'
     return url
 
 
 def generate_channel():
-    feed_url = config.BASE_URL + config.SUBMISSION_RSS_URL
+    feed_url = cityconfig.BASE_URL + '/static/rss/' + cityconfig.RS + '_dokumente.xml'
     root = etree.Element("rss", version="2.0", nsmap={'atom': 'http://www.w3.org/2005/Atom'})
     channel = etree.SubElement(root, "channel")
-    etree.SubElement(channel, "title").text = config.APP_NAME + ': Neue Dokumente'
-    etree.SubElement(channel, "link").text = config.BASE_URL
+    etree.SubElement(channel, "title").text = cityconfig.APP_NAME + ': Neue Dokumente'
+    etree.SubElement(channel, "link").text = cityconfig.BASE_URL
     etree.SubElement(channel, "language").text = 'de-de'
-    description = ("Neue oder geänderte Dokumente auf ".decode('utf-8')) + config.APP_NAME
+    description = ("Neue oder geänderte Dokumente auf ".decode('utf-8')) + cityconfig.APP_NAME
     etree.SubElement(channel, "description").text = description
     etree.SubElement(channel, '{http://www.w3.org/2005/Atom}link',
         href=feed_url, rel="self", type="application/rss+xml")
 
     project = {
-        'identifier': 1,
-        'title': 1,
-        'last_modified': 1,
-        'date': 1,
-        'type': 1,
-        'sessions': 1,
-        'attachments': 1
+        'identifier': {'$exists': True},
+        'title': {'$exists': True},
+        'last_modified': {'$exists': True},
+        "rs" : cityconfig.RS
     }
     # use latest item lastmod date as pubDate of the feed
     pub_date = None
     # iterate items
-    for s in db.submissions.find({}, project).sort('last_modified', -1).limit(LIMIT):
+    for s in db.submissions.find(project).sort('last_modified', -1).limit(LIMIT):
         if pub_date is None:
             pub_date = s['last_modified']
         url = submission_url(s['identifier'])
         description = 'Art des Dokuments: ' + s['type'] + '<br />'
-        description += 'Erstellt am: ' + s['date'].strftime('%d. %B %Y') + '<br />'
+        description += 'Erstellt am: ' + s['date'].strftime('%d. %B %Y').decode('utf-8') + '<br />'
         description += 'Zuletzt geändert am: '.decode('utf-8') + s['last_modified'].strftime('%d. %B %Y') + '<br />'
         if 'sessions' in s:
             if len(s['sessions']) == 1:
@@ -97,8 +101,11 @@ def generate_channel():
         etree.SubElement(item, "pubDate").text = rfc1123date(s['last_modified'])
         etree.SubElement(item, "title").text = s['title']
         etree.SubElement(item, "description").text = description
-        etree.SubElement(item, "link").text = url
-        etree.SubElement(item, "guid").text = url
+        etree.SubElement(item, "link").text = url.replace('%2F', '/')
+        etree.SubElement(item, "guid").text = url.replace('%2F', '/')
+    #failback if empty
+    if pub_date is None:
+        pub_date = datetime.now()
     etree.SubElement(channel, "pubDate").text = rfc1123date(pub_date)
     return etree.tostring(root, pretty_print=True)
 
@@ -110,7 +117,7 @@ def save_channel(xml):
     for cached versions to be used (conditional get etc.).
     """
     overwrite = False
-    path = config.BASE_PATH + '/' + config.SUBMISSION_RSS_URL
+    path = config.BASE_PATH + '/static/rss/' + cityconfig.RS + '_dokumente.xml'
     if not os.path.exists(path):
         overwrite = True
     else:
@@ -133,6 +140,12 @@ def save_channel(xml):
         f.close()
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Generate Fulltext for given City Conf File')
+    parser.add_argument(dest='city', help=("e.g. bochum"))
+    options = parser.parse_args()
+    city = options.city
+    cityconfig = __import__(city)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
     xml = generate_channel()

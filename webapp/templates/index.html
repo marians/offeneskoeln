@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title %}Startseite{% endblock %}
 {% block ogtitle %}Startseite{% endblock %}
-{% block meta_description %}Informationen aus der Kölner Lokalpolitik, zugänglich dargestellt, durchsuchbar und geografisch zugeordnet.{% endblock %}
+{% block meta_description %}{{ config.META_DESCR|safe }}{% endblock %}
 
 {% block endbody_script %}
 {{ super() }}

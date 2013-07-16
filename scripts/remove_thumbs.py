@@ -27,14 +27,29 @@ im Zusammenhang mit der Software oder sonstiger Verwendung der Software
 entstanden.
 """
 
+import sys
+sys.path.append('./')
+
 from pymongo import MongoClient
 import config
+import os
+import inspect
+import argparse
 
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Generate Fulltext for given City Conf File')
+    parser.add_argument(dest='city', help=("e.g. bochum"))
+    options = parser.parse_args()
+    city = options.city
+    cityconfig = __import__(city)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
-    query = {'thumbnails': {'$exists': True}}
+    query = {'thumbnails': {'$exists': True}, "rs" : cityconfig.RS}
     modification = {
         '$unset': {
             'thumbnails': 1,

@@ -2,11 +2,19 @@
 *.pyc
 config.py
 venv/
+git-web/
+ris-web/
+temp/*
+ris.wsgi
+*.komodoproject
+*.komodotools
 webapp/static/thumbs
 webapp/static/tiles
-webapp/attachments
-webapp/daten
-webapp/static/rss/dokumente.xml
+webapp/static/*.xml*
+webapp/static/attachments/*
+webapp/static/database/*
+webapp/static/sitemap/*
+webapp/static/rss/*.xml
 scripts/osm-import/bin
 scripts/osm-import/lib
 scripts/osm-import/config
@@ -14,3 +22,4 @@ scripts/osm-import/*.poly
 scripts/osm-import/*.osm
 scripts/osm-import/osmfilter
 scripts/osm-import/osmosis
+

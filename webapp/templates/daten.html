@@ -9,11 +9,11 @@
 	<h1>Daten</h1>
 	<div class="text">
 		
-		<p>Die Datenbank hinter offeneskoeln.de steht zum Download zur Verfügung. Bitte beachte, dass wir auch eine <a href="/api/">Programmierschnittstelle (API)</a> anbieten, mit sich Daten <strong>gezielt abfragen</strong> lassen.</p>
+		<p>Die Datenbank hinter {{ config.BASE_HOST }} steht zum Download zur Verfügung. Bitte beachte, dass wir auch eine <a href="/api/">Programmierschnittstelle (API)</a> anbieten, mit sich Daten <strong>gezielt abfragen</strong> lassen.</p>
 		
 		<p>Bei den Inhalten handelt es sich größtenteils um amtliche Dokumente, die um einige Daten angereichert wurden.</p>
 		
-		<p>Wenn Du die Daten für eigene Projekte nutzt, freuen wir uns über eine <a href="/kontakt/">Nachricht</a> und einen Link zu offeneskoeln.de!</p>
+		<p>Wenn Du die Daten für eigene Projekte nutzt, freuen wir uns über eine <a href="/kontakt/">Nachricht</a> und einen Link zu {{ config.BASE_HOST }}!</p>
 
 	</div>
 </div>
@@ -28,7 +28,7 @@
 		
 		<p>Die enthaltenen <strong>Geodaten</strong> sind Auszüge aus dem Datenbestand von <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>. Urheber sind hier "OpenStreetMap und Mitwirkende".</p>
 
-		<p>Die <strong>Anhänge</strong> zu Dokumenten (PDF-Dateien etc.) stehen nicht unter der genannten Lizenz.</p>
+		<p>Die <strong>Anhänge</strong> zu Dokumenten (PDF-Dateien etc.) stehen nicht unter der genannten Lizenz, bei etwaiger Weiterverwendung muss die Lizenz mit der Stadt {{ config.LOCATION_NAME }} geklärt werden.</p>
 	</div>
 </div>
 <div class="content middle">
@@ -42,13 +42,15 @@
 
 		<p>Die Exporte geben die Inhalte der <strong>MongoDB</strong> Datenbank wieder und sind zur Verwendung mit den entsprechenden MongoDB-Werkzeugen (<a href="http://docs.mongodb.org/manual/reference/mongorestore/" target="_blank">mongorestore oder mongoimport</a>) gedacht.</p>
 		
+		<p>Der Export beinhaltet die Daten aller Städte. Die Einträge mit dem Regionalschlüssel rs = {{config.RS}} sind die für {{config.LOCATION_NAME}} relevanten Einträge.</p>
+		
 		<h3>Downloads</h3>
 
 		<table>
 			<tbody>
-				{% for file in filelist %}
+				{% for file in databasefilelist %}
 				<tr>
-					<td><a href="{{ file.name }}">{{ file.name }}</a></td>
+					<td><a href="/static/database/{{ file.name }}">{{ file.name }}</a></td>
 					<td style="padding-left: 1em">({{ file.size }} MB)</td>
 				</tr>
 				{% endfor %}
@@ -62,10 +64,20 @@
 	<div class="text">
 		<h2>Anlagen/Dateien zu Dokumenten</h2>
 		
-		<p>Die digitalen Anträge, Anfragen, Mitteilungen etc. liegen in Form von einzelnen Dateien vor. Zum größten Teil sind dies PDF-Dokumente, aber auch JPEG- und TIF-Bilder sowie andere Formate.</p>
+		<p>Die digitalen Anträge, Anfragen, Mitteilungen etc. liegen ebenfalls als Archiv vor. Zum größten Teil sind dies PDF-Dokumente, aber auch JPEG- und TIF-Bilder sowie andere Formate.</p>
 		
-		<p>Sämtliche dieser Dateien sind in der <a href="/attachments/">Attachments-Ordnerhierarchie</a> abgelegt. Dort können sie mit geeigneten Werkzeugen heruntergeladen werden. Es handelt sich um ca. 60.000 Dateien mit insgesamt über 13 GB Datenvolumen (Stand März 2012).</p>
-	
+		<h3>Downloads</h3>
+		
+		<table>
+			<tbody>
+				{% for file in attachmentfilelist %}
+				<tr>
+					<td><a href="/static/attachments/{{ file.name }}">{{ file.name }}</a></td>
+					<td style="padding-left: 1em">({{ file.size }} MB)</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
 	</div>
 </div>
 {% endblock %}

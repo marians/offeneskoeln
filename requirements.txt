@@ -1,0 +1,10 @@
+PIL
+flask
+Flask-PyMongo
+flask-mongo-sessions
+pyes
+Werkzeug
+ordereddict
+datetime
+python-dateutil
+

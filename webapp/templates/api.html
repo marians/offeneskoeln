@@ -6,15 +6,15 @@
 {% block content %}
 <div id="api">
 <div class="content top">
-    <h1>Die Offenes Köln API</h1>
+    <h1>Die {{ config.APP_NAME }} API</h1>
     
     <div class="text">
         
         <p>API = engl. <em>Application Program Interface</em>: Eine Programmierschnittstelle für den Zugriff auf ein System.</p>
         
-        <p>Das Ziel von Offenes Köln ist es, Daten und Informationen zur Kölner Lokalpolitik so weit wie möglich für jede denkbare Nutzung zu öffnen. Dazu gehört auch die Öffnung für den Zugriff mit Hilfe von Programmen und Systemen.</p>
+        <p>Das Ziel von {{config.APP_NAME}} ist es, Daten und Informationen zur {{config.CITY_NAME_ER}} Lokalpolitik so weit wie möglich für jede denkbare Nutzung zu öffnen. Dazu gehört auch die Öffnung für den Zugriff mit Hilfe von Programmen und Systemen.</p>
     
-        <p>offeneskoeln.de bietet einige Zugriffsmöglichkeiten auf den Datenbestand als Webservice-API. Genau wie die Plattform selbst ist die API noch in einem sehr, sehr frühen Reifestadium und wird mit großer Wahrscheinlichkeit noch vielen Änderungen unterworfen sein.</p>
+        <p>{{ config.BASE_HOST }} bietet einige Zugriffsmöglichkeiten auf den Datenbestand als Webservice-API. Genau wie die Plattform selbst ist die API noch in einem sehr, sehr frühen Reifestadium und wird mit großer Wahrscheinlichkeit noch vielen Änderungen unterworfen sein.</p>
         
     </div>
 </div>
@@ -443,10 +443,10 @@
             <dd><p>Liste der Titel des Dokuments. In der Regel enthält die Liste genau ein Element. Da es jedoch in der Praxis auch vorkommt, dass es mehrere Dokumente mit der selben Kennung gibt, kann die Liste mehrere Titel enthalten.</p></dd>
             
             <dt><code>response &rarr; documents &rarr; url</code></dt>
-            <dd><p>Der URL der Dokumenten-Detailseite auf offeneskoeln.de</p></dd>
+            <dd><p>Der URL der Dokumenten-Detailseite auf {{config.BASE_HOST}}</p></dd>
             
             <dt><code>response &rarr; documents &rarr; original_url</code></dt>
-            <dd><p>Liste der URLs der Dokumenten-Detailseiten im RIS der Stadt Köln. In der Regel ist hier nur eine URL enthalten. Handelt es sich jedoch um eine Dokumentenkennung, zu der mehrere Dokumente gehören, sind hier auch mehrere URLs angegeben.</p></dd>
+            <dd><p>Liste der URLs der Dokumenten-Detailseiten im RIS der Stadt {{config.CITY_NAME}}. In der Regel ist hier nur eine URL enthalten. Handelt es sich jedoch um eine Dokumentenkennung, zu der mehrere Dokumente gehören, sind hier auch mehrere URLs angegeben.</p></dd>
             
             <dt><code>response &rarr; documents &rarr; date</code></dt>
             <dd><p>Veröffentlichungsdatum des Dokuments</p></dd>
@@ -497,7 +497,7 @@
             <dd><p>Dateiname des Anhangs</p></dd>
             
             <dt><code>response &rarr; documents &rarr; attachments &rarr; last_modified</code></dt>
-            <dd><p>Datum und Uhrzeit der letzten Änderung der Kopie dieser Datei auf offeneskoeln.de (UTC).</p></dd>
+            <dd><p>Datum und Uhrzeit der letzten Änderung der Kopie dieser Datei auf {{config.BASE_HOST}} (UTC).</p></dd>
             
             <dt><code>response &rarr; documents &rarr; attachments &rarr; role</code></dt>
             <dd><p>Erläuterung zur Bedeutung des Anhangs</p></dd>
@@ -583,7 +583,7 @@
 
         <h3 style="font-weight: bold">/api/locations</h3>
         
-        <p>Gibt alle Geo-Positionen aus, die zum angegebenen Straßennamen im Kölner Stadtgebiet vorliegen.</p>
+        <p>Gibt alle Geo-Positionen aus, die zum angegebenen Straßennamen im {{config.CITY_NAME_ER}} Stadtgebiet vorliegen.</p>
         
         <h4>Datenherkunft und Lizenz</h4>
         
@@ -655,7 +655,7 @@
 
         <h3 style="font-weight: bold">/api/streets</h3>
         
-        <p>Dient zum Auffinden von Straßen im Umkreis einer Geo-Position im Kölner Stadtgebiet. Die Ausgabe erfolgt aufsteigend sortiert nach Entfernung zum Ausgangspunkt.</p>
+        <p>Dient zum Auffinden von Straßen im Umkreis einer Geo-Position im {{config.CITY_NAME_ER}} Stadtgebiet. Die Ausgabe erfolgt aufsteigend sortiert nach Entfernung zum Ausgangspunkt.</p>
         
         <p>In den Geodaten des OpenStreetmap Projekts besteht jede Straße aus mehreren Punkten. Damit sich eine Straße als im Umkreis zu einer Position befindlich qualifiziert, muss mindestens einer der Punkte der Straße in dem Umkreis liegen.</p>
         
@@ -725,7 +725,7 @@
         
         <p>Lesen und Schreiben von Session-Eigenschaften.</p>
         
-        <p>Wenn die Geo-Position des Nutzers (mittels Parameter <code>lat</code> und <code>lon</code>) gesetzt wird, wird automatisch versucht, die Adresse zu dieser Position, sofern sie im Kölner Stadtgebiet liegt, auzulösen. Dies geschieht im Hintergrund über die Yahoo Placefinder API.</p>
+        <p>Wenn die Geo-Position des Nutzers (mittels Parameter <code>lat</code> und <code>lon</code>) gesetzt wird, wird automatisch versucht, die Adresse zu dieser Position, sofern sie im {{config.CITY_NAME_ER}} Stadtgebiet liegt, auzulösen. Dies geschieht im Hintergrund über die Yahoo Placefinder API.</p>
         
         <h4>Beispielhafte Abfragen:</h4>
         
@@ -799,7 +799,7 @@
             <br />Gibt die Top 10 Stichwörter aus</li>
         </ul>
         
-        <p>Diese Funktion wird auch bei offeneskoeln.de aktuell noch nicht eingesetzt und ist daher noch als experimentell zu verstehen. Sie wird ausführlicher dokumentiert, sobald sie in Produktion geht.</p>
+        <p>Diese Funktion wird auch bei {{config.BASE_HOST}} aktuell noch nicht eingesetzt und ist daher noch als experimentell zu verstehen. Sie wird ausführlicher dokumentiert, sobald sie in Produktion geht.</p>
 
     </div>
 </div>

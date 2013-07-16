@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+{% block title %}Über OpenRuhr:RIS{% endblock %}
+{% block ogtitle %}Über Offenes Köln{% endblock %}
+{% block meta_description %}Ziele und Pläne für Offenes Köln und weitere Informationen{% endblock %}
+
+{% block content %}
+
+<div class="content top">
+	<h1>{{config.APP_NAME}}</h1>
+  
+	<blockquote class="nice">Ziel von {{config.APP_NAME}} ist es, Informationen, Dokumente und Daten aus der {{config.CITY_NAME_ER}} Lokalpolitik für jedermann offen zugänglich zu machen.</blockquote>
+	
+	<p>Dazu werden auf {{ config.BASE_HOST }} Dokumente und Daten, die im <a href="{{ config.RIS_ORIGINAL_URL }}" target="_blank">Ratsinformationssystem (<abbr title="Ratsinformationssystem">RIS</abbr>) der Stadt {{ config.CITY_NAME }}</a> veröffentlicht werden, gesammelt, aufbereitet und in einer nutzerfreundlichen Art und Weise dargestellt.</p>
+</div>
+<div class="content middle">
+		
+	<p style="text-align: center; margin: 0 5em;">{{ config.APP_NAME }} richtet sich an alle, die sich dafür interessieren, wie die {{ config.CITY_NAME_ER }} Politik ihr Leben direkt und indirekt beeinflusst. Dabei steht hinter dem Konzept die Vermutung, dass sich dieser Kreis der Interessierten durch den Abbau von Zugriffshürden vergrößern lässt.</p>
+
+</div>
+<div class="content middle">
+	<div style="overflow: auto;">
+		<div style="float: left; width: 300px; padding-left: 8em;">
+			<img src="/static/img/ueber/ueber-indeinernaehe.jpg" width="250" height="250" alt="Screenshot" style="border: 1px solid #fff" />
+		</div>
+		<div style="float: left; width: 250px;">
+			<p><b>Dinge in meiner Nähe</b>: Durch die in den Dokumenten enthaltenen Namen von Straßen und Plätzen kannst Du Dokumente und Vorgänge finden, die mit Orten in Deinem Umfeld zu tun haben. Dafür gibst Du auf der Startseite nur Deinen Standort oder Ort von Interesse an. <a href="/">Jetzt ausprobieren</a></p>
+		</div>
+	</div>
+</div>
+<div class="content middle">
+	<div style="overflow: auto; text-align: right;">
+		<div style="float: right; width: 300px; padding-right: 8em;">
+			<img src="/static/img/ueber/ueber-suche.jpg" width="250" height="250" alt="Screenshot" style="border: 1px solid #fff" />
+		</div>
+		<div style="float: right; width: 250px;">
+			<p><b>Flexible Suchfunktionen</b>: Die Suche ermöglicht Dir nicht nur die Suche nach Stichwörtern, auch aus dem Volltext von Dokumenten. Du kannst das Suchergebnis auch auf bestimmte Gremien, wie z.B. die Bezirksvertretung Deines Bezirks, oder nach Arten von Dokumenten beschränken. <a href="/suche/">Ausprobieren</a></p>
+		</div>
+	</div>
+</div>
+<div class="content middle">
+	<div style="overflow: auto;">
+		<div style="float: left; width: 300px; padding-left: 8em;">
+			<img src="/static/img/ueber/ueber-anlagenvorschau.jpg" width="250" height="250" alt="Screenshot" style="border: 1px solid #fff" />
+		</div>
+		<div style="float: left; width: 250px;">
+			<p><b>Anlagen-Vorschau</b>: Du kannst Anlagen zu Dokumenten, bevor Du sie zur detaillierten Einsicht herunter lädst, in einer schnellen Voransicht ansehen. Damit kannst Du schnell einen Eindruck bekommen, um welche Art von Dokument es sich handelt: Antragstext, Bericht, Präsentation etc. Damit fällt die Entscheidung, welches Dokument einen näheren Blick wert ist, leichter. <a href="/suche/">Ausprobieren</a></p>
+		</div>
+	</div>
+</div>
+<div class="content middle">
+	<div style="overflow: auto; text-align: right;">
+		<div style="float: right; width: 300px; padding-right: 8em;">
+			<img src="/static/img/ueber/ueber-persistenteurls.jpg" width="250" height="250" alt="Screenshot" style="border: 1px solid #fff" />
+		</div>
+		<div style="float: right; width: 250px;">
+			<p><b>Persistente URLs für Anlagen</b>: Anders als im RIS der Stadt {{ config.CITY_NAME }} kannst Du alle Anlagen (z.B. PDF-Dokumente) über einen öffentlichen, langfristig bestehenden <abbr title="Uniform Resource Locator">URL</abbr> abrufen. Dies ist eine Grundvoraussetzung, damit Du einen Favoriten/ein Lesezeichen auf die Datei setzen kannst. Oder einen Link zum Dokument per E-Mail weiter senden.</p>
+		</div>
+	</div>
+</div>
+<div class="content middle">
+	<div style="overflow: auto;">
+		<div style="float: left; width: 300px; padding-left: 8em;">
+			<img src="/static/img/ueber/ueber-daten.jpg" width="250" height="250" alt="Screenshot" style="border: 1px solid #fff" />
+		</div>
+		<div style="float: left; width: 250px;">
+			<p><b>Daten-Download</b>: Die Datenbank hinter {{ config.BASE_HOST }} steht zum Download zur Verfügung. <a href="/daten/">Mehr erfahren</a></p>
+		</div>
+	</div>
+</div>
+<div class="content middle">
+	<div style="overflow: auto; text-align: right;">
+		<div style="float: right; width: 300px; padding-right: 8em;">
+			<img src="/static/img/ueber/ueber-api.jpg" width="250" height="250" alt="Screenshot" style="border: 1px solid #fff" />
+		</div>
+		<div style="float: right; width: 250px;">
+			<p><b>API</b>: Unsere Daten sind nicht nur als Download verfügbar. Wir haben auch eine API, also eine Schnittstelle zum gezielten Abruf bestimmter Daten mit Hilfe von Software. <a href="/api/">Mehr erfahren</a></p>
+		</div>
+	</div>
+</div>
+
+<div class="content middle" id="links">
+	<h2 class="top-nomargin">Zum Weiterklicken</h2>
+	<p>Niemand ist eine Insel, erst recht nicht im World Wide Web. Daher gibt es hier gesammelt wesentliche Links zu relevanten Ressourcen.</p>
+	<p>Das <a href="{{ config.RIS_ORIGINAL_URL }}" target="_blank">Ratsinformationssystem der Stadt {{ config.CITY_NAME }}</a> ist die Quelle der Dokumente, dier hier auf {{ config.BASE_HOST}} zu finden sind. Dieses System gibt es unter anderem, um die Gremienarbeit, so wie sie in der <a href="https://recht.nrw.de/lmi/owa/pl_text_anzeigen?v_id=2320021205103438063" target="_blank">Gemeindeordnung des Landes NRW</a> und in der <a href="{{ config.GESCHAEFTSORDNUNG_URL}}" target="_blank">Geschäftsordnung des Rates der Stadt {{ config.CITY_NAME }} (PDF)</a> festgelegt sind.</p>
+	<p>Sowas wie {{ config.APP_NAME }} gibt es schon länger in Frankfurt unter dem Namen <a href="http://www.frankfurt-gestalten.de/" target="_blank">Frankfurt gestalten</a>. Interessierte, die solche und ähnliche Plattformen in anderen Städten Nordrhein-Westfalens fördern wollen, diskutieren auf der <a href="http://lists.okfn.org/mailman/listinfo/od-nrw" target="_blank">Open Data NRW Mailingliste</a>. Überregionale Anlaufstellen, um sich Mitstreiter für ein solches Projekt zu suchen, ist das <a href="http://opendata-network.org/" target="_blank">Open Data Network</a> und die <a href="http://okfn.de/" target="_blank">Open Knowledge Foundation Deutschland</a>.</p>
+
+</div>
+
+<div class="content bottom">
+	<h2 class="top-nomargin">Impressum und Kontakt</h2>
+
+	<p><strong>Anbieter im Sinne des Telemediengesetzes</strong></p>
+	<p>{{ config.IMPRESSUM_NAME }}<br />
+	{{ config.IMPRESSUM_STREET }}<br />
+	{{ config.IMPRESSUM_CITY }}</p>
+	
+	<p>E-Mail: <a href="mailto:{{ config.IMPRESSUM_MAIL }}">{{ config.IMPRESSUM_MAIL }}</a><br />
+	Telefon: <a href="tel:{{ config.IMPRESSUM_PHONE_URL }}">{{ config.IMPRESSUM_PHONE_DESCR }}</a></p>
+
+</div>
+
+{% endblock %}

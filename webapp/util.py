@@ -9,6 +9,7 @@ import re
 import urllib
 import urllib2
 import pprint
+import sys
 
 from webapp import app
 
@@ -114,4 +115,11 @@ class MyEncoder(json.JSONEncoder):
                 'collection': obj.collection,
                 '_id': obj.id
             }
-        return obj.__dict__
+        if hasattr(obj, 'ObjectId') != 0:
+            return obj.__dict__
+        else:
+            print >> sys.stderr, "Doofen Fehler gefunden:"
+            print >> sys.stderr, str(obj)
+            print >> sys.stderr, dir(obj)
+            print >> sys.stderr, type(obj)
+            return str(obj)

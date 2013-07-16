@@ -30,12 +30,23 @@ import sys
 
 sys.path.append('./')
 
-import config
+import os
+import inspect
 from imposm.parser import OSMParser
 from pymongo import MongoClient
 from bson.son import SON
 
 import pprint
+
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../../")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
+
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
+
+import config
 
 
 # Wir legen alle nodes in diesem dict ab. Das bedeutet, dass wir
@@ -88,11 +99,12 @@ class StreetCollector(object):
             self.streets.append(street)
 
 if __name__ == '__main__':
-
+    cityconfig = __import__(sys.argv[2])
+    
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
-    db.locations.remove({'rs': config.RS})
-    db.locations.ensure_index('osmid', unique=True)
+    db.locations.remove({'rs': cityconfig.RS})
+    db.locations.ensure_index('osmid')#, unique=True)
     db.locations.ensure_index('name')
     db.locations.ensure_index([('nodes.location', '2dsphere')])
 
@@ -128,5 +140,5 @@ if __name__ == '__main__':
                     ('coordinates', wanted_nodes[street['nodes'][n]]['location'])
                 ])
             }
-        street['rs'] = config.RS
+        street['rs'] = cityconfig.RS
         db.locations.save(street)

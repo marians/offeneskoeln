@@ -33,20 +33,39 @@ entstanden.
 import sys
 sys.path.append('./')
 
+import os
+import inspect
+import argparse
 import config
 from pymongo import MongoClient
 import re
 import datetime
 
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
 
 def generate_georeferences(db):
     """Generiert Geo-Referenzen für die gesamte submissions-Collection"""
 
     # Submissions ohne Geo-Referenzen
-    query = {'georeferences_generated': {'$exists': False}}
+    # erst mal weg: 'georeferences_generated': {'$exists': False}, 
+    query = {"rs" : cityconfig.RS}
     for doc in db.submissions.find(query):
         generate_georeferences_for_submission(doc['_id'], db)
+        #delete_georeferences_for_submission(doc['_id'], db)
     # TODO: Aktualisierte Dokumente berücksichtigen
+
+def delete_georeferences_for_submission(doc_id, db):
+    update = {
+        '$unset': {
+            'georeferences_generated': 1,
+            'georeferences': 1
+        }
+    }
+    print 'remove %s' % doc_id
+    db.submissions.update({'_id': doc_id}, update)
+
 
 
 def generate_georeferences_for_submission(doc_id, db):
@@ -56,15 +75,15 @@ def generate_georeferences_for_submission(doc_id, db):
     Submission-Dokument in der Datenbank.
     """
     submission = db.submissions.find_one({'_id': doc_id})
+    if 'title' in submission:
+        title = submission['title']
     text = ''
     if 'attachments' in submission and len(submission['attachments']) > 0:
         for a in submission['attachments']:
-            text += " " + get_attachment_fulltext(a.id)
-    if 'title' in submission:
-        text += " " + submission['title']
+            text += " " + get_attachment_fulltext(a.id, title)
     if 'subject' in submission:
         text += " " + submission['subject']
-    text = text.encode('utf-8')
+    #text = text.encode('utf-8')
     result = match_streets(text)
     now = datetime.datetime.utcnow()
     update = {
@@ -79,23 +98,29 @@ def generate_georeferences_for_submission(doc_id, db):
     db.submissions.update({'_id': doc_id}, update)
 
 
-def get_attachment_fulltext(attachment_id):
+def get_attachment_fulltext(attachment_id, title):
     """
     Gibt den Volltext zu einem attachment aus
     """
     attachment = db.attachments.find_one({'_id': attachment_id})
     if 'fulltext' in attachment:
+        if 'name' in attachment:
+            if any(x in attachment['name'] for x in cityconfig.SEARCH_IGNORE_ATTACHMENTS):
+                return ''
         return attachment['fulltext']
     return ''
 
 
-def load_streets(path):
+def load_streets():
     """
     Lädt eine Straßenliste (ein Eintrag je Zeile UTF-8)
     in ein Dict. Dabei werden verschiedene Synonyme für
     Namen, die auf "straße" oder "platz" enden, angelegt.
     """
-    nameslist = open(path, 'r').read().strip().split("\n")
+    nameslist = []
+    query = {"rs" : cityconfig.RS }
+    for street in db.locations.find(query):
+        nameslist.append(street['name'])
     ret = {}
     pattern1 = re.compile(".*straße$")
     pattern2 = re.compile(".*Straße$")
@@ -142,7 +167,13 @@ def match_streets(text):
 
 
 if __name__ == '__main__':
-    streets = load_streets(config.STREETS_FILE)
+    parser = argparse.ArgumentParser(
+        description='Generate Fulltext for given City Conf File')
+    parser.add_argument(dest='city', help=("e.g. bochum"))
+    options = parser.parse_args()
+    city = options.city
+    cityconfig = __import__(city)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
+    streets = load_streets()
     generate_georeferences(db)

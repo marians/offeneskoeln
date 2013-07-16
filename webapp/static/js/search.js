@@ -5,6 +5,7 @@ $(document).ready(function(){
         //console.log("Page search settings:", ok_search_settings);
         var search_parms = OffenesKoeln.deepCopy(ok_search_settings);
         search_parms['output'] = 'facets';
+        //console.log(search_parms)
         OffenesKoeln.search(
             search_parms,
             function(data) {
@@ -68,15 +69,51 @@ $(document).ready(function(){
 	
     function displaySearchResultFacets(facets, query, targetSelector) {
         if (typeof facets != 'undefined') {
+            //create obj of string
+            fq = query.fq
+            var rest = true
+            x = 0
+            result = new Object();
+            while (rest) {
+                y = fq.indexOf(":", x);
+                if (y == -1)
+                    break
+                temp = fq.substring(x, y);
+                x = y + 1
+                if (fq.substring(x, x+5) == "&#34;") {
+                    y = fq.indexOf("&#34;", x+5);
+                    if (y == -1)
+                        break
+                    result[temp] = fq.substring(x+5, y)
+                    x = y + 6;
+                    if (x > fq.length)
+                        break
+                }
+                else {
+                    y = fq.indexOf(";", x);
+                    if (y == -1) {
+                        result[temp] = fq.substring(x, fq.length);
+                        break
+                    }
+                    else {
+                        result[temp] = fq.substring(x, y);
+                        x = y + 1
+                    }
+                }
+            }
+            
             // typ facet
-            type_facet = createSearchResultFacet('type', facets.type, 'Typ', 'value', query.fq);
+            type_facet = createSearchResultFacet('type', facets.type, 'Typ', 'value', result);
             $(targetSelector).append(type_facet);
             // gremium facet
-            committee_facet = createSearchResultFacet('committee', facets.committee, 'Gremium', 'value', query.fq, true);
+            committee_facet = createSearchResultFacet('committee', facets.committee, 'Gremium', 'value', result, true);
             $(targetSelector).append(committee_facet);
             // schlagwort facet
-            term_facet = createSearchResultFacet('term', facets.term, 'Stichwort', 'value', query.fq, true);
-            $(targetSelector).append(term_facet);
+            //term_facet = createSearchResultFacet('term', facets.term, 'Stichwort', 'value', query.fq, true);
+            //$(targetSelector).append(term_facet);
+            // schlagwort datum
+            date_facet = createSearchResultFacet('date', facets.date, 'Zeitraum', '', result, true);
+            $(targetSelector).append(date_facet);
         }
     }
     
@@ -94,25 +131,42 @@ $(document).ready(function(){
         var facet_data = sortFacet(data, sortField);
         var facet = $(document.createElement('div')).attr('class', 'facet ' + name);
         var list = $(document.createElement('ul')).attr('class', 'facet');
-        if (fq.indexOf(name) != -1) {
-            // currently filtered by this facet
-            var re = new RegExp(name + ':"*([^"]+)"*');
-            var find = fq.match(re);
-            if (find) {
-                var label = find[1];
-                if (filterIds == true) {
-                    label = label.replace(/^[0-9]+\s+/, '');
-                }
-                list.append('<li class="current"><a title="Diese Einschränkung aufheben" href="/suche/?'+ (searchQueryString({fq: null })) +'"><span class="del">&#10005;</span><span class="label">'+ label +'</span></a></li>');
+        console.log(fq[name])
+        // currently filtered by this facet
+        if (fq[name]) {
+            console.log(fq)
+            var label = fq[name];
+            if (name=='date')
+                label=OffenesKoeln.monthstr[label.substr(5,7)] + " " + label.substr(0,4);
+            if (filterIds == true) {
+                label = label.replace(/^[0-9]+\s+/, '');
             }
-            
-        } else {
+            var sqs = ''
+            for (var i in fq) {
+                if (i != name) {
+                    if (sqs)
+                        sqs += ';';
+                    sqs += i + ':' + quoteFacetValue(fq[i]);
+                }
+                
+            }
+            if (!sqs)
+                sqs = null
+            list.append('<li class="current"><a title="Diese Einschränkung aufheben" href="/suche/?'+ (searchQueryString({fq: sqs })) +'"><span class="del">&#10005;</span><span class="label">'+ label.replace(/&#34;/g, "") +'</span></a></li>');
+        }
+        else {
             for (var i in facet_data) {
                 var label = facet_data[i].key;
-                if (filterIds == true) {
+                if (filterIds == true)
                     label = label.replace(/^[0-9]+\s+/, '');
-                }
-                list.append('<li><a href="/suche/?'+ (searchQueryString({fq: name + ':' + quoteFacetValue(facet_data[i].key) })) +'"><span class="label">'+ label +'</span> <span class="num">'+ facet_data[i].value +'</span></a></li>');
+                if (name=='date')
+                    label=OffenesKoeln.monthstr[label.substr(5,7)] + " " + label.substr(0,4);
+                var sqs;
+                if (!ok_search_settings['fq'])
+                    sqs = name + ':' + quoteFacetValue(facet_data[i].key);
+                else
+                    sqs = ok_search_settings['fq'] + ';' + name + ':' + quoteFacetValue(facet_data[i].key);
+                list.append('<li><a href="/suche/?'+ (searchQueryString({fq: sqs })) +'"><span class="label">'+ label +'</span> <span class="num">'+ facet_data[i].value +'</span></a></li>');
             }
         }
         facet.append('<div class="header">'+ headline +'</div>');
@@ -142,7 +196,7 @@ $(document).ready(function(){
         $('h1').text(data.response.numhits + ' gefundene Dokumente');
         if (data.response.numhits > 0) {
             var subheadline = $(document.createElement('h3'));
-            subheadline.text('Seite ' + (Math.floor(data.response.start / ok_search_settings.num)+1) + ' von ' + (Math.floor(data.response.numhits / ok_search_settings.num)+1));
+            subheadline.text('Seite ' + (Math.floor(data.response.start / ok_search_settings.num)+1) + ' von ' + (Math.ceil(data.response.numhits / ok_search_settings.num)));
             result.append(subheadline);
         }
         
@@ -153,7 +207,7 @@ $(document).ready(function(){
         for (var i in data.response.documents) {
             var item = $(document.createElement('li')).attr('class','resultitem');
             resultlist.append(item);
-            var link = $(document.createElement('a')).attr('href', data.response.documents[i].url);
+            var link = $(document.createElement('a')).attr('href', data.response.documents[i].url); // Backup: .replace(/%2F/, '/')
             item.append(link);
             var title = $(document.createElement('span')).attr('class','title').html(itemTitle(data.response.documents[i]));
             link.append(title);

@@ -1,6 +1,6 @@
 
 $(document).ready(function(){
-    var map = new L.Map('map', {scrollWheelZoom: false});
+    var map = new L.Map('map', {/*scrollWheelZoom: false*/});
     //var maplayers = [];
     var markerLayerGroup = new L.LayerGroup();
     map.addLayer(markerLayerGroup);
@@ -15,22 +15,25 @@ $(document).ready(function(){
     
     var lastLocationEntry = ''; // die letzte vom User eingegebene Strasse
     
-    // geo bounds for cologne
-    var lat_min = 50.87,
-        lat_max = 51.04,
-        lon_min = 6.8,
-        lon_max = 7.1;
-        
     map.setView(new L.LatLng(CONF.mapStartPoint[1], CONF.mapStartPoint[0]), 11).addLayer(backgroundLayer);
+    
+    /*
+    Alternative tile config. This tile-set should only be used for testing.
+    // OSM Copyright Notice
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: 'Map &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    */
     
     // set to user position, if set and within cologne
     OffenesKoeln.session({}, function(data){
         sessionData = data.response;
-        //console.log("sessionData:", sessionData);
+        console.log("sessionData:", sessionData);
         if (typeof sessionData != 'undefined' &&
             typeof sessionData.lat != 'undefined' &&
             typeof sessionData.lon != 'undefined' &&
-            sessionData.lat !== '' && sessionData.lon !== '') {
+            sessionData.lat !== '' && sessionData.lon !== '' &&
+            sessionData.lat !== null && sessionData.lon !== null) {
                 setUserPosition(parseFloat(sessionData.lat),
                     parseFloat(sessionData.lon));
             if ($('#street').val() === '' && typeof sessionData.location_entry != 'undefined') {
@@ -222,14 +225,15 @@ $(document).ready(function(){
         if (streetString === '') {
             streetString = sessionData.location_entry;
         }
-        var changeLocationLink = $(document.createElement('a')).text(streetString).attr('href', '#').click(handleChangePositionClick);
+        var changeLocationLink = $(document.createElement('span')).text(streetString).attr({'id': 'map-claim-street'});
+        var newSearchLink = $(document.createElement('a')).text('Neue Suche').attr({'href': '#', 'class': 'awesome extrawide'}).css('margin-left', '20px').click(handleChangePositionClick);
         var article = '';
         if (OffenesKoeln.endsWith(streetString, 'straße') || OffenesKoeln.endsWith(streetString, 'gasse')) {
             article = 'die';
         }
-        var mapClaim = '<div id="map-claim">Das passiert rund um ' + article + ' </div>';
+        var mapClaim = '<div id="map-claim"><span>Das passiert rund um ' + article + ' </span></div>';
         $('#position-prompt').slideUp().after(mapClaim);
-        $('#map-claim').append(changeLocationLink);
+        $('#map-claim').append(changeLocationLink).append(newSearchLink);
         // Karte umbauen
         clearMap();
         var userLocation = new L.LatLng(lat, lon),

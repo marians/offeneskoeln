@@ -10,7 +10,7 @@
 #
 # an! Das koennte Dir Zeit und uns Server-Ressourcen sparen. :)
 
-Sitemap: /static/sitemap.xml
+Sitemap: /static/sitemap/{{config.RS}}.xml
 
 # Suche und API sind Tabu für Robots!
 User-agent: *
