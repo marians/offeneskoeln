@@ -75,7 +75,7 @@ ANALYTICS_ACCOUNT = 'UA-00000000-1'
 PIWIK_HOST = 'piwik.sectio-aurea.org'
 
 #PIWIK Site ID
-PIWIK_SITE_ID = 36
+PIWIK_SITE_ID = 37
 
 #Google Site Verification Code, leave empty for deactivate it
 GOOGLE_SITE_VERIFICATION = "5cPBydviDSt-NQFMrBn6kXGnuVbYHqVyK3ACsYAYk8g"
@@ -109,7 +109,7 @@ RIS_ORIGINAL_URL = 'https://www.duisburg.de/ratsinformationssystem/bi/'
 GESCHAEFTSORDNUNG_URL = 'http://www.duisburg.de/fa/ortsrecht/medien/S10.02_Geschaeftsordnung.pdf'
 
 # Monat der Veröffentlichung
-PUBLISH_DATE_MONTH = 'Juli 2013'
+PUBLISH_DATE_MONTH = 'August 2013'
 
 #Impressum
 IMPRESSUM_ORGANISATION = 'Open Knowledge Foundation Deutschland e.V.'
