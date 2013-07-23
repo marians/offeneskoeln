@@ -31,7 +31,7 @@ entstanden.
 import locale
 
 # The basis for all absolute URLs on this site
-BASE_URL = 'http://infinite-ris/'
+BASE_URL = 'http://infinite-ris:5000/'
 
 # Basis Host
 BASE_HOST = 'duisburg.ris.openruhr.de'

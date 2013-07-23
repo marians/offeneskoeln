@@ -299,14 +299,15 @@ $(document).ready(function() {
         //TODO: form handling 
         if (!error) {
           data = {
-            'attachment_id': $('#attachment_id').val(),
-            'name': $('#attachment_name').val(),
-            'mail': $('#attachment_mail').val(),
-            'attachment_type': $('#attachment_type').val(),
-            'comment': $('#attachment_comment').val(),
+            'id': $('#response_id').val(),
+            'name': $('#response_name').val(),
+            'email': $('#response_email').val(),
+            'type': $('#response_type').val(),
+            'message': $('#response_message').val(),
+            'sent_on': window.location.href,
           }
           $.post('/api/response', data).done(function(data) {
-            alert('gesendet!');
+            alert('Ihre Nachricht wurde gesendet.');
           });
           $('#attachment_dialog').dialog('close');
         }
@@ -331,20 +332,24 @@ function generateResponseContent(id) {
   var html = ''
   html += '<form id="attachment_response_form">';
   html += '<p>Name</p>'
-  html += '<input type="text" id="attachment_name" name="attachment_name" /></p>';
+  html += '<input type="text" id="response_name" name="response_name" /></p>';
   html += '<p>E-Mail</p>'
-  html += '<input type="text" id="attachment_mail" name="attachment_mail" /></p>';
+  html += '<input type="text" id="response_email" name="response_email" /></p>';
   html += '<h3>Thema</h3>';
-  html += '<select id="attachment_type">';
-  html += '<option id="attachment_type_0" value="0">- bitte wählen -</option>';
-  html += '<option id="attachment_type_1" value="1">Das Dokument verletzt meine Urheberrechte.</option>';
-  html += '<option id="attachment_type_2" value="2">Das Dokument verletzt die Urheberrechte Dritter.</option>';
-  html += '<option id="attachment_type" value="3">Das Dokument verfälscht die Suchergebnisse.</option>';
-  html += '<option id="attachment_type_4" value="4">Ich habe eine andere Frage.</option>';
+  html += '<select id="response_type">';
+  html += '<option id="response_type_0" value="0">- bitte wählen -</option>';
+  html += '<option id="response_type_2" value="2">Das Dokument verletzt Urheberrechte.</option>';
+  html += '<option id="response_type_3" value="3">Das Dokument verletzt den Datenschutz.</option>';
+  html += '<option id="response_type_4" value="4">Das Dokument hat / besteht aus leeren Seiten.</option>';
+  html += '<option id="response_type_5" value="5">Das Dokument kann nicht geöffnet werden / die Datei ist beschädigt.</option>';
+  html += '<option id="response_type_6" value="6">Das Dokument ist schwer lesbar.</option>';
+  html += '<option id="response_type_7" value="7">Das Dokument hat gedrehte Seiten.</option>';
+  html += '<option id="response_type_8" value="8">Das Dokument verfälscht die Suchergebnisse.</option>';
+  html += '<option id="response_type_1" value="1">Ich habe eine andere Frage / Anregung / Rückmeldung.</option>';
   html += '</select>';
   html += '<h3>Nachricht</h3>';
-  html += '<textarea id="attachment_comment"></textarea>';
-  html += '<input type="hidden" value="' + id + '" id="attachment_id" />';
+  html += '<textarea id="response_message"></textarea>';
+  html += '<input type="hidden" value="' + id + '" id="response_id" />';
   html += '<p><input type="submit" value="senden" /></p>';
   html += '</form>';
   

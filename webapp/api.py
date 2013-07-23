@@ -264,9 +264,11 @@ def api_response():
     attachment_id = request.form['id']
     name = request.form['name']
     email = request.form['email']
-    attachment_type = request.form['attachment_type']
-    comment = request.form['comment']
-    db.response.insert({attachment_id: attachment_id, name: name, email: email, attachment_type: attachment_type, comment: comment})
+    response_type = request.form['type']
+    message = request.form['message']
+    sent_on = request.form['sent_on']
+    ip = str(request.remote_addr)
+    db.add_response({'attachment_id': attachment_id, 'sent_on': sent_on, 'ip': ip, 'name': name, 'email': email, 'response_type': response_type, 'message': message})
     response = make_response('1', 200)
     response.mimetype = 'application/json'
     return response

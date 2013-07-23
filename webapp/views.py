@@ -45,8 +45,11 @@ from flask import request
 from flask import redirect
 from flask import Response
 from flask import Markup
+from flask.ext.basicauth import BasicAuth
 
 from webapp import app
+
+basic_auth = BasicAuth(app)
 
 @app.route("/")
 def index():
@@ -217,6 +220,17 @@ def dokument(identifier):
     if len(result) == 0:
         abort(404)
     return render_template('dokument_detailseite.html', submission=result[0])
+
+@app.route("/admin")
+@app.route("/admin/<string:funct>")
+@basic_auth.required
+def admin(funct):
+    if funct == 'responses':
+        responses=db.get_responses()
+        for response in responses:
+            response['response_type'] = app.config['RESPONSE_IDS'][response['response_type']]
+        return render_template('admin_response.html', responses=responses)
+    return render_template('admin.html')
 
 
 @app.template_filter('urlencode')

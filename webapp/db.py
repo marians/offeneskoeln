@@ -274,3 +274,15 @@ def get_locations(lon, lat, radius=1000):
         street['distance'] = int(round(street['distance']))
         streets.append(street)
     return streets
+
+def get_responses():
+    cursor = mongo.db.responses.find()
+    responses = []
+    for response in cursor:
+        responses.append(response)
+    return responses
+
+def add_response(response):
+    mongo.db.responses.insert(response)
+    return True
+

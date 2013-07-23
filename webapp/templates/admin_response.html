@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block title %}Disclaimer{% endblock %}
+{% block ogtitle %}Disclaimer{% endblock %}
+{% block meta_description %}Ein paar Worte zur Vorsicht{% endblock %}
+
+{% block content %}
+
+<div class="content">
+	<h1>Admin-Interface: Response</h1>
+	<table>
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>IP-Adresse</th>
+				<th>Name</th>
+				<th>Mail</th>
+				<th>Gesendet auf</th>
+				<th>Anhang ID</th>
+				<th>Kategorie</th>
+				<th>Nachricht</th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<th>ID</th>
+				<th>IP-Adresse</th>
+				<th>Name</th>
+				<th>Mail</th>
+				<th>Gesendet auf</th>
+				<th>Anhang ID</th>
+				<th>Kategorie</th>
+				<th>Nachricht</th>
+			</tr>
+		</tfoot>
+		<tbody>
+			{% for response in responses %}
+			<tr>
+				<td>{{ response._id }}</td>
+				<td>{{ response.ip }}</td>
+				<td>{{ response.name }}</td>
+				<td><a href="mailto:{{ response.email }}">{{ response.email }}</a></td>
+				<td><a href="{{ response.sent_on }}">{{ response.sent_on }}</a></td>
+				<td>{{ response.attachment_id }}</td>
+				<td>{{ response.response_type }}</td>
+				<td>{{ response.message }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+{% endblock %}
