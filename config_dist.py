@@ -87,6 +87,9 @@ DB_DUMP_TEMPFOLDER = 'temp'
 TMP_FOLDER = 'temp'
 ATTACHMENT_FOLDER = 'webapp/static/attachments'
 
+ADMIN_USER = 'YOUR_ADMIN_USER'
+ADMIN_PASS = 'YOUR_ADMIN_PASS'
+
 ####################################################
 # Webapp configuration
 
@@ -108,3 +111,22 @@ MAP_TILE_ZOOMLEVEL_MIN = 4
 MAP_TILE_ZOOMLEVEL_MAX = 18
 MAP_TILE_ATTRIBUTION = 'Map Data © <a href="http://www.openstreetmap.org">OpenStreetMap</a> contributors, Tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>.'
 
+BASIC_AUTH_USERNAME = ADMIN_USER
+BASIC_AUTH_PASSWORD = ADMIN_PASS
+
+RESPONSE_IDS = {
+    '1': 'Ich habe eine andere Frage / Anregung / Rückmeldung.',
+    '2': 'Das Dokument verletzt Urheberrechte.',
+    '3': 'Das Dokument verletzt den Datenschutz.',
+    '4': 'Das Dokument hat / besteht aus leeren Seiten.',
+    '5': 'Das Dokument kann nicht geöffnet werden / die Datei ist beschädigt.',
+    '6': 'Das Dokument ist schwer lesbar.',
+    '7': 'Das Dokument hat gedrehte Seiten.',
+    '8': 'Das Dokument verfälscht die Suchergebnisse.'
+}
+
+DOMAINS = {
+    'bochum.ris.openruhr.de': 'bochum.py',
+    'duisburg.ris.openruhr.de': 'moers.py',
+    'moers.ris.openruhr.de': 'moers.py'
+}
