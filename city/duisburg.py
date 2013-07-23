@@ -96,11 +96,11 @@ GEOCODING_FILTER_COUNTY = 'Duisburg'
 
 # Suchbeispiele
 SEARCH_EXAMPLES = [
-    'Grafengalerie', 'Solimare', 'Baustelle', 'Theaterhalle'
+    'Theater', 'Loveparade', 'Baustelle', 'Innenhafen'
 ]
 
 SEARCH_IGNORE_ATTACHMENTS = [
-  'Einladung', 'Niederschrift'
+  'Beschlussprotokoll', 'Nachtrag', 'Tagesordnung', 
 ]
 
 #Ursprüngliche URL des Ratsinformationssystems
