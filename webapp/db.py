@@ -12,11 +12,6 @@ import urllib2
 import datetime
 import dateutil.relativedelta
 
-es = pyes.ES(app.config['ES_HOST']+':'+str(app.config['ES_PORT']))
-es.default_indices = [app.config['ES_INDEX_NAME_PREFIX']+'-latest']
-es.refresh()
-
-
 def map_legacy_url(download_path):
     """
     Von legacy-attachment-URL zu neuer Attachment URL.
@@ -189,6 +184,9 @@ def query_submissions(q='', fq=None, sort='score desc', start=0, docs=10, date=N
     search.facet.add_term_facet('rs')
     search.facet.add_term_facet('committee')
     search.facet.add_date_facet(field='date', name='date', interval='month')
+    es = pyes.ES(app.config['ES_HOST']+':'+str(app.config['ES_PORT']))
+    es.default_indices = [app.config['ES_INDEX_NAME_PREFIX']+'-latest']
+    es.refresh()
     result = es.search(search, model=lambda x, y: y)
     ret = {
         'numhits': result.total,
