@@ -303,7 +303,7 @@ span.spinner {
     margin-bottom: 4px;
 }
 
-table td,table th {
+.datatable td, .datatable th {
 	border: 1px solid #000000;
 }
 
