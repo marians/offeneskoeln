@@ -100,7 +100,7 @@ SEARCH_EXAMPLES = [
 ]
 
 SEARCH_IGNORE_ATTACHMENTS = [
-  'Beschlussprotokoll', 'Nachtrag', 'Tagesordnung', 
+  'Beschlussprotokoll', 'Nachtrag', 'Tagesordnung', 'Niederschrift'
 ]
 
 #Ursprüngliche URL des Ratsinformationssystems
