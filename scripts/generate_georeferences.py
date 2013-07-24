@@ -91,10 +91,10 @@ def generate_georeferences_for_submission(doc_id, db):
             'georeferences_generated': now
         }
     }
-    if result != []:
-        update['$set']['georeferences'] = result
-        print ("Writing %d georeferences to submission %s" %
-            (len(result), doc_id))
+    #if result != []:
+    update['$set']['georeferences'] = result
+    print ("Writing %d georeferences to submission %s" %
+        (len(result), doc_id))
     db.submissions.update({'_id': doc_id}, update)
 
 
