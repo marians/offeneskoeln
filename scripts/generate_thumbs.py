@@ -172,7 +172,7 @@ def generate_thumbs_for_attachment(attachment_id, db):
         STATS['ms_saving_tempfile'] += file_write_duration
         STATS['num_saving_tempfile'] += 1
     subpath = subfolders_for_attachment(attachment_id)
-    abspath = config.THUMBS_PATH + os.sep + subpath
+    abspath = config.THUMBS_PATH + os.sep + cityconfig.RS + os.sep + subpath
     if not os.path.exists(abspath):
         os.makedirs(abspath)
 
