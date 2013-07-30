@@ -130,7 +130,7 @@ API_DOC_EXAMPLE_COMMITTEE_NAME = 'Bezirksbeirat Rheinau'
 STATIC_URL = BASE_URL + 'static/'
 
 # Partial path to the thumbs directory
-THUMBS_URL = BASE_URL + 'static/thumbs/'
+THUMBS_URL = BASE_URL + 'static/thumbs/' + RS + '/'
 
 # Attachment URL pattern
 ATTACHMENT_DOWNLOAD_URL = BASE_URL + 'anhang/%s.%s'
