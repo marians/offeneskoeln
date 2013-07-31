@@ -41,23 +41,8 @@
 		<p>Die Datei-Anhänge (PDF-Dateien etc.) sowie die Vorschaubilder zu diesen Dateien sind <strong>nicht im Export enthalten</strong> (siehe dazu der Abschnitt weiter unten). Weiterhin nicht enthalten sind Session-Daten, die zum Betrieb der Webapplikation benötigt werden und die nutzerbezogene Informationen enthalten.</p>
 
 		<p>Die Exporte geben die Inhalte der <strong>MongoDB</strong> Datenbank wieder und sind zur Verwendung mit den entsprechenden MongoDB-Werkzeugen (<a href="http://docs.mongodb.org/manual/reference/mongorestore/" target="_blank">mongorestore oder mongoimport</a>) gedacht.</p>
-		
-		<p>Der Export beinhaltet die Daten aller Städte. Die Einträge mit dem Regionalschlüssel rs = {{config.RS}} sind die für {{config.LOCATION_NAME}} relevanten Einträge.</p>
-		
-		<h3>Downloads</h3>
-
-		<table>
-			<tbody>
-				{% for file in databasefilelist %}
-				<tr>
-					<td><a href="/static/database/{{ file.name }}">{{ file.name }}</a></td>
-					<td style="padding-left: 1em">({{ file.size }} MB)</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-		
-		
+				
+		<p>Die Datenbank kann <a href="/static/database/{{config.RS}}.tar.bz2">als komprimierter Datenbank-Dump ({{databasefilesize}} MB) gedownloaded werden</a>.</p>
 	</div>
 </div>
 <div class="content bottom">

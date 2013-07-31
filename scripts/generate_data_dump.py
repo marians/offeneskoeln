@@ -52,29 +52,29 @@ def execute(cmd):
 def create_dump(folder):
     """
     Drops dumps in folder/config.DB_NAME
-    TODO: Export nur für eine Stadt
     """
     cmd = (config.MONGODUMP_CMD + ' --db ' + config.DB_NAME +
-            ' --out ' + folder)
+            ' --out ' + folder + " --query {'rs':'" + cityconfig.RS + "'}")
+    
     for collection in config.DB_DUMP_COLLECTIONS:
         thiscmd = cmd + ' --collection ' + collection
         execute(thiscmd)
 
 
 def compress_folder(folder):
-    now = datetime.datetime.now()
-    filename = 'dump_' + now.strftime('%Y-%m-%d') + '.tar.bz2'
+    filename = cityconfig.RS + '.tar.bz2'
     cmd = ('tar cjf ' + filename + ' ' + folder +
             os.sep + config.DB_NAME + os.sep)
     execute(cmd)
     shutil.rmtree(folder + os.sep + config.DB_NAME)
-    shutil.move(filename, 'webapp/static/database/')
+    if os.path.exists(config.DB_DUMP_FOLDER + filename):
+        os.remove(config.DB_DUMP_FOLDER + filename)
+    shutil.move(filename, config.DB_DUMP_FOLDER)
 
 
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Generate a database dump')
-    #TODO: Parameter Stadt ist im Moment wirklungslos
     parser.add_argument(dest='city', help=("e.g. bochum"))
     parser.add_argument('-f', '--tempfolder', dest='folder', metavar='FOLDER', type=str,
                         help=('an integer for the accumulator. Default: %s' %
@@ -84,5 +84,8 @@ if __name__ == '__main__':
     options = parser.parse_args()
     city = options.city
     cityconfig = __import__(city)
-    create_dump(options.folder)
-    compress_folder(options.folder)
+    folder = options.folder  + cityconfig.RS
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    create_dump(folder)
+    compress_folder(folder)

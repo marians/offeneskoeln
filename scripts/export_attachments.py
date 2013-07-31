@@ -98,7 +98,7 @@ if __name__ == '__main__':
     #city
     parser.add_argument(dest='city', help=("e.g. bochum"))
     # date range default: current month
-    parser.add_argument(dest='daterange', help=("e.g. 2010-2011 or 201208-201209."))
+    #parser.add_argument(dest='daterange', help=("e.g. 2010-2011 or 201208-201209."))
     parser.add_argument('--verbose', '-v', action='count', default=0, dest="verbose",
         help="Give verbose output")
     #output_name_default = datetime.datetime.now().strftime('attachments_%Y-%m-%d-%H%M') + '_<daterange>'
