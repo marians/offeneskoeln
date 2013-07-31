@@ -46,6 +46,8 @@ cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(insp
 if cmd_subfolder not in sys.path:
     sys.path.insert(0, cmd_subfolder)
 
+
+
 def save_file(file_id, path):
     """
     Copy a file from MongoDB GridFS to a local file system path
@@ -59,28 +61,31 @@ def save_file(file_id, path):
     return path
 
 
-def create_download_package(daterange, folder):
+def create_download_package():
     """
     daterange: a datetime tuple compatible string
     folder: The target folder and final output filename prefix
     """
-    start = datetime.datetime(daterange[0].year, daterange[0].month, daterange[0].day, 0, 0, 0)
-    end = datetime.datetime(daterange[1].year, daterange[1].month, daterange[1].day, 23, 59, 59)
-    #print start, end
     query = {
-        'uploadDate': {
-            '$gt': start,
-            '$lt': end,
-        },
         "rs" : cityconfig.RS
     }
+    tmp_folder = (config.ATTACHMENT_TEMPFOLDER + os.sep + cityconfig.RS)
+    if not os.path.exists(tmp_folder):
+        os.makedirs(tmp_folder)
+    
     for afile in db.fs.files.find(query):
         fid = afile['_id']
-        path = config.TMP_FOLDER + os.sep + folder + os.sep + afile['filename']
+        #ext = 'dat'
+        #if afile['mimetype'] in self.config.FILE_EXTENSIONS:
+        #    ext = config.FILE_EXTENSIONS[afile['mimetype']]
+        #if ext == 'dat':
+        #    print("No entry in config.FILE_EXTENSIONS for '%s', ignore file ", (mimetype, fid))
+        #else:
+        path = tmp_folder + os.sep + str(fid) + '_' + afile['filename']
         save_file(fid, path)
-    execute('tar cjf %s.tar.bz2 %s' % (config.TMP_FOLDER + os.sep + folder, config.TMP_FOLDER + os.sep + folder))
-    execute('rm -r %s' % config.TMP_FOLDER + os.sep + folder)
-    execute('mv %s.tar.bz2 %s.tar.bz2' % (config.TMP_FOLDER + os.sep + folder, config.ATTACHMENT_FOLDER + os.sep + folder))
+    execute('tar cjf %s.tar.bz2 %s' % (config.ATTACHMENT_TEMPFOLDER + os.sep + cityconfig.RS, tmp_folder))
+    execute('mv %s.tar.bz2 %s.tar.bz2' % (config.ATTACHMENT_TEMPFOLDER + os.sep + cityconfig.RS, config.ATTACHMENT_FOLDER + os.sep + cityconfig.RS))
+    execute('rm -r %s' % tmp_folder)
 
 
 def execute(cmd):
@@ -97,27 +102,14 @@ if __name__ == '__main__':
         description='Create a package of attachment files for a certain date range')
     #city
     parser.add_argument(dest='city', help=("e.g. bochum"))
-    # date range default: current month
-    #parser.add_argument(dest='daterange', help=("e.g. 2010-2011 or 201208-201209."))
     parser.add_argument('--verbose', '-v', action='count', default=0, dest="verbose",
         help="Give verbose output")
-    #output_name_default = datetime.datetime.now().strftime('attachments_%Y-%m-%d-%H%M') + '_<daterange>'
-    #parser.add_argument('--name', '-n', dest="output_name",
-    #    help='Name prefix for the output file. Default: %s' % output_name_default)
     options = parser.parse_args()
     city = options.city
     cityconfig = __import__(city)
-
-    #if options.output_name is None:
-    #    options.output_name = 'attachments_' + options.daterange
-    output_name = "%s_attachments_%s" % (cityconfig.RS, options.daterange)
     
-    daterange = date_range.to_dates(options.daterange)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
     fs = gridfs.GridFS(db)
 
-    tempdir = os.mkdir(config.TMP_FOLDER + os.sep + output_name)
-
-    #print (daterange, options.output_name)
-    create_download_package(daterange, output_name)
+    create_download_package()

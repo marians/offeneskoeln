@@ -80,26 +80,19 @@ def daten():
     Anzeige der /daten Seite mit Auflistung der
     Download-Dateien
     """
-    databasefilelist = []
     path = app.config['DB_DUMP_FOLDER'] + os.sep + app.config['RS'] + '.tar.bz2'
     if os.path.isfile(path):
         stat = os.lstat(path)
         databasefilesize = "%d" % (stat.st_size / 1024.0 / 1024.0)
     else:
         databasefilesize = 0
-        print "wie doooooof" + path
-    attachmentfilelist = []
-    #path = app.config['BASE_PATH'] + os.sep + 'static' + os.sep + 'attachments'
-    #for filename in os.listdir(path):
-    #    if filename[0:12] == app.config['RS']:
-    #        filepath = path + os.sep + filename
-    #        stat = os.lstat(filepath)
-    #        if os.path.isfile(filepath) or os.path.islink(filepath):
-    #            attachmentfilelist.append({
-    #                'name': filename,
-    #                'size': "%d" % (stat.st_size / 1024.0 / 1024.0),
-    #            })
-    return render_template('daten.html', databasefilesize=databasefilesize, attachmentfilelist=attachmentfilelist)
+    path = app.config['ATTACHMENT_FOLDER'] + os.sep + app.config['RS'] + '.tar.bz2'
+    if os.path.isfile(path):
+        stat = os.lstat(path)
+        attachmentsfilesize = "%d" % (stat.st_size / 1024.0 / 1024.0)
+    else:
+        attachmentsfilesize = 0
+    return render_template('daten.html', databasefilesize=databasefilesize, attachmentsfilesize=attachmentsfilesize)
 
 
 @app.route("/disclaimer/")

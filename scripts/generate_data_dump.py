@@ -67,8 +67,8 @@ def compress_folder(folder):
             os.sep + config.DB_NAME + os.sep)
     execute(cmd)
     shutil.rmtree(folder + os.sep + config.DB_NAME)
-    if os.path.exists(config.DB_DUMP_FOLDER + filename):
-        os.remove(config.DB_DUMP_FOLDER + filename)
+    if os.path.exists(config.DB_DUMP_FOLDER + os.sep + filename):
+        os.remove(config.DB_DUMP_FOLDER + os.sep + filename)
     shutil.move(filename, config.DB_DUMP_FOLDER)
 
 

@@ -51,18 +51,7 @@
 		
 		<p>Die digitalen Anträge, Anfragen, Mitteilungen etc. liegen ebenfalls als Archiv vor. Zum größten Teil sind dies PDF-Dokumente, aber auch JPEG- und TIF-Bilder sowie andere Formate.</p>
 		
-		<h3>Downloads</h3>
-		
-		<table>
-			<tbody>
-				{% for file in attachmentfilelist %}
-				<tr>
-					<td><a href="/static/attachments/{{ file.name }}">{{ file.name }}</a></td>
-					<td style="padding-left: 1em">({{ file.size }} MB)</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
+		<p>Die Anhänge können <a href="/static/attachments/{{config.RS}}.tar.bz2">als komprimiertes Archiv ({{attachmentsfilesize}} MB) gedownloaded werden</a>.</p>
 	</div>
 </div>
 {% endblock %}
