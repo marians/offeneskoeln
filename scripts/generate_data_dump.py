@@ -53,7 +53,7 @@ def create_dump(folder):
     """
     Drops dumps in folder/config.DB_NAME
     """
-    cmd = (config.MONGODUMP_CMD + ' --db ' + config.DB_NAME +
+    cmd = (config.MONGODUMP_CMD + ' --host ' + config.MONGO_HOST + ' --db ' + config.DB_NAME +
             ' --out ' + folder + " --query {'rs':'" + cityconfig.RS + "'}")
     
     for collection in config.DB_DUMP_COLLECTIONS:
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     options = parser.parse_args()
     city = options.city
     cityconfig = __import__(city)
-    folder = options.folder  + cityconfig.RS
+    folder = options.folder  + os.sep + cityconfig.RS
     if not os.path.exists(folder):
         os.makedirs(folder)
     create_dump(folder)

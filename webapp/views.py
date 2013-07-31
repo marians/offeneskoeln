@@ -89,7 +89,7 @@ def daten():
     path = app.config['ATTACHMENT_FOLDER'] + os.sep + app.config['RS'] + '.tar.bz2'
     if os.path.isfile(path):
         stat = os.lstat(path)
-        attachmentsfilesize = "%d" % (stat.st_size / 1024.0 / 1024.0)
+        attachmentsfilesize = "%d" % (stat.st_size / 1024.0 / 1024.0 / 1024.0)
     else:
         attachmentsfilesize = 0
     return render_template('daten.html', databasefilesize=databasefilesize, attachmentsfilesize=attachmentsfilesize)
