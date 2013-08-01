@@ -45,16 +45,40 @@ cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(insp
 if cmd_subfolder not in sys.path:
     sys.path.insert(0, cmd_subfolder)
 
-def generate_georeferences(db):
+def generate_georeferences(db, options):
     """Generiert Geo-Referenzen für die gesamte submissions-Collection"""
 
-    # Submissions ohne Geo-Referenzen
-    # erst mal weg: 'georeferences_generated': {'$exists': False}, 
-    query = {"rs" : cityconfig.RS}
-    for doc in db.submissions.find(query):
-        generate_georeferences_for_submission(doc['_id'], db)
-        #delete_georeferences_for_submission(doc['_id'], db)
-    # TODO: Aktualisierte Dokumente berücksichtigen
+    if options.new:
+        query = {'rs' : cityconfig.RS}
+        for doc in db.submissions.find(query):
+            delete_georeferences_for_submission(doc['_id'], db)
+    elif options.reset:
+        query = {'rs': cityconfig.RS}
+        for doc in db.submissions.find(query):
+            generate_georeferences_for_submission(doc['_id'], db)
+    else:
+        # Georeferenzen die ein Update benötigen
+        query = {'rs': cityconfig.RS, 'georeferences_generated': {'$exists': True}}
+        for submission in db.submissions.find(query):
+            to_update = False
+            # Datumsabgleich der letzten Modifizierung der Session
+            if submission['last_modified'] > submission['georeferences_generated']:
+                to_update = True
+            # Datumsabgleich der generierten Fulltexts
+            if 'attachments' in submission and len(submission['attachments']) > 0:
+                for a in submission['attachments']:
+                    attachment = db.attachments.find_one({'_id': a.id})
+                    if 'fulltext_generated' in attachment:
+                        if attachment['fulltext_generated'] > submission['georeferences_generated']:
+                            to_update = True
+            if to_update:
+                generate_georeferences_for_submission(submission['_id'], db)
+        # Fehlende Georeferenzen
+        query = {'rs': cityconfig.RS, 'georeferences_generated': {'$exists': False}}
+        for doc in db.submissions.find(query):
+            generate_georeferences_for_submission(submission['_id'], db)
+
+
 
 def delete_georeferences_for_submission(doc_id, db):
     update = {
@@ -83,7 +107,6 @@ def generate_georeferences_for_submission(doc_id, db):
             text += " " + get_attachment_fulltext(a.id, title)
     if 'subject' in submission:
         text += " " + submission['subject']
-    #text = text.encode('utf-8')
     result = match_streets(text)
     now = datetime.datetime.utcnow()
     update = {
@@ -91,7 +114,6 @@ def generate_georeferences_for_submission(doc_id, db):
             'georeferences_generated': now
         }
     }
-    #if result != []:
     update['$set']['georeferences'] = result
     print ("Writing %d georeferences to submission %s" %
         (len(result), doc_id))
@@ -170,10 +192,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Generate Fulltext for given City Conf File')
     parser.add_argument(dest='city', help=("e.g. bochum"))
+    parser.add_argument('--new', '-n', action='count', default=0, dest="new",
+        help="Regenerates all georeferences")
+    parser.add_argument('--reset', '-r', action='count', default=0, dest="reset",
+        help="Resets all georeferences")
     options = parser.parse_args()
     city = options.city
     cityconfig = __import__(city)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
     streets = load_streets()
-    generate_georeferences(db)
+    generate_georeferences(db, options)
