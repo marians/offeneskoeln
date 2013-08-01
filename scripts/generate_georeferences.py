@@ -76,7 +76,7 @@ def generate_georeferences(db, options):
         # Fehlende Georeferenzen
         query = {'rs': cityconfig.RS, 'georeferences_generated': {'$exists': False}}
         for doc in db.submissions.find(query):
-            generate_georeferences_for_submission(submission['_id'], db)
+            generate_georeferences_for_submission(doc['_id'], db)
 
 
 
