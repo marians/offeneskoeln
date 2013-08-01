@@ -56,7 +56,7 @@ def generate_fulltext(db):
     """Generiert Volltexte für die gesamte attachments-Collection"""
 
     # Attachments mit veralteten Volltexten
-    query = {'fulltext_generated': {'$exists': True}, "rs" : cityconfig.RS}
+    query = {'fulltext_generated': {'$exists': True}, 'depublication': {'$exists': False}, "rs" : cityconfig.RS}
     for doc in db.attachments.find(query):
         # Dateiinfo abholen
         filedoc = db.fs.files.find_one({'_id': doc['file'].id})

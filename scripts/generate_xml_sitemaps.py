@@ -70,7 +70,7 @@ def generate_sitemaps():
     sitemaps = []
     urls = []
     # gather attachment URLs
-    for attachment in db.attachments.find({"rs" : cityconfig.RS}):
+    for attachment in db.attachments.find({"rs" : cityconfig.RS, 'depublication': {'$exists': False}}):
         fileentry = db.fs.files.find_one(attachment['file'].id)
         thisfile = {
             'path': attachment_url(attachment['_id'], filename=attachment['filename']),
