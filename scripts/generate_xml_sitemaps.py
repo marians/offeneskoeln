@@ -115,7 +115,7 @@ def generate_sitemaps():
 
 
     # Create meta-sitemap
-    meta_sitemap_path = config.STATIC_PATH + '/sitemap/' + cityconfig.RS + '.xml'
+    meta_sitemap_path = config.SITEMAP_FOLDER + os.sep + cityconfig.RS + '.xml'
     f = open(meta_sitemap_path, 'w')
     f.write("""<?xml version="1.0" encoding="UTF-8"?>
         <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
@@ -128,7 +128,7 @@ def generate_sitemaps():
 
 
 def generate_sitemap(files, name):
-    sitemap_path = (config.STATIC_PATH + '/sitemap/' + cityconfig.RS + '_' + name + '.xml')
+    sitemap_path = (config.SITEMAP_FOLDER + os.sep + cityconfig.RS + '_' + name + '.xml')
     f = open(sitemap_path, 'w')
     f.write("""<?xml version="1.0" encoding="UTF-8"?>
         <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")

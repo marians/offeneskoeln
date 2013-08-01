@@ -64,7 +64,7 @@ def submission_url(identifier):
 
 
 def generate_channel():
-    feed_url = cityconfig.BASE_URL + '/static/rss/' + cityconfig.RS + '_dokumente.xml'
+    feed_url = config.RSS_FOLDER + os.sep + cityconfig.RS + '_dokumente.xml'
     root = etree.Element("rss", version="2.0", nsmap={'atom': 'http://www.w3.org/2005/Atom'})
     channel = etree.SubElement(root, "channel")
     etree.SubElement(channel, "title").text = cityconfig.APP_NAME + ': Neue Dokumente'
@@ -117,7 +117,7 @@ def save_channel(xml):
     for cached versions to be used (conditional get etc.).
     """
     overwrite = False
-    path = config.BASE_PATH + '/static/rss/' + cityconfig.RS + '_dokumente.xml'
+    path = config.RSS_FOLDER + os.sep + cityconfig.RS + '_dokumente.xml'
     if not os.path.exists(path):
         overwrite = True
     else:

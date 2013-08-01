@@ -7,4 +7,4 @@ Werkzeug
 ordereddict
 datetime
 python-dateutil
-
+lxml
