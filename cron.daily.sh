@@ -16,6 +16,8 @@ do
   sudo -u ris-web /opt/ris-web/ris-web/bin/python /opt/ris-web/scripts/generate_thumbs.py $CITY
   sudo -u ris-web /opt/ris-web/ris-web/bin/python /opt/ris-web/scripts/generate_submissions_rss_feed.py $CITY
   sudo -u ris-web /opt/ris-web/ris-web/bin/python /opt/ris-web/scripts/elasticsearch_import.py $CITY
+  sudo -u ris-web /opt/ris-web/ris-web/bin/python /opt/ris-web/scripts/generate_data_dump.py $CITY
+  sudo -u ris-web /opt/ris-web/ris-web/bin/python /opt/ris-web/scripts/export_attachments.py $CITY
 done
 
 #CDN
