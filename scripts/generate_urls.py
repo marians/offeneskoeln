@@ -58,7 +58,6 @@ def generate_session_urls(db, options):
         # Fehlende Georeferenzen
         query = {'rs': cityconfig.RS, 'url_generated': {'$exists': False}}
         for doc in db.sessions.find(query):
-            print doc['identifier']
             generate_url_for_session(doc['_id'], db)
 
 
@@ -102,7 +101,6 @@ def generate_url_for_session(doc_id, db):
     """
     Generiert URLs für Sessions
     """
-    print doc_id
     session = db.sessions.find_one({'_id': doc_id})
     url = session['identifier']
     url = url.replace('/', '-')
@@ -114,8 +112,8 @@ def generate_url_for_session(doc_id, db):
             'url_generated': now
         }
     }
-    update['$set']['urls'] = [str(url)]
-    print ("Writing url %s to submission %s" % (session['identifier'], url))
+    update['$set']['urls'] = [url]
+    print ("Writing url %s for submission %s" % (session['identifier'], url))
     db.sessions.update({'_id': doc_id}, update)
 
 
@@ -134,8 +132,8 @@ def generate_url_for_submission(doc_id, db):
             'url_generated': now
         }
     }
-    update['$set']['urls'] = [str(url)]
-    print ("Writing url %s to submission %s" % (url, submission['identifier']))
+    update['$set']['urls'] = [url]
+    print ("Writing url %s for submission %s" % (url, submission['identifier']))
     db.submissions.update({'_id': doc_id}, update)
 
 
