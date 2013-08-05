@@ -76,7 +76,7 @@ def get_submissions(references=None, submission_ids=None, get_attachments=False,
     for r in keys:
         query = None
         if mode == 'references':
-            query = {'identifier': r, "rs" : app.config['RS']}
+            query = {'urls': r, 'rs': app.config['RS'] }
         else:
             if type(r) != ObjectId:
                 r = ObjectId(r)
