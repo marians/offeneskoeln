@@ -74,7 +74,6 @@ def generate_submission_urls(db, options):
         # Fehlende Georeferenzen
         query = {'rs': cityconfig.RS, 'url_generated': {'$exists': False}}
         for doc in db.submissions.find(query):
-            print doc['id']
             generate_url_for_submission(doc['_id'], db)
 
 def delete_url_for_submission(doc_id, db):
