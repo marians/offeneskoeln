@@ -83,7 +83,10 @@ def get_submissions(references=None, submission_ids=None, get_attachments=False,
             query = {'_id': r, "rs" : app.config['RS']}
         result = mongo.db.submissions.find(query)
         for res in result:
-            res['url'] = util.submission_url(res['identifier'])
+            if 'urls' in res and len(res['urls']):
+                res['url'] = util.submission_url(res['urls'][0])
+            else:
+                res['url'] = util.submission_url(res['identifier'])
             if get_attachments:
                 # Zugehörige attachments einfügen
                 if 'attachments' in res:
