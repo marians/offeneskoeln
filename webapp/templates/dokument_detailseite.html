@@ -7,6 +7,11 @@
 {{ super() }}
 <script type="text/javascript">
 var ok_document_id = '{{ submission.identifier }}';
+{% if submission.urls.0 %}
+var ok_document_url = '{{ submission.urls.0 }}';
+{% else %}
+var ok_document_url = '{{ submission.identifier }}';
+{% endif %}
 </script>
 {% if config.DISQUS_SHORTNAME %}
 <script type="text/javascript">

@@ -102,7 +102,7 @@ $(document).ready(function(){
         });
     }
 
-    OffenesKoeln.documentDetails(ok_document_id, function(data){
+    OffenesKoeln.documentDetails(ok_document_url, function(data){
         //console.log(data);
         readThumbnailData(data);
         enhanceThumbnails();
