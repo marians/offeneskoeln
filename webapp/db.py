@@ -219,11 +219,14 @@ def get_all_submission_identifiers():
     """
     Liefert Liste mit allen Submission-Identifiern zurück
     """
-    search = mongo.db.submissions.find({"rs" : app.config['RS']}, {'identifier': 1})
+    search = mongo.db.submissions.find({"rs" : app.config['RS']}, {'identifier': 1, 'urls': 1})
     if search.count():
         slist = []
         for submission in search:
-            slist.append(submission['identifier'])
+            if 'urls' in submission and len(submission['urls']):
+                slist.append({'identifier': submission['identifier'], 'url': submission['urls'][0]})
+            else:
+                slist.append({'identifier': submission['identifier'], 'url': submission['identifier']})
         return slist
 
 
