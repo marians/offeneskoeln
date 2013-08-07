@@ -57,7 +57,7 @@ cd /opt/ris-web
 git clone git clone https://github.com/OpenRuhr/ris-web.git ./
 
 # OSM Import vorbereiten
-pip install pymongo
+pip install pymongo numpy
 pip install git+git://github.com/werner2101/python-osm.git
 
 # Virtuelle Python-Umgebung erstellen, dort hinein wechseln, relevante Pakete installieren
