@@ -73,8 +73,11 @@ def geocode(location_string):
         street = postal_matching.group(1)
         postal = postal_matching.group(2)
     url = 'http://open.mapquestapi.com/nominatim/v1/search.php'
+    city = app.config['GEOCODING_DEFAULT_CITY']
+    if type(city) == unicode:
+        city = city.encode('utf8')
     params = {'format': 'json',  # json
-              'q': ' '.join([street, app.config['GEOCODING_DEFAULT_CITY']]),
+              'q': ' '.join([street, city]),
               'addressdetails': 1,
               'accept-language': 'de_DE',
               'countrycodes': app.config['GEOCODING_DEFAULT_COUNTRY']}
