@@ -117,7 +117,7 @@ if __name__ == '__main__':
             non_existing_nodes += 1
 
     # reduziere das nodes dict auf das wesentliche
-    wanted_nodes.values()
+    wanted_nodes.values()  # TODO: Das ergibt keinen Sinn.
 
     for street in streetcollector.streets:
         for n in range(len(street['nodes'])):
