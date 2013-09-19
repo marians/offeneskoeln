@@ -8,7 +8,7 @@ import bson
 import re
 import urllib
 import urllib2
-import pprint
+from pprint import pprint
 
 from webapp import app
 
@@ -84,25 +84,22 @@ def geocode(location_string):
     request = urllib2.urlopen(url + '?' + urllib.urlencode(params))
     response = request.read()
     addresses = json.loads(response)
+    pprint(addresses)
     addresses_out = []
-    for n in range(len(addresses)):
-        for key in addresses[n].keys():
+    for address in addresses:
+        for key in address.keys():
             if key in ['address', 'boundingbox', 'lat', 'lon', 'osm_id']:
                 continue
-            del addresses[n][key]
-        # skip if no road contained
-        if 'road' not in addresses[n]['address']:
-            continue
+            del address[key]
         # skip if not in correct county
-        if 'county' not in addresses[n]['address']:
+        if 'county' not in address['address']:
             continue
-        if addresses[n]['address']['county'] != app.config['GEOCODING_FILTER_COUNTY']:
+        if address['address']['county'] != app.config['GEOCODING_FILTER_COUNTY']:
             continue
         if postal is not None:
-            if 'postcode' in addresses[n]['address'] and addresses[n]['address']['postcode'] == postal:
-                addresses_out.append(addresses[n])
-        else:
-            addresses_out.append(addresses[n])
+            if 'postcode' in address['address'] and address['address']['postcode'] != postal:
+                continue
+        addresses_out.append(address)
     return addresses_out
 
 
