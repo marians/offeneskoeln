@@ -42,11 +42,26 @@ import datetime
 def generate_georeferences(db):
     """Generiert Geo-Referenzen für die gesamte submissions-Collection"""
 
-    # Submissions ohne Geo-Referenzen
+    # Aktualisiere Vorlagen mit Geo-Referenzen
+    query = {'georeferences_generated': {'$exists': True}}
+    for doc in db.submissions.find(query, timeout=False):
+        update = False
+        for attachment_dbref in doc['attachments']:
+            attachment = db[attachment_dbref.collection].find_one(
+                {'_id': attachment_dbref.id},
+                {'fulltext_generated': 1}
+            )
+            if 'fulltext_generated' not in attachment:
+                continue
+            if attachment['fulltext_generated'] > doc['georeferences_generated']:
+                update = True
+                break
+        if update:
+            generate_georeferences_for_submission(doc['_id'], db)
+    # Bearbeite Submissions ohne Geo-Referenzen
     query = {'georeferences_generated': {'$exists': False}}
     for doc in db.submissions.find(query, timeout=False):
         generate_georeferences_for_submission(doc['_id'], db)
-    # TODO: Aktualisierte Dokumente berücksichtigen
 
 
 def generate_georeferences_for_submission(doc_id, db):
@@ -76,6 +91,8 @@ def generate_georeferences_for_submission(doc_id, db):
         update['$set']['georeferences'] = result
         print ("Writing %d georeferences to submission %s" %
             (len(result), doc_id))
+    else:
+        print "0 georeferences for submission %s" % doc_id
     db.submissions.update({'_id': doc_id}, update)
 
 
