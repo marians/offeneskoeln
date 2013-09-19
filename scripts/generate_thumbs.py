@@ -84,6 +84,7 @@ import shutil
 from PIL import Image
 import datetime
 import time
+import threading
 
 
 STATS = {
@@ -102,6 +103,7 @@ STATS = {
 
 # Aktiviert die Zeitmessung
 TIMING = True
+TIMEOUT = 10
 
 
 def generate_thumbs(db, thumbs_folder):
@@ -111,6 +113,7 @@ def generate_thumbs(db, thumbs_folder):
         'thumbnails_generated': {'$exists': True},
         'depublication': {'$exists': False}
     }
+    # Attachments mit veralteten Thumbnails
     for doc in db.attachments.find(query, timeout=False):
         # Dateiinfo abholen
         filedoc = db.fs.files.find_one({'_id': doc['file'].id})
@@ -175,7 +178,8 @@ def generate_thumbs_for_attachment(attachment_id, db):
     file_path = max_folder + os.sep + '%d.png'
     cmd = ('%s -dQUIET -dSAFER -dBATCH -dNOPAUSE -sDisplayHandle=0 -sDEVICE=png16m -r100 -dTextAlphaBits=4 -sOutputFile=%s -f %s' %
             (config.GS_CMD, file_path, temppath))
-    execute(cmd)
+    pm = ProcessMonitor(cmd)
+    pm.run(timeout=TIMEOUT)
     if TIMING:
         after_maxthumbs = milliseconds()
         maxthumbs_duration = after_maxthumbs - after_file_write
@@ -266,15 +270,6 @@ def scale_width_height(height, original_width, original_height):
     return (width, height)
 
 
-def execute(cmd):
-    output, error = subprocess.Popen(
-        cmd.split(' '), stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE).communicate()
-    if error is not None and error.strip() != '':
-        print >> sys.stderr, "Command: " + cmd
-        print >> sys.stderr, "Error: " + error
-
-
 def milliseconds():
     """Return current time as milliseconds int"""
     return int(round(time.time() * 1000))
@@ -283,6 +278,36 @@ def milliseconds():
 def print_stats():
     for key in STATS.keys():
         print "%s: %d" % (key, STATS[key])
+
+
+class ProcessMonitor(object):
+    def __init__(self, cmd):
+        self.cmd = cmd
+        self.process = None
+
+    def run(self, timeout):
+        def target():
+            print 'Thread started'
+            self.process = subprocess.Popen(self.cmd,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+            output, error = self.process.communicate()
+            print 'Thread finished'
+            if error is not None and error.strip() != '':
+                sys.stderr.write("Command: %s\n" % self.cmd)
+                sys.stderr.write("Error: %s\n" % error)
+
+        thread = threading.Thread(target=target)
+        thread.start()
+
+        thread.join(timeout)
+        if thread.is_alive():
+            print 'Terminating process'
+            self.process.terminate()
+            thread.join()
+        print "Process return code: %s" % self.process.returncode
+
 
 if __name__ == '__main__':
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
