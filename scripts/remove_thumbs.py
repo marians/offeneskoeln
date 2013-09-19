@@ -27,6 +27,9 @@ im Zusammenhang mit der Software oder sonstiger Verwendung der Software
 entstanden.
 """
 
+import sys
+sys.path.append('./')
+
 from pymongo import MongoClient
 import config
 
