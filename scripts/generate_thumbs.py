@@ -85,6 +85,7 @@ from PIL import Image
 import datetime
 import time
 import threading
+import argparse
 
 
 STATS = {
@@ -106,7 +107,7 @@ TIMING = True
 TIMEOUT = 10
 
 
-def generate_thumbs(db, thumbs_folder):
+def generate_thumbs(db, thumbs_folder, timeout):
     """Generiert alle Thumbnails für die gesamte attachments-Collection"""
     # Attachments mit veralteten Thumbnails
     query = {
@@ -120,7 +121,7 @@ def generate_thumbs(db, thumbs_folder):
         if filedoc['uploadDate'] > doc['thumbnails_generated']:
             # Thumbnails müssen erneuert werden
             STATS['attachments_with_outdated_thumbs'] += 1
-            generate_thumbs_for_attachment(doc['_id'], db)
+            generate_thumbs_for_attachment(doc['_id'], db, timeout)
     # Attachments ohne Thumbnails
     query = {
         'thumbnails': {'$exists': False},
@@ -129,7 +130,7 @@ def generate_thumbs(db, thumbs_folder):
     for doc in db.attachments.find(query, timeout=False):
         if get_file_suffix(doc['filename']) in config.THUMBNAILS_VALID_TYPES:
             STATS['attachments_without_thumbs'] += 1
-            generate_thumbs_for_attachment(doc['_id'], db)
+            generate_thumbs_for_attachment(doc['_id'], db, timeout)
 
 
 def get_file_suffix(filename):
@@ -145,7 +146,7 @@ def subfolders_for_attachment(attachment_id):
         attachment_id)
 
 
-def generate_thumbs_for_attachment(attachment_id, db):
+def generate_thumbs_for_attachment(attachment_id, db, timeout):
     """
     Generiert alle Thumbnails fuer ein bestimmtes Attachment
     """
@@ -179,12 +180,19 @@ def generate_thumbs_for_attachment(attachment_id, db):
     cmd = ('%s -dQUIET -dSAFER -dBATCH -dNOPAUSE -sDisplayHandle=0 -sDEVICE=png16m -r100 -dTextAlphaBits=4 -sOutputFile=%s -f %s' %
             (config.GS_CMD, file_path, temppath))
     pm = ProcessMonitor(cmd)
-    pm.run(timeout=TIMEOUT)
+    result = pm.run(timeout=timeout)
+
     if TIMING:
         after_maxthumbs = milliseconds()
         maxthumbs_duration = after_maxthumbs - after_file_write
         STATS['ms_creating_maxsize'] += maxthumbs_duration
         STATS['num_creating_maxsize'] += 1
+
+    if result == False:
+        # break here
+        STATS['thumbs_not_created'] += 1
+        os.unlink(temppath)
+        return
 
     thumbnails = {}
     for size in config.THUMBNAILS_SIZES:
@@ -281,39 +289,45 @@ def print_stats():
 
 
 class ProcessMonitor(object):
+    """
+    Gratefully taken from
+    http://stackoverflow.com/a/4825933/1228491
+    """
     def __init__(self, cmd):
         self.cmd = cmd
         self.process = None
 
     def run(self, timeout):
         def target():
-            print 'Thread started'
             self.process = subprocess.Popen(self.cmd,
                 shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
             output, error = self.process.communicate()
-            print 'Thread finished'
             if error is not None and error.strip() != '':
                 sys.stderr.write("Command: %s\n" % self.cmd)
                 sys.stderr.write("Error: %s\n" % error)
-
         thread = threading.Thread(target=target)
         thread.start()
-
         thread.join(timeout)
         if thread.is_alive():
-            print 'Terminating process'
+            sys.stderr.write("Process taking too long -- terminating\n")
             self.process.terminate()
             thread.join()
-        print "Process return code: %s" % self.process.returncode
+            # Process has been interrupted
+            return False
+        return True
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Generate thumbnails for attachment files')
+    parser.add_argument('--timeout', dest='timeout', default=TIMEOUT, type=int,
+        help='Number of seconds to wait for thumbnail generation per attachment')
+    args = parser.parse_args()
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
     fs = gridfs.GridFS(db)
     tempdir = tempfile.mkdtemp()
-    generate_thumbs(db, config.THUMBS_PATH)
+    generate_thumbs(db, config.THUMBS_PATH, timeout=args.timeout)
     os.rmdir(tempdir)
     print_stats()
