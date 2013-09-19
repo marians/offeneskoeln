@@ -51,7 +51,7 @@ def generate_fulltext(db):
 
     # Attachments mit veralteten Volltexten
     query = {'fulltext_generated': {'$exists': True}}
-    for doc in db.attachments.find(query):
+    for doc in db.attachments.find(query, timeout=False):
         # Dateiinfo abholen
         filedoc = db.fs.files.find_one({'_id': doc['file'].id})
         if filedoc['uploadDate'] > doc['fulltext_generated']:
@@ -61,7 +61,7 @@ def generate_fulltext(db):
 
     # Attachments ohne Volltext
     query = {'fulltext_generated': {'$exists': False}}
-    for doc in db.attachments.find(query):
+    for doc in db.attachments.find(query, timeout=False):
         STATS['attachments_without_fulltext'] += 1
         generate_fulltext_for_attachment(doc['_id'], db)
 
