@@ -43,7 +43,10 @@ def generate_georeferences(db):
     """Generiert Geo-Referenzen für die gesamte submissions-Collection"""
 
     # Aktualisiere Vorlagen mit Geo-Referenzen
-    query = {'georeferences_generated': {'$exists': True}}
+    query = {
+        'georeferences_generated': {'$exists': True},
+        'attachments': {'$exists': True}
+    }
     for doc in db.submissions.find(query, timeout=False):
         update = False
         for attachment_dbref in doc['attachments']:
