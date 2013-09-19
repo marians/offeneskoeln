@@ -198,10 +198,20 @@ def generate_thumbs_for_attachment(attachment_id, db, timeout):
     for size in config.THUMBNAILS_SIZES:
         thumbnails[str(size)] = []
 
-    # create thumbs based on large pixel version
-    for maxfile in os.listdir(max_folder):
-        path = max_folder + os.sep + maxfile
-        num = maxfile.split('.')[0]
+    ### create thumbs based on large pixel version
+
+    # get highest page number
+    maxfiles = os.listdir(max_folder)
+    max_pagenum = 0
+    for mfile in maxfiles:
+        num = int(mfile.split('.')[0])
+        max_pagenum = max(max_pagenum, num)
+
+    for pagenum in range(1, max_pagenum + 1):
+        path = max_folder + os.sep + str(pagenum) + '.png'
+        if not os.path.exists(path):
+            sys.stderr.write('Page thumbnail missing: page %d' % pagenum)
+            continue
         im = Image.open(path)
         im = conditional_to_greyscale(im)
         (owidth, oheight) = im.size
@@ -211,7 +221,7 @@ def generate_thumbs_for_attachment(attachment_id, db, timeout):
             size_folder = abspath + os.sep + str(size)
             if not os.path.exists(size_folder):
                 os.makedirs(size_folder)
-            out_path = size_folder + os.sep + num + '.' + config.THUMBNAILS_SUFFIX
+            out_path = size_folder + os.sep + str(pagenum) + '.' + config.THUMBNAILS_SUFFIX
             (width, height) = scale_width_height(size, owidth, oheight)
             #print (width, height)
             # Two-way resizing
@@ -222,7 +232,7 @@ def generate_thumbs_for_attachment(attachment_id, db, timeout):
             resizedim = resizedim.resize((width, height), Image.ANTIALIAS)
             resizedim.save(out_path)
             thumbnails[str(size)].append({
-                'page': int(num),
+                'page': pagenum,
                 'width': width,
                 'height': height,
                 'filesize': os.path.getsize(out_path)
