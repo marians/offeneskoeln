@@ -1,0 +1,7 @@
+[program:offeneskoeln]
+directory=/home/ok/offeneskoeln
+command=/home/ok/offeneskoeln/venv/bin/gunicorn -c /home/ok/offeneskoeln/gunicorn_conf.py webapp:app
+user=root
+autostart=true
+autorestart=true
+redirect_stderr=True
