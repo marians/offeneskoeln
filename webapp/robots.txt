@@ -16,3 +16,4 @@ Sitemap: /static/sitemap.xml
 User-agent: *
 Disallow: /suche/
 Disallow: /api/
+Disallow: /anhang/download/

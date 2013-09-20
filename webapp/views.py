@@ -109,8 +109,15 @@ def legacy_attachment(download_path):
         return redirect(new_url, 301)
 
 
-@app.route("/anhang/<string:attachment_id>.<string:extension>")
+@app.route("/anhang/download/<string:attachment_id>.<string:extension>")
 def attachment_download(attachment_id, extension):
+    return attachment_view(attachment_id=attachment_id,
+        extension=extension,
+        savefile=True)
+
+
+@app.route("/anhang/<string:attachment_id>.<string:extension>")
+def attachment_view(attachment_id, extension, savefile=False):
     """
     Abruf/Download eines Attachments
     """
@@ -155,9 +162,8 @@ def attachment_download(attachment_id, extension):
                                         hours=(24 * 30))
     response.headers['Cache-Control'] = util.cache_max_age(
                                             hours=(24 * 30))
-    # Download option
-    savefile = request.args.get('savefile', '0')
-    if savefile != '0':
+    # Save to file option
+    if savefile == True:
         response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_info['filename']
     return response
 
