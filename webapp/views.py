@@ -112,7 +112,7 @@ def legacy_attachment(download_path):
 @app.route("/anhang/<string:attachment_id>.<string:extension>")
 def attachment_download(attachment_id, extension):
     """
-    Download eines Attachments
+    Abruf/Download eines Attachments
     """
     attachment_info = db.get_attachment(attachment_id)
     #pprint.pprint(attachment_info)
@@ -155,6 +155,10 @@ def attachment_download(attachment_id, extension):
                                         hours=(24 * 30))
     response.headers['Cache-Control'] = util.cache_max_age(
                                             hours=(24 * 30))
+    # Download option
+    savefile = request.args.get('savefile', '0')
+    if savefile != '0':
+        response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_info['filename']
     return response
 
 
