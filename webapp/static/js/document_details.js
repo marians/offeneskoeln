@@ -61,23 +61,25 @@ $(document).ready(function(){
         thumbs_data = {};
         $.each(data.response.documents[0].attachments, function(i, attachment){
             thumbs_data[attachment._id] = {};
-            $.each(attachment.thumbnails, function(height, heightthumbs){
-                if (height == 300 || height == 800) {
-                    thumbs_data[attachment._id][height] = {
-                        num_thumbs: 0,
-                        width: 0,
-                        images: []
-                    };
-                    $.each(attachment.thumbnails[height], function(index, thumb){
-                        thumbs_data[attachment._id][height].num_thumbs += 1;
-                        thumbs_data[attachment._id][height].width += thumb.width + 11;
-                        thumbs_data[attachment._id][height].images.push({
-                            width: thumb.width,
-                            url: thumb.url
+            if (typeof attachment.thumbnails !== 'undefined') {
+                $.each(attachment.thumbnails, function(height, heightthumbs){
+                    if (height == 300 || height == 800) {
+                        thumbs_data[attachment._id][height] = {
+                            num_thumbs: 0,
+                            width: 0,
+                            images: []
+                        };
+                        $.each(attachment.thumbnails[height], function(index, thumb){
+                            thumbs_data[attachment._id][height].num_thumbs += 1;
+                            thumbs_data[attachment._id][height].width += thumb.width + 11;
+                            thumbs_data[attachment._id][height].images.push({
+                                width: thumb.width,
+                                url: thumb.url
+                            });
                         });
-                    });
-                }
-            });
+                    }
+                });
+            }
         });
     }
 
