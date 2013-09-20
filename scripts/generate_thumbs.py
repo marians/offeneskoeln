@@ -312,13 +312,14 @@ class ProcessMonitor(object):
     def run(self, timeout):
         def target():
             self.process = subprocess.Popen(self.cmd,
-                shell=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
+                shell=True
+                #,stdout=subprocess.PIPE,
+                #,stderr=subprocess.PIPE
+            )
             output, error = self.process.communicate()
-            if error is not None and error.strip() != '':
-                sys.stderr.write("Command: %s\n" % self.cmd)
-                sys.stderr.write("Error: %s\n" % error)
+            #if error is not None and error.strip() != '':
+            #    sys.stderr.write("Command: %s\n" % self.cmd)
+            #    sys.stderr.write("Error: %s\n" % error)
         thread = threading.Thread(target=target)
         thread.start()
         thread.join(timeout)
