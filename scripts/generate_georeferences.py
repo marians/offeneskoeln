@@ -109,13 +109,20 @@ def get_attachment_fulltext(attachment_id):
     return ''
 
 
-def load_streets(path):
+def load_streets():
     """
     Lädt eine Straßenliste (ein Eintrag je Zeile UTF-8)
     in ein Dict. Dabei werden verschiedene Synonyme für
     Namen, die auf "straße" oder "platz" enden, angelegt.
     """
-    nameslist = open(path, 'r').read().strip().split("\n")
+    # Jede Straße nur einmal in nameslist laden
+    namesdict = {}
+    query = {"rs": config.RS}
+    for street in db.locations.find(query, timeout=False):
+        if street['name'] not in namesdict:
+            namesdict[street['name']] = True
+    nameslist = namesdict.keys()
+    del namesdict
     ret = {}
     pattern1 = re.compile(".*straße$")
     pattern2 = re.compile(".*Straße$")
@@ -162,7 +169,7 @@ def match_streets(text):
 
 
 if __name__ == '__main__':
-    streets = load_streets(config.STREETS_FILE)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
+    streets = load_streets()
     generate_georeferences(db)
