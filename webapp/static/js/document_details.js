@@ -102,10 +102,26 @@ $(document).ready(function(){
         });
     }
 
+    /**
+     * Blendet einen zusätzlichen Download-Button je Attachment ein
+     * (Wir machen das in JavaScript, um Robots möclichst von den URLs
+     * fern zu halten.)
+     */
+    function enhanceDownloadLinks() {
+        $('div.attachment').each(function(i, item){
+            //console.log(i, item, this);
+            var openButton = $(this).find('a.open');
+            var downloadUrl = openButton.attr('href');
+            downloadUrl = downloadUrl.replace('anhang/', 'anhang/download/');
+            $(this).find('a.download').attr('href', downloadUrl).show();
+        });
+    }
+
     OffenesKoeln.documentDetails(ok_document_id, function(data){
         //console.log(data);
         readThumbnailData(data);
         enhanceThumbnails();
+        enhanceDownloadLinks();
     });
 
     truncateFulltext();

@@ -136,7 +136,8 @@ var disqus_shortname = '{{ config.DISQUS_SHORTNAME }}';
 			{% endif %}
 			{% if attachment.url %}
 			<div class="actions">
-				<a target="_blank" href="{{ attachment.url }}" class="awesome">Anhang öffnen</a>
+				<a target="_blank" href="{{ attachment.url }}" class="awesome open">Anhang öffnen</a>
+				<a href="#" class="awesome download" rel="nofollow" title="Speichert die Datei unter dem Namen {{ attachment.filename }}" style="display: none">Download</a>
 				<span class="typesize">{{ (attachment.size / 1024)|round(0)|int }} KB PDF – <a title="öffnet das PDF mit Google Docs Viewer" href="https://docs.google.com/viewer?url={{ attachment.url }}" target="_blank">Vorschau</a></span>
 			</div>
 			{% endif %}
