@@ -166,6 +166,9 @@ def attachment_view(attachment_id, extension, savefile=False):
     if savefile == True:
         response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_info['filename']
         response.headers['X-Robots-Tag'] = 'noindex'
+        # See https://support.google.com/webmasters/answer/139394
+        response.headers['Link'] = '<%sanhang/%s.%s>; rel="canonical"' % (
+            app.config['BASE_URL'], attachment_id, extension)
     return response
 
 
