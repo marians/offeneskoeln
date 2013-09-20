@@ -165,6 +165,7 @@ def attachment_view(attachment_id, extension, savefile=False):
     # Save to file option
     if savefile == True:
         response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_info['filename']
+        response.headers['X-Robots-Tag'] = 'noindex'
     return response
 
 
