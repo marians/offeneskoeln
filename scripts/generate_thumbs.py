@@ -322,7 +322,7 @@ class ProcessMonitor(object):
         thread.join(timeout)
         if thread.is_alive():
             sys.stderr.write("Process taking too long -- terminating\n")
-            self.process.terminate()
+            self.process.kill()
             thread.join()
             # Process has been interrupted
             return False
