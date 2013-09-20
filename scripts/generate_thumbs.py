@@ -112,7 +112,8 @@ def generate_thumbs(db, thumbs_folder, timeout):
     # Attachments mit veralteten Thumbnails
     query = {
         'thumbnails_generated': {'$exists': True},
-        'depublication': {'$exists': False}
+        'depublication': {'$exists': False},
+        'mimetype': 'application/pdf'
     }
     # Attachments mit veralteten Thumbnails
     for doc in db.attachments.find(query, timeout=False):
@@ -125,7 +126,8 @@ def generate_thumbs(db, thumbs_folder, timeout):
     # Attachments ohne Thumbnails
     query = {
         'thumbnails': {'$exists': False},
-        'depublication': {'$exists': False}
+        'depublication': {'$exists': False},
+        'mimetype': 'application/pdf'
     }
     for doc in db.attachments.find(query, timeout=False):
         if get_file_suffix(doc['filename']) in config.THUMBNAILS_VALID_TYPES:
