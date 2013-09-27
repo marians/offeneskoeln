@@ -35,6 +35,7 @@ import config
 from pymongo import MongoClient
 import re
 import datetime
+import translitcodec
 
 cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
 if cmd_subfolder not in sys.path:

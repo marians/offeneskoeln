@@ -8,3 +8,4 @@ ordereddict
 datetime
 python-dateutil
 lxml
+translitcodec
