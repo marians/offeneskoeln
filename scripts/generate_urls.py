@@ -112,7 +112,7 @@ def generate_url_for_session(doc_id, db):
     url = session['identifier']
     url = url.replace('/', '-')
     now = datetime.datetime.utcnow()
-    url = slugify(slugify)
+    url = slugify(url)
     
     # Hier könnte noch viel mehr hin um sprechende URLs zu generieren
     update = {
@@ -133,7 +133,7 @@ def generate_url_for_submission(doc_id, db):
     url = submission['identifier']
     url = url.replace('/', '-')
     now = datetime.datetime.utcnow()
-    url = slugify(slugify)
+    url = slugify(url)
     
     # Hier könnte noch viel mehr hin um sprechende URLs zu generieren
     update = {
