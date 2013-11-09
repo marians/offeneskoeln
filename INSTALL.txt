@@ -61,8 +61,8 @@ pip install pymongo numpy
 pip install git+git://github.com/werner2101/python-osm.git
 
 # Virtuelle Python-Umgebung erstellen, dort hinein wechseln, relevante Pakete installieren
-virtualenv --no-site-packages ris-scraper
-source ris-scraper/bin/activate
+virtualenv --no-site-packages ris-web
+source ris-web/bin/activate
 pip install -r requirements.txt
 exit
 
