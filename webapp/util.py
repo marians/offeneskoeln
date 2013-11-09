@@ -13,7 +13,6 @@ import sys
 
 from webapp import app
 
-
 def rfc1123date(value):
     """
     Gibt ein Datum (datetime) im HTTP Head-tauglichen Format (RFC 1123) zurück

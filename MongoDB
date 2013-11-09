@@ -1,0 +1,175 @@
+submission
+{
+  "_id" : ObjectId("51f862f39bcda4096f1fd71b"),
+  "attachments" : [
+    DBRef("attachments", ObjectId("51f8675d9bcda4099eda0123"))
+  ],
+  "date" : ISODate("2013-02-13T00:00:00Z"),
+  "identifier" : "0698/V15",
+  "last_modified" : ISODate("2013-07-31T01:24:44.254Z"),
+  "numeric_id" : 3129,
+  "original_url" : "https://secure.stadt-witten.de/session/bis/vo0050.asp?__kvonr=3129",
+  "rs" : "059540036036",
+  "subject" : "Erweiterung des Förderschwerpunktes Emotionale und Soziale Entwicklung an der Pestalozzischule",
+  "title" : "Erweiterung des Förderschwerpunktes Emotionale und Soziale Entwicklung an der Pestalozzischule",
+  "type" : "Beschlussvorlage V15"
+  "georeferences" : [
+    "Brunnenplatz",
+    "Gesundheitscampus",
+    "Hustadtring",
+    "Lennershofstraße",
+    "Lise-Meitner-Allee",
+    "Schattbachstraße",
+    "Universitätsstraße"
+  ],
+  "georeferences_generated" : ISODate("2013-08-02T15:12:19.715Z"), 
+}
+
+
+session
+{
+  "_id" : ObjectId("51f927219bcda409038d0c19"),
+  "address" : "Duisburg-Süd,  Bezirksamt Süd, Sitzungssaal",
+  "agendaitems" : [
+    {
+      "number" : " ",
+      "id" : 116283,
+      "result" : "BESCHLOSSEN_EINSTIMMIG",
+      "submissions" : [
+        DBRef("submissions", ObjectId("51f927219bcda409038d0c14"))
+      ],
+      "public" : true,
+      "subject" : "Vorhabenbezogener Bebauungsplan (VEP) Nr. 2037 - Wedau - Wedauer Straße 366; 1. Einleitungsbeschluss; 2. Prioritätenliste ;  "
+    },
+    {
+      "number" : " ",
+      "id" : 116331,
+      "result" : "BESCHLOSSEN_EINSTIMMIG",
+      "submissions" : [
+        DBRef("submissions", ObjectId("51f927219bcda409038d0c15"))
+      ],
+      "public" : true,
+      "subject" : "Antrag der CDU-Fraktion: Park & Ride-Konzept ÖPNV-Haltepunkt Sittardsberg ;  "
+    },
+    {
+      "public" : false,
+      "subject" : "nichtöffentliche Information ;  ",
+      "id" : 116121, 	"number" : " "
+    },
+    {
+      "result" : "TAGESORDNUNG_ABGESETZT",
+      "public" : true,
+      "subject" : "Fragestunde für Einwohner gem. §22 e) der Geschäftsordnung für den Rat der Stadt Duisburg ;  ",
+      "id" : 116123,
+      "number" : "3 "
+    },
+    {
+      "public" : true,
+      "subject" : "Begrüßung durch den Bezirksbürgermeister ;  ",
+      "id" : 116122,
+      "number" : "1 "
+    },
+    { 	"number" : "15 ", 	"id" : 116107, 	"result" : "MITTEILUNG_KENNTNIS",
+      "submissions" : [
+        DBRef("submissions", ObjectId("51f927199bcda409038d0ba8"))
+      ],
+      "public" : true, 	"subject" : "Mitteilung über erteilte Baugenehmigungen für den Monat Mai 2013 ;  "
+    },
+    {
+      "number" : "13 ",
+      "id" : 116106,
+      "result" : "MITTEILUNG_KENNTNIS",
+      "submissions" : [
+        DBRef("submissions", ObjectId("51f926ec9bcda409038d0938"))
+      ],
+      "public" : true,
+      "subject" : "Pakt für den Sport in Duisburg ;  "
+    },
+    {
+      "number" : "12 ",
+      "id" : 116105,
+      "result" : "MITTEILUNG_KENNTNIS",
+      "submissions" : [
+        DBRef("submissions", ObjectId("51f926ec9bcda409038d092b"))
+      ],
+      "public" : true, 	"subject" : "Resolution gegen zunehmende Gewalt im Sport in Duisburg ;  "
+    },
+    {
+      "result" : "MITTEILUNG_KENNTNIS",
+      "public" : true,
+      "subject" : "Mündliche Mitteilungen des Bezirksbürgermeisters und des Bezirksamtsleiters ;  ",
+      "id" : 116108, 	"number" : " "
+    }
+  ],
+  "attachments" : [
+    DBRef("attachments", ObjectId("51f927219bcda409038d0c01")),
+    DBRef("attachments", ObjectId("51f927219bcda409038d0c04")),
+    DBRef("attachments", ObjectId("51f927219bcda409038d0c07")),
+    DBRef("attachments", ObjectId("51f927219bcda409038d0c0a")),
+    DBRef("attachments", ObjectId("51f927219bcda409038d0c0d")),
+    DBRef("attachments", ObjectId("51f927219bcda409038d0c10")),
+    DBRef("attachments", ObjectId("51f927219bcda409038d0c13"))
+  ],
+  "committee_id" : 32,
+  "committee_name" : "Bezirksvertretung Süd", "date_start" : ISODate("2013-07-04T00:00:00Z"),
+  "description" : "40. öffentliche/ 23. nicht öffentliche Sitzung der Bezirksvertretung Süd",
+  "identifier" : "B97/2012/1317",
+  "last_modified" : ISODate("2013-07-31T15:02:53.079Z"), "numeric_id" : 20053479,
+  "original_url" : "https://www.duisburg.de/ratsinformationssystem/bi/to0040.php?__ksinr=20053479",
+  "rs" : "051120000000",
+  "title" : "40. öffentliche/ 23. nicht öffentliche Sitzung der Bezirksvertretung Süd",
+  "url_generated" : ISODate("2013-08-05T02:46:26.455Z"),
+  "urls" : [  "B97-2012-1317" ]
+}
+
+attachments
+{
+  "_id" : ObjectId("51e909b1c0947d0890c0b47e"),
+  "file" : DBRef("fs.files", ObjectId("51e909b1c0947d0890c0b47c")),
+  "filename" : "oeffentliche_nicht_oeffentliche_Sitzung_des_Kulturausschusses_12_05_2011_Nachtrag_oeffentlich.pdf",
+  "fulltext" : "Stadt Duisburg\nKulturausschuss\nKulturbetriebe Duisburg\nFrau Sens\n\nDuisburg, den 9. Mai 2011\nNeckarstr. 1\nZimmer 542, Tel.: 0203-3009 256\nE-Mail: h.sens@stadt-duisburg.de\n\nNACHTRAG\nzur öffentlichen Sitzung des Kulturausschusses\nam Donnerstag, dem 12.05.2011, 15:00 Uhr\nRathaus Duisburg, Ratssaal (Zi. 100)\n\nDie Tagesordnung wird wie folgt ergänzt bzw. erweitert:\n\n14. DS 11-0853\n\nAnfrage der SPD-Fraktion: Mercator 2012 - 500 Jahre Gerhard Mercator\n\n15. DS 11-0854\n\nAnfrage der SPD-Fraktion: filmforum\n\n16. DS 11-0855\n\nAnfrage der SPD-Fraktion: Hundertmeister\n\n17. DS 11-0856\n\nAnfrage der SDP-Fraktion: Reinigung Stadtmauer\n\n18. DS 11-0842\n\nResolution der CDU-Fraktion:\nTheater brauchen Förderung und Verlässlichkeit\n\n19. DS 11-0847\n\nAntrag der CDU-Fraktion:\nFörderbescheide für freie Kunstszene in Duisburg\n\n20. DS 11-0846\n\nAnfrage der CDU-Fraktion: Planungsstand TAM\n\nAlbrecht\nRatsherr\nVorsitzender",
+  "fulltext_generated" : ISODate("2013-07-22T13:18:15.274Z"),
+  "identifier" : "oeffentliche_nicht_oeffentliche_Sitzung_des_Kulturausschusses_12_05_2011_Nachtrag_oeffentlich",
+  "last_modified" : ISODate("2013-07-26T06:42:11.436Z"),
+  "mimetype" : "application/pdf",
+  "name" : "Nachtrag öffentlich",
+  "rs" : "051120000000",
+  "sha1" : "713a189d3984fa04c76cfb7a89a1326723dc6027",
+  "size" : 7552,
+  "thumbnails" : {
+    "300" : [
+      {  "width" : 212,  "filesize" : 6598,  "page" : 1,  "height" : 300 }
+    ],
+    "150" : [
+      {  "width" : 106,  "filesize" : 2458,  "page" : 1,  "height" : 150 }
+    ],
+    "800" : [
+      {  "width" : 566,  "filesize" : 34880,  "page" : 1,  "height" : 800 }
+    ]
+  },
+  "thumbnails_generated" : ISODate("2013-07-26T06:42:11.436Z")
+}
+
+locations
+{
+  "_id" : ObjectId("51ee7630ed39265a6fb647e2"),
+  "nodes" : [
+    {
+      "osmid" : 60237855,
+      "location" : {
+        "type" : "Point",
+        "coordinates" : [ 	7.1356523, 	51.4836576 ]
+      }
+    },
+    {
+      "osmid" : 60237856,
+      "location" : {
+        "type" : "Point",
+        "coordinates" : [ 	7.1355489, 	51.4826743 ]
+      }
+    }
+  ],
+  "rs" : "059110000000",
+  "osmid" : 8056353,
+  "name" : "Rathausstraße"
+}
