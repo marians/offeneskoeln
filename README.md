@@ -19,3 +19,7 @@ Weitere Informationen findest Du im [https://github.com/marians/offeneskoeln/wik
 ###Lizenz
 
 Der Code steht unter einer MIT-artigen [Lizenz](https://github.com/marians/offeneskoeln/blob/master/LIZENZ.txt).
+
+## offeneskoeln gefällt Dir?
+
+Du kannst mir [per Gittip danken](https://www.gittip.com/marians/)!
