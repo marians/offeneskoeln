@@ -9,7 +9,6 @@
 <script type="text/javascript" src="http://a.ok.mycdn.de/js/jquery.ajaxq.js"></script>
 <script>
 var CONF = {
-  mapStartPoint: [{{ config.MAP_START_POINT[0]|safe }}, {{ config.MAP_START_POINT[1]|safe }}],
   mapTileUrlSchema: '{{ config.MAP_TILE_URL_SCHEMA|safe }}',
   mapTileAttribution: '{{ config.MAP_TILE_ATTRIBUTION|safe }}',
   mapTileMinZoom: {{ config.MAP_TILE_ZOOMLEVEL_MIN|safe }},
@@ -17,18 +16,25 @@ var CONF = {
   locationName: '{{ config.LOCATION_NAME|safe }}'
 };
 </script>
+<script type="text/javascript" src="/static/js/region.js"></script>
 <script type="text/javascript" src="/static/js/map.js"></script>
 {% endblock %}
 
 {% block content %}
 <div id="home">
 	<div id="position-form-container" class="content top">
+		<div id="region-prompt">
+			<div id="region-question" class="question">Ausgewählte Region: <span id="region-current">Deutschland</span> <span id="change-region" class="awesome extrawide">Ändern</span></div>
+			<div id="region-choice"></div>
+		</div>
+	</div>
+	<div id="position-form-container" class="content middle">
 		<div id="position-prompt">
 			<form id="position-prompt-form" action="/" method="GET">
 				<div class="question">Sieh Dir an, was die Politik in Deiner Umgebung macht:</div>
 				<div>
-					<span class="mobilerow"><label for="street">Straße:</label> <input id="street" type="text" title="Straße in der Du wohnst oder für die Du Dich interessierst"/></span>
-					<a href="#" id="position-prompt-submit" class="awesome extrawide">Anzeigen</a>
+					<span class="mobilerow"><label for="address" id='address-label'>Straße und Stadt:</label> <input id="address" type="text" name='address' title="Straße in der Du wohnst oder für die Du Dich interessierst"/></span>
+					<a href="#" id='position-prompt-submit' class="awesome extrawide">Anzeigen</a>
 					<span class="spinner placeholder"></span>
 				</div>
 			</form>
@@ -41,13 +47,8 @@ var CONF = {
 			<input type="text" id="qinput" name="q" value="" />
 			<a href="#" id="submit" class="awesome extrawide">Suchen</a>
 		</form>
-		{% if config.SEARCH_EXAMPLES %}
-		<div class="examples">Beispiele: 
-			{% for example in config.SEARCH_EXAMPLES %}
-			<a href="/suche/?q={{ example|urlencode }}">{{ example }}</a>
-			{% endfor %}
+		<div class="examples" id='search-examples'>
 		</div>
-		{% endif %}
 	</div>
 </div>
 {% endblock %}

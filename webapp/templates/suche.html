@@ -5,6 +5,7 @@
 
 {% block endbody_script %}
 {{ super() }}
+<script type="text/javascript" src="/static/js/region.js"></script>
 <script type="text/javascript" src="/static/js/search.js"></script>
 {% endblock %}
 
@@ -22,7 +23,13 @@ var ok_search_settings = {
 </script>
 
 <div id="search">
-	<div class="content top">
+	<div id="position-form-container" class="content top">
+		<div id="region-prompt">
+			<div id="region-question" class="question">Ausgewählte Region: <span id="region-current">Deutschland</span> <span id="change-region" class="awesome extrawide">Ändern</span></div>
+			<div id="region-choice"></div>
+		</div>
+	</div>
+	<div class="content middle">
 		<h1 style="margin-bottom: 0">Suche</h1>
 	</div>
 	<div class="content middle">

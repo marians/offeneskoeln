@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>OpenRuhr API</title>
+</head>
+<body>
+	{% if is_dict(data) %}
+		<ul>
+		{% for key, value in data.items() recursive %}
+			{% set outer_loop = loop %}
+			<li>{{ key }}:
+			{% if is_dict(value) %}
+				<ul>{{ loop(value.items())}}</ul>
+			{% elif is_list(value) %}
+				<ul>
+					{% for subvalue in value %}
+						{% if is_dict(subvalue) %}
+							<li>{{ loop.index }}:
+							<ul>{{ outer_loop(subvalue.items()) }}</ul></li>
+						{% elif is_list(subvalue) %}
+							<li>no yet implemented</li>
+						{% elif is_link(subvalue) %}
+							<li><a href="{{ subvalue }}">{{ subvalue }}</a></li>
+						{% else %}
+							<li>{{ subvalue }}</li>
+						{% endif %}
+					{% endfor %}
+				</ul>
+			{% elif is_link(value) %}
+				<a href="{{ value }}">{{ value }}</a>
+			{% else %}
+				{{ value }}
+			{% endif %}
+			</li>
+		{% endfor %}
+	</ul>
+	{% elif is_list(data) %}
+	<ul>
+		{% for item in data %}
+			{% if is_dict(item) %}
+				<li>no yes implemented</li>
+			{% elif is_list(item) %}
+				<li>no yes implemented</li>
+			{% elif is_link(item) %}
+				<li><a href="{{ item }}">{{ item }}</a></li>
+			{% else %}
+				<li>{{ item }}</li>
+			{% endif %}
+		{% endfor %}
+	</ul>
+	{% else %}
+		{{ data }}
+	{% endif %}
+</body>
+</html>

@@ -21,9 +21,9 @@ city.osm: city.poly city-regbez-latest.osm osmosis
 	bin/osmosis --read-xml file="city-regbez-latest.osm" --bounding-polygon file="city.poly" --write-xml file="city.osm"
 
 city-regbez-latest.osm:
-	wget -N http://download.geofabrik.de/europe/germany/nordrhein-westfalen/$(REGBEZ)-regbez-latest.osm.bz2
-	bunzip2 $(REGBEZ)-regbez-latest.osm.bz2
-	mv $(REGBEZ)-regbez-latest.osm city-regbez-latest.osm
+	wget -N http://download.geofabrik.de/europe/germany/$(FOLDER)$(FILE)-latest.osm.bz2
+	bunzip2 $(FILE)-latest.osm.bz2
+	mv $(FILE)-latest.osm city-regbez-latest.osm
 
 osmfilter: loadconf
 	wget -O - http://m.m.i24.cc/osmfilter.c |cc -x c - -O3 -o osmfilter

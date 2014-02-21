@@ -23,11 +23,6 @@ im Zusammenhang mit der Software oder sonstiger Verwendung der Software
 entstanden.
 """
 
-# Don't know about these yet
-#from __future__ import absolute_import
-#from __future__ import division
-#from __future__ import print_function
-
 import pprint
 import os
 import json
@@ -189,15 +184,15 @@ def suche():
     return response
 
 
-@app.route("/dokumente/")
-def dokumente_liste():
+#@app.route("/dokumente/")
+#def dokumente_liste():
     """
     Gibt eine sehr simple Liste aller Dokumente mit Links zur
     Detailseite aus.
     """
-    documents = db.get_all_submission_identifiers()
+#    documents = db.get_all_submission_identifiers()
     #pprint.pprint(documents)
-    return render_template('dokument_liste.html', documents=documents)
+#    return render_template('dokument_liste.html', documents=documents)
 
 
 @app.route("/dokumente/<path:identifier>/")

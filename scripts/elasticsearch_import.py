@@ -38,10 +38,6 @@ import pyes
 import json
 import bson
 
-cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
-if cmd_subfolder not in sys.path:
-    sys.path.insert(0, cmd_subfolder)
-
 class MyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
@@ -60,7 +56,7 @@ def index_submissions(index):
     """
     Import alle Einträge aus "submissions" in den Index mit dem gegebenen Namen.
     """
-    for submission in db.submissions.find({"rs" : cityconfig.RS}, {'_id': 1}):
+    for submission in db.submissions.find({}, {'_id': 1}):
         index_submission(index, submission['_id'])
 
 
@@ -77,11 +73,11 @@ def index_submission(index, submission_id):
                 del submission['attachments'][n]['thumbnails']
             if 'file' in submission['attachments'][n]:
                 del submission['attachments'][n]['file']
-            if any(x in submission['attachments'][n]['name'] for x in cityconfig.SEARCH_IGNORE_ATTACHMENTS):
-                submission['attachments'][n] = {}
+            #if any(x in submission['attachments'][n]['name'] for x in cityconfig.SEARCH_IGNORE_ATTACHMENTS):
+            #    submission['attachments'][n] = {}
     # Verweisende agendaitems in sessions finden
     committees = []
-    sessions = db.sessions.find({'agendaitems.submissions.$id': submission_id, "rs" : cityconfig.RS}, {'committee_name': 1})
+    sessions = db.sessions.find({'agendaitems.submissions.$id': submission_id}, {'committee_name': 1})
     for session in sessions:
         if 'committee_name' in session:
             committees.append(session['committee_name'])
@@ -92,23 +88,21 @@ def index_submission(index, submission_id):
     if 'subordinate' in submission:
         del submission['subordinate']
     #pprint.pprint(submission)
+    print submission
     es.index(submission, index, 'submission', str(submission_id))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Generate Fulltext for given City Conf File')
-    parser.add_argument(dest='city', help=("e.g. bochum"))
     options = parser.parse_args()
-    city = options.city
-    cityconfig = __import__(city)
     connection = MongoClient(config.DB_HOST, config.DB_PORT)
     db = connection[config.DB_NAME]
     host = config.ES_HOST + ':' + str(config.ES_PORT)
     es = pyes.ES(host)
 
     now = datetime.utcnow()
-    new_index = cityconfig.ES_INDEX_NAME_PREFIX + '-' + now.strftime('%Y%m%d-%H%M')
+    new_index = config.ES_INDEX_NAME_PREFIX + '-' + now.strftime('%Y%m%d-%H%M')
     try:
         es.indices.delete_index(new_index)
     except:
@@ -228,7 +222,7 @@ if __name__ == '__main__':
     index_submissions(new_index)
     # Setze nach dem Indexieren Alias auf neuen Index
     # z.B. 'offeneskoeln-20130414-1200' -> 'offeneskoeln-latest'
-    latest_name = cityconfig.ES_INDEX_NAME_PREFIX + '-latest'
+    latest_name = config.ES_INDEX_NAME_PREFIX + '-latest'
     try:
         latest_before = es.get_alias(latest_name)[0]
         print "Aliasing index %s to '%s'" % (new_index, latest_name)

@@ -533,7 +533,7 @@ a:hover .del {
 #home #qinput {
 	width: 11em;
 }
-#position-prompt {
+#position-prompt, #region-prompt {
 	font-size: 125%;
 	text-align: center;
 }
@@ -555,7 +555,9 @@ a:hover .del {
 	font-size: 90%;
 	padding: 5px;
 }
-
+#region-choice span {
+	margin: 0px 5px;
+}
 #location-prompt-resultchoice {
 	line-height: 160%;
 }
@@ -578,7 +580,7 @@ a:hover .del {
 	margin-top: 4px;
 }
 
-#map-claim-street {
+#map-claim-address, #region-current {
 	color: #6C9447;
 	white-space: nowrap;
 }
@@ -774,10 +776,10 @@ form .awesome {
   #logo { width: 220px; }
   #nametagline { width: 300px; }
   #name { font-size: 200%; }
-  #map { height: 500px; }
+  #map { height: 580px; }
   .text { width: 80%;}
   label {display: inline;}
-  #home #street { width: 18em; }
+  #home #address { width: 18em; }
   #home #qinput { width: 18em; }
   /*#home #submit { padding-left: 1em; padding-right: 1em;}*/
   /* input, select, textarea { width: 24em; } */
@@ -786,7 +788,7 @@ form .awesome {
 @media only screen and (min-width: 800px) {
   body { margin: 5px 50px; font-size: 14px; }
   #nametagline { width: 600px; }
-  #home #street { width: 22em; }
+  #home #address { width: 22em; }
   #home #qinput { width: 22em; }
   /*#home #submit { padding-left: 2em; padding-right: 2em;}*/
   .mobilerow { display: inline;  margin-top: 0; margin-bottom: 0; margin-left: 10px; margin-right: 10px;}

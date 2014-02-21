@@ -1,4 +1,16 @@
-$(document).ready(function(){
+$(document).ready(function() {
+    search_wait();
+});
+
+// ugly way of waiting for region data
+function search_wait() {
+    if (!OffenesKoeln.region)
+        setTimeout(function() { search_wait(); }, 10);
+    else
+        search_start();
+}
+
+function search_start() {
     if (typeof ok_search_settings != undefined) {
         $('#search .result').empty();
         $('#search .result').append('<div class="loading big outer"><div class="loading big inner">Suche...</div></div>');
@@ -6,6 +18,7 @@ $(document).ready(function(){
         var search_parms = OffenesKoeln.deepCopy(ok_search_settings);
         search_parms['output'] = 'facets';
         //console.log(search_parms)
+        console.log(OffenesKoeln.region);
         OffenesKoeln.search(
             search_parms,
             function(data) {
@@ -27,7 +40,6 @@ $(document).ready(function(){
                 }
             }
         );
-
     }
 
     $('#search-submit').click(function(evt){
@@ -309,7 +321,7 @@ $(document).ready(function(){
         return parts.join('&');
     }
    
-});
+}
 
 /**
  * Search field autocompletion

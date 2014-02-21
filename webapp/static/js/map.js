@@ -15,7 +15,7 @@ $(document).ready(function(){
     
     var lastLocationEntry = ''; // die letzte vom User eingegebene Strasse
     
-    map.setView(new L.LatLng(CONF.mapStartPoint[1], CONF.mapStartPoint[0]), 11).addLayer(backgroundLayer);
+    map.setView(new L.LatLng(51.165691, 10.451526), 6).addLayer(backgroundLayer);
     
     /*
     Alternative tile config. This tile-set should only be used for testing.
@@ -28,7 +28,7 @@ $(document).ready(function(){
     // set to user position, if set and within cologne
     OffenesKoeln.session({}, function(data){
         sessionData = data.response;
-        console.log("sessionData:", sessionData);
+        //console.log("sessionData:", sessionData);
         if (typeof sessionData != 'undefined' &&
             typeof sessionData.lat != 'undefined' &&
             typeof sessionData.lon != 'undefined' &&
