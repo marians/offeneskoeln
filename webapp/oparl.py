@@ -558,6 +558,11 @@ def oparl_basic(content_fuction, params={}, direct_output=False):
   extended_info = extended_info == '1'
   if extended_info:
     request_info['i'] = 1
+  # Singular Mode
+  singular = request.args.get('s')
+  singular = singular == '1'
+  if singular:
+    request_info['i'] = 1
   page = request.args.get('p')
   try:
     page = int(page)
@@ -573,6 +578,12 @@ def oparl_basic(content_fuction, params={}, direct_output=False):
   }
   params.update(request_info)
   response = content_fuction(params)
+  if not singular:
+    convert_def = {'committee': 'committees', 'person': 'people', 'meeting': 'meetings', 'agendaitem': 'agendaitems', 'paper': 'papers', 'document': 'documents'}
+    for key, value in convert_def.iteritems():
+      if key in response:
+        response[value] = response[key]
+        del response[key]
   if direct_output:
     return response
   if extended_info:

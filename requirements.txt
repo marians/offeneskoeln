@@ -9,3 +9,7 @@ datetime
 python-dateutil
 lxml
 translitcodec
+pytz
+cssselect
+requests
+translitcodec
