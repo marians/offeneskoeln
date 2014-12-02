@@ -23,7 +23,6 @@ im Zusammenhang mit der Software oder sonstiger Verwendung der Software
 entstanden.
 """
 
-import pprint
 import os
 import json
 import util
@@ -41,189 +40,257 @@ from flask import redirect
 from flask import Response
 from flask import Markup
 from flask.ext.basicauth import BasicAuth
+from bson.objectid import ObjectId
 
-from webapp import app
-
-basic_auth = BasicAuth(app)
+from webapp import app, mongo, basic_auth
+from forms import *
 
 
 @app.route("/")
 def index():
-    return render_template('index.html')
+  return render_template('index.html')
 
 
 @app.route("/api/")
 def api_home():
-    return render_template('api.html')
+  return render_template('api.html')
 
 
 @app.route("/hilfe/")
 def hilfe():
-    return render_template('hilfe.html')
+  return render_template('hilfe.html')
 
 @app.route("/ueber/")
 def ueber():
-    return render_template('ueber.html')
+  return render_template('ueber.html')
 
 @app.route("/impressum/")
 def impressum():
-    return render_template('impressum.html')
+  return render_template('impressum.html')
 
 @app.route("/daten/")
 def daten():
-    """
-    Anzeige der /daten Seite mit Auflistung der
-    Download-Dateien
-    """
-    path = app.config['DB_DUMP_FOLDER'] + os.sep + app.config['RS'] + '.tar.bz2'
-    if os.path.isfile(path):
-        stat = os.lstat(path)
-        databasefilesize = "%d" % (stat.st_size / 1024.0 / 1024.0)
-    else:
-        databasefilesize = 0
-    path = app.config['ATTACHMENT_FOLDER'] + os.sep + app.config['RS'] + '.tar.bz2'
-    if os.path.isfile(path):
-        stat = os.lstat(path)
-        attachmentsfilesize = "%d" % (stat.st_size / 1024.0 / 1024.0 / 1024.0)
-    else:
-        attachmentsfilesize = 0
-    return render_template('daten.html', databasefilesize=databasefilesize, attachmentsfilesize=attachmentsfilesize)
+  """
+  Anzeige der /daten Seite mit Auflistung der
+  Download-Dateien
+  """
+  path = app.config['DB_DUMP_FOLDER'] + os.sep + app.config['RS'] + '.tar.bz2'
+  if os.path.isfile(path):
+    stat = os.lstat(path)
+    databasefilesize = "%d" % (stat.st_size / 1024.0 / 1024.0)
+  else:
+    databasefilesize = 0
+  path = app.config['ATTACHMENT_FOLDER'] + os.sep + app.config['RS'] + '.tar.bz2'
+  if os.path.isfile(path):
+    stat = os.lstat(path)
+    attachmentsfilesize = "%d" % (stat.st_size / 1024.0 / 1024.0 / 1024.0)
+  else:
+    attachmentsfilesize = 0
+  return render_template('daten.html', databasefilesize=databasefilesize, attachmentsfilesize=attachmentsfilesize)
 
 
 @app.route("/disclaimer/")
 def disclaimer():
-    return render_template('disclaimer.html')
+  return render_template('disclaimer.html')
 
 
 @app.route("/favicon.ico")
 def favicon():
-    return ""
+  return ""
 
 @app.route("/data/<filename>")
 def data_download(filename):
-    return ""
+  return ""
 
 
 @app.route("/robots.txt")
 def robots_txt():
-    return render_template('robots.txt')
+  return render_template('robots.txt')
 
 
 @app.route("/anhang/<string:attachment_id>.<string:extension>")
 def attachment_download(attachment_id, extension):
-    """
-    Download eines Attachments
-    """
-    attachment_info = db.get_attachment(attachment_id)
-    #pprint.pprint(attachment_info)
-    if attachment_info is None:
-        # TODO: Rendere informativere 404 Seite
-        abort(404)
-    # extension doesn't match file extension (avoiding arbitrary URLs)
-    proper_extension = attachment_info['filename'].split('.')[-1]
-    if proper_extension != extension:
-        abort(404)
+  """
+  Download eines Attachments
+  """
+  attachment_info = db.get_attachment(attachment_id)
+  #pprint.pprint(attachment_info)
+  if attachment_info is None:
+    # TODO: Rendere informativere 404 Seite
+    abort(404)
+  # extension doesn't match file extension (avoiding arbitrary URLs)
+  proper_extension = attachment_info['filename'].split('.')[-1]
+  if proper_extension != extension:
+    abort(404)
 
-    # 'file' property is not set (e.g. due to depublication)
-    if 'file' not in attachment_info:
-        if 'depublication' in attachment_info:
-            abort(410)  # Gone
-        else:
-            # TODO: log this as unexplicable...
-            abort(500)
+  # 'file' property is not set (e.g. due to depublication)
+  if 'file' not in attachment_info:
+    if 'depublication' in attachment_info:
+      abort(410)  # Gone
+    else:
+      # TODO: log this as unexplicable...
+      abort(500)
 
-    # handle conditional GET
-    if 'If-Modified-Since' in request.headers:
-        file_date = attachment_info['file']['uploadDate'].replace(tzinfo=None)
-        request_date = util.parse_rfc1123date(request.headers['If-Modified-Since'])
-        difference = file_date - request_date
-        if difference < datetime.timedelta(0, 1):  # 1 second
-            return Response(status=304)
+  # handle conditional GET
+  if 'If-Modified-Since' in request.headers:
+    file_date = attachment_info['file']['uploadDate'].replace(tzinfo=None)
+    request_date = util.parse_rfc1123date(request.headers['If-Modified-Since'])
+    difference = file_date - request_date
+    if difference < datetime.timedelta(0, 1):  # 1 second
+      return Response(status=304)
 
-    #if 'if-none-match' in request.headers:
-    #    print "Conditional GET: If-None-Match"
-    # TODO: handle ETag in request
+  #if 'if-none-match' in request.headers:
+  #  print "Conditional GET: If-None-Match"
+  # TODO: handle ETag in request
 
-    handler = db.get_file(attachment_info['file']['_id'])
-    response = make_response(handler.read(), 200)
-    response.mimetype = attachment_info['mimetype']
-    response.headers['X-Robots-Tag'] = 'noarchive'
-    response.headers['ETag'] = attachment_info['sha1']
-    response.headers['Last-modified'] = util.rfc1123date(
-                    attachment_info['file']['uploadDate'])
-    response.headers['Expires'] = util.expires_date(
-                                        hours=(24 * 30))
-    response.headers['Cache-Control'] = util.cache_max_age(
-                                            hours=(24 * 30))
-    return response
+  handler = db.get_file(attachment_info['file']['_id'])
+  response = make_response(handler.read(), 200)
+  response.mimetype = attachment_info['mimetype']
+  response.headers['X-Robots-Tag'] = 'noarchive'
+  response.headers['ETag'] = attachment_info['sha1']
+  response.headers['Last-modified'] = util.rfc1123date(
+      attachment_info['file']['uploadDate'])
+  response.headers['Expires'] = util.expires_date(
+          hours=(24 * 30))
+  response.headers['Cache-Control'] = util.cache_max_age(
+            hours=(24 * 30))
+  return response
 
 
 @app.route("/suche/")
 def suche():
-    """
-    URL-Parameter:
-    q: Suchanfrage, nutzer-formuliert
-    fq: Filter query (Lucene Syntax)
-    sort: Sortierung, z.B. "id asc"
-    start: Offset im Suchergebnis
-    num: Anzahl der Treffer pro Seite
-    date: Datumsbereich als String
-    """
-    search_settings = {}
-    search_settings['q'] = request.args.get('q', '')
-    search_settings['fq'] = request.args.get('fq', '')
-    search_settings['sort'] = request.args.get('sort', '')
-    search_settings['start'] = int(request.args.get('start', '0'))
-    search_settings['num'] = int(request.args.get('num', '10'))
-    search_settings['num'] = min(search_settings['num'], 100)  # max 100 items
-    search_settings['date'] = request.args.get('date', '')
-    html = render_template('suche.html', search_settings=search_settings)
-    response = make_response(html, 200)
-    response.headers['Expires'] = util.expires_date(hours=24)
-    response.headers['Cache-Control'] = util.cache_max_age(hours=24)
-    return response
+  """
+  URL-Parameter:
+  q: Suchanfrage, nutzer-formuliert
+  fq: Filter query (Lucene Syntax)
+  sort: Sortierung, z.B. "id asc"
+  start: Offset im Suchergebnis
+  num: Anzahl der Treffer pro Seite
+  date: Datumsbereich als String
+  """
+  search_settings = {}
+  search_settings['q'] = request.args.get('q', '')
+  search_settings['fq'] = request.args.get('fq', '')
+  search_settings['sort'] = request.args.get('sort', '')
+  search_settings['start'] = int(request.args.get('start', '0'))
+  search_settings['num'] = int(request.args.get('num', '10'))
+  search_settings['num'] = min(search_settings['num'], 100)  # max 100 items
+  search_settings['date'] = request.args.get('date', '')
+  html = render_template('suche.html', search_settings=search_settings)
+  response = make_response(html, 200)
+  response.headers['Expires'] = util.expires_date(hours=24)
+  response.headers['Cache-Control'] = util.cache_max_age(hours=24)
+  return response
 
 
 #@app.route("/dokumente/")
 #def dokumente_liste():
-    """
-    Gibt eine sehr simple Liste aller Dokumente mit Links zur
-    Detailseite aus.
-    """
-#    documents = db.get_all_submission_identifiers()
-    #pprint.pprint(documents)
-#    return render_template('dokument_liste.html', documents=documents)
+  """
+  Gibt eine sehr simple Liste aller Dokumente mit Links zur
+  Detailseite aus.
+  """
+#  documents = db.get_all_submission_identifiers()
+  #pprint.pprint(documents)
+#  return render_template('dokument_liste.html', documents=documents)
 
 
 @app.route("/dokumente/<path:identifier>/")
 def dokument(identifier):
-    """
-    Gibt Dokumenten-Detailseite aus
-    """
-    result = db.get_submissions(references=[identifier],
-                        get_attachments=True,
-                        get_consultations=True,
-                        get_thumbnails=True)
-    if len(result) == 0:
-        abort(404)
-    return render_template('dokument_detailseite.html', submission=result[0])
+  """
+  Gibt Dokumenten-Detailseite aus
+  """
+  result = db.get_submissions(references=[identifier],
+    get_attachments=True,
+    get_consultations=True,
+    get_thumbnails=True)
+  if len(result) == 0:
+    abort(404)
+  return render_template('dokument_detailseite.html', submission=result[0])
 
-@app.route("/admin")
-@app.route("/admin/<string:funct>")
+#@app.route("/admin")
+#@app.route("/admin/<string:funct>")
+#@basic_auth.required
+#def admin(funct):
+#  if funct == 'responses':
+#    responses=db.get_responses()
+#    for response in responses:
+#      response['response_type'] = app.config['RESPONSE_IDS'][response['response_type']]
+#    return render_template('admin_response.html', responses=responses)
+#  return render_template('admin.html')
+
+@app.route('/admin/config', methods=['GET', 'POST'])
 @basic_auth.required
-def admin(funct):
-    if funct == 'responses':
-        responses=db.get_responses()
-        for response in responses:
-            response['response_type'] = app.config['RESPONSE_IDS'][response['response_type']]
-        return render_template('admin_response.html', responses=responses)
-    return render_template('admin.html')
+def admin_config():
+  if request.method == 'POST':
+    config_form = ConfigForm(request.form)
+    config_form.config.data = json.dumps(json.loads(config_form.config.data), cls=util.MyEncoder, sort_keys=True, indent=2, ensure_ascii=False)
+  else:
+    config = []
+    for value in mongo.db.config.find():
+      if '_id' in value:
+        del value['_id']
+      config.append(value)
+    if len(config) == 1:
+      config = config[0]
+    else:
+      config = {}
+    config = json.dumps(config, cls=util.MyEncoder, sort_keys=True, indent=2, ensure_ascii=False)
+    config_form = ConfigForm(config=config)
+  if request.method == 'POST' and config_form.validate():
+    config = json.loads(config_form.config.data)
+    mongo.db.config.remove({})
+    mongo.db.config.insert(config)
+  return render_template('admin_config.html', config_form=config_form)
+
+@app.route('/admin/bodies', methods=['GET', 'POST'])
+@basic_auth.required
+def admin_bodies():
+  return render_template('admin_bodies.html', bodies=mongo.db.body.find())
+
+@app.route('/admin/body/new', methods=['GET', 'POST'])
+@basic_auth.required
+def admin_body_new():
+  if request.method == 'POST':
+    body_form = BodyForm(request.form)
+  else:
+    body_form = BodyForm()
+  if request.method == 'POST' and body_form.validate():
+    new_body = json.loads(body_form.config.data)
+    mongo.db.body.insert(new_body)
+    return redirect('/admin/bodies')
+  return render_template('admin_body_new.html', body_form=body_form)
+
+
+@app.route('/admin/body/edit', methods=['GET', 'POST'])
+@basic_auth.required
+def admin_body_edit():
+  if request.method == 'POST':
+    body_form = BodyForm(request.form)
+    body_form.config.data = json.dumps(json.loads(body_form.config.data), cls=util.MyEncoder, sort_keys=True, indent=2, ensure_ascii=False)
+  else:
+    config = []
+    for value in mongo.db.body.find({'_id': ObjectId(request.args.get('id'))}):
+      if '_id' in value:
+        del value['_id']
+      config.append(value)
+    if len(config) == 1:
+      config = config[0]
+    else:
+      abort(500)
+    config = json.dumps(config, cls=util.MyEncoder, sort_keys=True, indent=2, ensure_ascii=False)
+    body_form = BodyForm(config=config)
+  if request.method == 'POST' and body_form.validate():
+    updated_body = json.loads(body_form.config.data)
+    if '_id' in updated_body:
+      del updated_body['_id']
+    mongo.db.body.update({'_id': ObjectId(request.args.get('id'))}, updated_body)
+  return render_template('admin_body_edit.html', body_form=body_form)
 
 
 @app.template_filter('urlencode')
 def urlencode_filter(s):
-    if type(s) == Markup:
-        s = s.unescape()
+  if type(s) == Markup:
+    s = s.unescape()
     s = s.encode('utf8')
     s = urllib.quote_plus(s)
     return Markup(s)
@@ -231,5 +298,5 @@ def urlencode_filter(s):
 
 @app.template_filter('debug')
 def debug_filter(s):
-    pprint.pprint(s)
-    return s
+  pprint.pprint(s)
+  return s

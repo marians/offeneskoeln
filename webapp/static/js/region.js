@@ -17,10 +17,10 @@ $(document).ready(function(){
             {'region_id': region_id, 'region': region},
             function(event) {
               OffenesKoeln.region = event.data.region;
-              $.getJSON('/api/session', {'region_id': OffenesKoeln.region.region_id}, function(data){});
+              //$.getJSON('/api/session', {'region_id': OffenesKoeln.region.region_id}, function(data){});
               $('#region-choice').html('');
               $('#region-question').css({'display': 'block'});
-              update_region();
+              //update_region();
             }
           )
           .appendTo('#region-choice');

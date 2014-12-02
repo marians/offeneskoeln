@@ -585,6 +585,21 @@ a:hover .del {
 	white-space: nowrap;
 }
 
+/* Admin */
+
+#admin-config textarea {
+	height: 350px;
+}
+
+.datatable {
+	width: 100% !important;
+}
+
+.datatable td, .datatable th {
+	border: 1px solid #999999;
+	padding: 3px;
+}
+
 /* API description */
 
 code {

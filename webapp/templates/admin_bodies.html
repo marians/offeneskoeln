@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Admin: Konfiguration{{super()}}{% endblock %}
+
+{% block riscontent %}
+<div class="content" id="admin-config">
+	<h1>Admin: Bodies</h1>
+	<p><a href="/admin/body/new">Neuen Body hinzufügen</a></p>
+	<table class="datatable">
+		<thead>
+			<tr>
+				<th>UID</th>
+				<th>Name</th>
+				<th>Regionalschlüssel</th>
+				<th>Funktionen</th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<th>UID</th>
+				<th>Name</th>
+				<th>Regionalschlüssel</th>
+				<th>Funktionen</th>
+			</tr>
+		</tfoot>
+		<tbody>
+			{% for body in bodies %}
+			<tr>
+				<th>{{ body._id }}</th>
+				<td>{{ body.name }}</td>
+				<td>{{ body.rgs }}</td>
+				<td><a href="/admin/body/edit?id={{ body._id }}">edit</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}

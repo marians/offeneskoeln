@@ -3,9 +3,9 @@
 {% block ogtitle %}Startseite{% endblock %}
 {% block meta_description %}{{ config.META_DESCR|safe }}{% endblock %}
 
-{% block endbody_script %}
+{% block scripts %}
 {{ super() }}
-<script type="text/javascript" src="/static/js/leaflet_0.4.5.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
 <script type="text/javascript" src="http://a.ok.mycdn.de/js/jquery.ajaxq.js"></script>
 <script>
 var CONF = {

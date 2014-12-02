@@ -43,7 +43,9 @@ from flask import Response
 
 import werkzeug
 
-from webapp import app
+from webapp import app, mongo
+
+#@cache.memoize(timeout=86400)
 
 
 @app.route("/api/documents")
@@ -239,7 +241,11 @@ def api_geocode():
 @app.route('/api/regions')
 def apt_rs():
     jsonp_callback = request.args.get('callback', None)
-    json_output = json.dumps(app.config['RSMAP'], cls=util.MyEncoder, sort_keys=True)
+    result = []
+    bodies=mongo.db.body.find()
+    for body in bodies:
+        result.append({'uid': body['_id'], 'name': body['name']})
+    json_output = json.dumps(result, cls=util.MyEncoder, sort_keys=True)
     if jsonp_callback is not None:
         json_output = jsonp_callback + '(' + json_output + ')'
     response = make_response(json_output, 200)

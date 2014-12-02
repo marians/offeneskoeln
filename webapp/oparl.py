@@ -41,10 +41,12 @@ from flask import session
 from flask import redirect
 from flask import Response
 from collections import OrderedDict
+from bson import ObjectId, DBRef
 
 import werkzeug
 
 from webapp import app
+config = app.conf
 
 ####################################################
 # system
@@ -55,18 +57,18 @@ def oparl_general():
   return oparl_basic(lambda params: {
     "@id": "de.openruhr",
     "@type": "OParlSystem",
-    "bodies": app.config['API_URL'] + "/oparl/body" + generate_postfix(params),
+    "bodies": "%s/oparl/body%s" % (config['api_url'], generate_postfix(params)),
     "contact": {
         "email": "info@openruhr.de",
         "name": "Initiative OpenRuhr"
     }, 
     "info_url": "http://openruhr.de/",
     "name": "OpenRuhr Oparl Service",
-    "new_objects": app.config['API_URL'] + "/feeds/new",
+    "new_objects": "%s/feeds/new" % config['api_url'],
     "oparl_version": "http://oparl.org/spezifikation/1.0/",
     "product_url": "http://openruhr.de/",
-    "removed_objects": app.config['API_URL'] + "/feeds/removed",
-    "updated_objects": app.config['API_URL'] + "/feeds/updated",
+    "removed_objects": "%s/feeds/removed" % config['api_url'],
+    "updated_objects": "%s/feeds/updated" % config['api_url'],
     "vendor_url": "http://openruhr.de/"
   })
 
@@ -81,128 +83,237 @@ def oparl_bodies():
   return oparl_basic(oparl_bodies_data)
 
 def oparl_bodies_data(params):
-  return db.get_body(body_list=True, add_prefix=app.config['API_URL']+'/oparl/body/', add_postfix=generate_postfix(params))
+  return db.get_body(body_list = True,
+                     add_prefix = "%s/oparl/body/" % config['api_url'],
+                     add_postfix=generate_postfix(params))
 
 # single body
-@app.route('/oparl/body/<string:body_slug>')
-def oparl_body(body_slug):
-  return oparl_basic(oparl_body_data, params={'slug':body_slug})
+@app.route('/oparl/body/<string:body_id>')
+def oparl_body(body_id):
+  return oparl_basic(oparl_body_data, params={'_id': body_id})
 
 def oparl_body_data(params):
-  data = db.get_body(search_params={'title':params['slug']})
+  data = db.get_body(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['committee'] = app.config['API_URL'] + '/oparl/body/' + params['slug'] + '/committee' + generate_postfix(params)
-    data[0]['person'] = app.config['API_URL'] + '/oparl/body/' + params['slug'] + '/person' + generate_postfix(params)
-    data[0]['meeting'] = app.config['API_URL'] + '/oparl/body/' + params['slug'] + '/meeting' + generate_postfix(params)
-    data[0]['paper'] = app.config['API_URL'] + '/oparl/body/' + params['slug'] + '/paper' + generate_postfix(params)
-    data[0]['document'] = app.config['API_URL'] + '/oparl/body/' + params['slug'] + '/document' + generate_postfix(params)
-    data[0]['system'] = app.config['API_URL'] + '/oparl' + generate_postfix(params)
+    data[0]['legislativeTerm'] = generate_sublist_url(params=params, main_type='body', sublist_type='legislativeTerm')
+    data[0]['organization'] = generate_sublist_url(params=params, main_type='body', sublist_type='organization')
+    data[0]['membership'] = generate_sublist_url(params=params, main_type='body', sublist_type='membership')
+    data[0]['person'] = generate_sublist_url(params=params, main_type='body', sublist_type='person')
+    data[0]['meeting'] = generate_sublist_url(params=params, main_type='body', sublist_type='meeting')
+    data[0]['agendaItem'] = generate_sublist_url(params=params, main_type='body', sublist_type='agendaItem')
+    data[0]['paper'] = generate_sublist_url(params=params, main_type='body', sublist_type='paper')
+    data[0]['consultation'] = generate_sublist_url(params=params, main_type='body', sublist_type='consultation')
+    data[0]['file'] = generate_sublist_url(params=params, main_type='body', sublist_type='file')
+    data[0]['system'] = "%s/oparl%s" % (config['api_url'], generate_postfix(params))
     data[0]['@type'] = 'OParlBody'
-    data[0]['@id'] = data[0]['title']
+    data[0]['@id'] = data[0]['_id']
+    del data[0]['config']
     return data[0]
   elif len(data) == 0:
     abort(404)
-  # Should never happen because slug is unique
-  else:
-    abort(500)
 
-# body commitee list
-@app.route('/oparl/body/<string:body_slug>/committee')
-def oparl_body_committee(body_slug):
-  return oparl_basic(oparl_body_committee_data, params={'body_slug':body_slug})
+# body legislativeTerm list
+@app.route('/oparl/body/<string:body_id>/legislativeTerm')
+def oparl_body_legislativeTerm(body_id):
+  return oparl_basic(oparl_body_legislativeTerm_data,
+                     params={'body_id':body_id})
 
-def oparl_body_committee_data(params):
-  data = db.get_committee(committee_list=True, search_params={'body_slug':params['body_slug']}, add_prefix=app.config['API_URL']+'/oparl/committee/', add_postfix=generate_postfix(params))
+def oparl_body_legislativeTerm_data(params):
+  data = db.get_legislativeTerm(legislativeTerm_list = True,
+                             search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
+                             add_prefix = "%s/oparl/legislativeTerm/" % config['api_url'],
+                             add_postfix = generate_postfix(params))
+  return data
+
+# body organization list
+@app.route('/oparl/body/<string:body_id>/organization')
+def oparl_body_organization(body_id):
+  return oparl_basic(oparl_body_organization_data,
+                     params={'body_id':body_id})
+
+def oparl_body_organization_data(params):
+  data = db.get_organization(organization_list = True,
+                             search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
+                             add_prefix = "%s/oparl/organization/" % config['api_url'],
+                             add_postfix = generate_postfix(params))
+  return data
+
+# body membership list
+@app.route('/oparl/body/<string:body_id>/membership')
+def oparl_body_membership(body_id):
+  return oparl_basic(oparl_body_membership_data,
+                     params={'body_id': body_id})
+
+def oparl_body_membership_data(params):
+  data = db.get_membership(membership_list = True,
+                       search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
+                       add_prefix = "%s/oparl/membership/" % config['api_url'],
+                       add_postfix = generate_postfix(params))
   return data
 
 # body person list
-@app.route('/oparl/body/<string:body_slug>/person')
-def oparl_body_person(body_slug):
-  return oparl_basic(oparl_body_person_data, params={'body_slug':body_slug})
+@app.route('/oparl/body/<string:body_id>/person')
+def oparl_body_person(body_id):
+  return oparl_basic(oparl_body_person_data,
+                     params={'body_id': body_id})
 
 def oparl_body_person_data(params):
-  data = db.get_person(person_list=True, search_params={'body_slug':params['body_slug']}, add_prefix=app.config['API_URL']+'/oparl/person/', add_postfix=generate_postfix(params))
+  data = db.get_person(person_list = True,
+                       search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
+                       add_prefix = "%s/oparl/person/" % config['api_url'],
+                       add_postfix = generate_postfix(params))
   return data
 
 # body meeting list
-@app.route('/oparl/body/<string:body_slug>/meeting')
-def oparl_body_meeting(body_slug):
-  return oparl_basic(oparl_body_meeting_data, params={'body_slug':body_slug})
+@app.route('/oparl/body/<string:body_id>/meeting')
+def oparl_body_meeting(body_id):
+  return oparl_basic(oparl_body_meeting_data,
+                     params = {'body_id': body_id})
 
 def oparl_body_meeting_data(params):
-  data = db.get_meeting(meeting_list=True, search_params={'body_slug':params['body_slug']}, add_prefix=app.config['API_URL']+'/oparl/meeting/', add_postfix=generate_postfix(params))
+  data = db.get_meeting(meeting_list = True,
+                        search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
+                        add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                        add_postfix = generate_postfix(params))
+  return data
+
+# body agendaitem list
+@app.route('/oparl/body/<string:body_id>/agendaItem')
+def oparl_body_agendaItem(body_id):
+  return oparl_basic(oparl_body_agendaItem_data,
+                     params = {'body_id': body_id})
+
+def oparl_body_agendaItem_data(params):
+  data = db.get_agendaItem(agendaItem_list = True,
+                        search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
+                        add_prefix = "%s/oparl/agendaItem/" % config['api_url'],
+                        add_postfix = generate_postfix(params))
+  return data
+
+# body consultation list
+@app.route('/oparl/body/<string:body_id>/consultation')
+def oparl_body_consultation(body_id):
+  return oparl_basic(oparl_body_consultation_data,
+                     params = {'body_id': body_id})
+
+def oparl_body_consultation_data(params):
+  data = db.get_consultation(consultation_list = True,
+                        search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
+                        add_prefix = "%s/oparl/consultation/" % config['api_url'],
+                        add_postfix = generate_postfix(params))
   return data
 
 # body paper list
-@app.route('/oparl/body/<string:body_slug>/paper')
-def oparl_body_paper(body_slug):
-  return oparl_basic(oparl_body_paper_data, params={'body_slug':body_slug})
+@app.route('/oparl/body/<string:body_id>/paper')
+def oparl_body_paper(body_id):
+  return oparl_basic(oparl_body_paper_data,
+                     params={'body_id': body_id})
 
 def oparl_body_paper_data(params):
-  data = db.get_paper(paper_list=True, search_params={'body_slug':params['body_slug']}, add_prefix=app.config['API_URL']+'/oparl/paper/', add_postfix=generate_postfix(params))
+  data = db.get_paper(paper_list=True,
+                      search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
+                      add_prefix =  "%s/oparl/paper/" % config['api_url'],
+                      add_postfix = generate_postfix(params))
   return data
 
-# body document list
-@app.route('/oparl/body/<string:body_slug>/document')
-def oparl_body_document(body_slug):
-  return oparl_basic(oparl_body_document_data, params={'body_slug':body_slug})
+# body file list
+@app.route('/oparl/body/<string:body_id>/file')
+def oparl_body_file(body_id):
+  return oparl_basic(oparl_body_file_data,
+                     params={'body_id': body_id})
 
-def oparl_body_document_data(params):
-  data = db.get_document(document_list=True, search_params={'body_slug':params['body_slug']}, add_prefix=app.config['API_URL']+'/oparl/document/', add_postfix=generate_postfix(params))
+def oparl_body_file_data(params):
+  data = db.get_file(file_list=True,
+                     search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
+                     add_prefix = "%s/oparl/file/" % config['api_url'],
+                     add_postfix = generate_postfix(params))
   return data
 
 ####################################################
-# committee
+# organization
 ####################################################
 
-# committee list
-@app.route('/oparl/committee')
-def oparl_committees():
-  return oparl_basic(oparl_committees_data)
+# organization list
+@app.route('/oparl/organization')
+def oparl_organizations():
+  return oparl_basic(oparl_organizations_data)
 
-def oparl_committees_data(params):
-  return db.get_committee(committee_list=True, add_prefix=app.config['API_URL']+'/oparl/committee/', add_postfix=generate_postfix(params))
+def oparl_organizations_data(params):
+  return db.get_organization(organization_list=True,
+                             add_prefix = "%s/oparl/organization/" % config['api_url'],
+                             add_postfix=generate_postfix(params))
 
-# single committee
-@app.route('/oparl/committee/<string:committee_slug>')
-def oparl_committee(committee_slug):
-  return oparl_basic(oparl_committee_data, params={'slug':committee_slug})
+# single organization
+@app.route('/oparl/organization/<string:organization_id>')
+def oparl_organization(organization_id):
+  return oparl_basic(oparl_organization_data, params={'_id':organization_id})
 
-def oparl_committee_data(params):
-  data = db.get_committee(search_params={'slug':params['slug']})
+def oparl_organization_data(params):
+  data = db.get_organization(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = app.config['API_URL'] + '/oparl/committee/' + params['slug'] + '/body' + generate_postfix(params)
-    #TODO: data[0]['committee'] = app.config['API_URL'] + '/oparl/body/' + params['slug'] + '/committee' + generate_postfix(params)
-    data[0]['person'] = app.config['API_URL'] + '/oparl/committee/' + params['slug'] + '/person' + generate_postfix(params)
-    #TODO: data[0]['meeting'] = app.config['API_URL'] + '/oparl/body/' + params['slug'] + '/meeting' + generate_postfix(params)
-    #TODO: data[0]['paper'] = app.config['API_URL'] + '/oparl/body/' + params['slug'] + '/paper' + generate_postfix(params)
-    #TODO: data[0]['document'] = app.config['API_URL'] + '/oparl/body/' + params['slug'] + '/document' + generate_postfix(params)
+    data[0]['body'] = "%s/oparl/body/%s%s" % (config['api_url'], data[0]['body'].id, generate_postfix(params))
+    data[0]['membership'] = generate_sublist_url(params=params, main_type='organization', sublist_type='membership')
+    data[0]['meeting'] = generate_sublist_url(params=params, main_type='organization', sublist_type='meeting')
     data[0]['@type'] = 'OParlCommittee'
-    data[0]['@id'] = data[0]['identifier']
+    data[0]['@id'] = data[0]['_id']
     return data[0]
   elif len(data) == 0:
     abort(404)
-  # Should never happen because slug is unique
-  else:
-    abort(500)
 
-# committee person list
-@app.route('/oparl/committee/<string:committee_slug>/body')
-def oparl_committee_body(committee_slug):
-  return oparl_basic(oparl_committee_body_data, params={'committee_slug':committee_slug})
+# organization membership list
+@app.route('/oparl/organization/<string:organization_id>/membership')
+def oparl_rganization_membership(organization_id):
+  return oparl_basic(oparl_organization_membership_data, params={'organization_id': organization_id})
 
-def oparl_committee_body_data(params):
-  data = db.get_committee(deref={'value': 'body', 'list_select': 'title'}, search_params={'slug':params['committee_slug']}, add_prefix=app.config['API_URL']+'/oparl/body/', add_postfix=generate_postfix(params))
+def oparl_organization_membership_data(params):
+  data = db.get_membership(membership_list = True,
+                           search_params = {'organization': DBRef('organization', ObjectId(params['organization_id']))},
+                           add_prefix = "%s/oparl/membership/" % config['api_url'],
+                           add_postfix = generate_postfix(params))
   return data
 
-# committee person list
-@app.route('/oparl/committee/<string:committee_slug>/person')
-def oparl_committee_person(committee_slug):
-  return oparl_basic(oparl_committee_person_data, params={'committee_slug':committee_slug})
+# organization meeting list
+@app.route('/oparl/organization/<string:organization_id>/meeting')
+def oparl_organization_meeting(organization_id):
+  return oparl_basic(oparl_organization_meeting_data, params={'organization_id': organization_id})
 
-def oparl_committee_person_data(params):
-  data = db.get_person(person_list=True, search_params={'committee_slug':params['committee_slug']}, add_prefix=app.config['API_URL']+'/oparl/person/', add_postfix=generate_postfix(params))
+def oparl_organization_meeting_data(params):
+  data = db.get_meeting(meeting_list = True,
+                        search_params = {'organization': DBRef('organization', ObjectId(params['organization_id']))},
+                        add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                        add_postfix = generate_postfix(params))
   return data
+
+####################################################
+# membership
+####################################################
+
+# membership list
+@app.route('/oparl/membership')
+def oparl_memberships():
+  return oparl_basic(oparl_memberships_data)
+
+def oparl_memberships_data(params):
+  return db.get_membership(membership_list=True,
+                           add_prefix = "%s/oparl/membership/" % config['api_url'],
+                           add_postfix=generate_postfix(params))
+
+# single organization
+@app.route('/oparl/membership/<string:membership_id>')
+def oparl_membership(membership_id):
+  return oparl_basic(oparl_membership_data, params={'_id': membership_id})
+
+def oparl_membership_data(params):
+  data = db.get_membership(search_params={'_id': ObjectId(params['_id'])})
+  if len(data) == 1:
+    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
+    data[0]['organization'] = generate_single_url(params=params, type='organization', id=data[0]['organization'].id)
+    data[0]['person'] = generate_single_backref_url(params=params, get='get_person', type='person', reverse_type='membership', id=params['_id'])
+    data[0]['@type'] = 'OParlMembership'
+    data[0]['@id'] = data[0]['_id']
+    return data[0]
+  elif len(data) == 0:
+    abort(404)
 
 ####################################################
 # person
@@ -211,47 +322,39 @@ def oparl_committee_person_data(params):
 # person list
 @app.route('/oparl/person')
 def oparl_persons():
-  return oparl_basic(oparl_person_data)
+  return oparl_basic(oparl_persons_data)
 
 def oparl_persons_data(params):
-  return db.get_person(person_list=True, add_prefix=app.config['API_URL']+'/oparl/person/', add_postfix=generate_postfix(params))
+  return db.get_person(person_list=True,
+                       add_prefix = "%s/oparl/person/" % config['api_url'],
+                       add_postfix=generate_postfix(params))
 
 # single person
-@app.route('/oparl/person/<string:person_slug>')
-def oparl_person(person_slug):
-  return oparl_basic(oparl_person_data, params={'slug':person_slug})
+@app.route('/oparl/person/<string:person_id>')
+def oparl_person(person_id):
+  return oparl_basic(oparl_person_data, params={'_id': person_id})
 
 def oparl_person_data(params):
-  data = db.get_person(search_params={'slug':params['slug']})
+  data = db.get_person(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = app.config['API_URL'] + '/oparl/person/' + params['slug'] + '/body' + generate_postfix(params)
-    data[0]['committee'] = app.config['API_URL'] + '/oparl/person/' + params['slug'] + '/committee' + generate_postfix(params)
-    #TODO: data[0]['meeting'] = app.config['API_URL'] + '/oparl/body/' + params['slug'] + '/meeting' + generate_postfix(params)
+    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
+    data[0]['membership'] = generate_sublist_url(params=params, main_type='person', sublist_type='membership')
     data[0]['@type'] = 'OParlPerson'
-    data[0]['@id'] = data[0]['identifier']
+    data[0]['@id'] = data[0]['_id']
     return data[0]
   elif len(data) == 0:
     abort(404)
-  # Should never happen because slug is unique
-  else:
-    abort(500)
 
-# person body list
-@app.route('/oparl/person/<string:person_slug>/body')
-def oparl_person_body(person_slug):
-  return oparl_basic(oparl_person_body_data, params={'person_slug':person_slug})
+# person membership list
+@app.route('/oparl/person/<string:person_id>/membership')
+def oparl_person_membership(person_id):
+  return oparl_basic(oparl_person_membership_data, params={'person_id': person_id})
 
-def oparl_person_body_data(params):
-  data = db.get_person(deref={'value': 'body', 'list_select': 'title'}, search_params={'slug':params['person_slug']}, add_prefix=app.config['API_URL']+'/oparl/body/', add_postfix=generate_postfix(params))
-  return data
-
-# person committee list
-@app.route('/oparl/person/<string:person_slug>/committee')
-def oparl_person_commiteee(person_slug):
-  return oparl_basic(oparl_person_commitee_data, params={'person_slug':person_slug})
-
-def oparl_person_commitee_data(params):
-  data = db.get_person(deref={'value': 'committee', 'list_select': 'slug'}, search_params={'slug':params['person_slug']}, add_prefix=app.config['API_URL']+'/oparl/committee/', add_postfix=generate_postfix(params))
+def oparl_person_membership_data(params):
+  data = db.get_person(deref={'value': 'membership', 'list_select': '_id'},
+                       search_params={'_id': ObjectId(params['person_id'])},
+                       add_prefix = "%s/oparl/membership/" % config['api_url'],
+                       add_postfix = generate_postfix(params))
   return data
 
 ####################################################
@@ -261,259 +364,390 @@ def oparl_person_commitee_data(params):
 # meeting list
 @app.route('/oparl/meeting')
 def oparl_meetings():
-  return oparl_basic(oparl_meeting_data)
+  return oparl_basic(oparl_meetings_data)
 
 def oparl_meetings_data(params):
-  return db.get_meeting(meeting_list=True, add_prefix=app.config['API_URL']+'/oparl/meeting/', add_postfix=generate_postfix(params))
+  return db.get_meeting(meeting_list = True,
+                        add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                        add_postfix=generate_postfix(params))
 
 # single meeting
-@app.route('/oparl/meeting/<string:meeting_slug>')
-def oparl_meeting(meeting_slug):
-  return oparl_basic(oparl_meeting_data, params={'slug':meeting_slug})
+@app.route('/oparl/meeting/<string:meeting_id>')
+def oparl_meeting(meeting_id):
+  return oparl_basic(oparl_meeting_data, params={'_id': meeting_id})
 
 def oparl_meeting_data(params):
-  data = db.get_meeting(search_params={'slug':params['slug']})
+  data = db.get_meeting(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = app.config['API_URL'] + '/oparl/meeting/' + params['slug'] + '/body' + generate_postfix(params)
-    data[0]['meeting'] = app.config['API_URL'] + '/oparl/meeting/' + params['slug'] + '/meeting' + generate_postfix(params)
-    data[0]['agendaitem'] = app.config['API_URL'] + '/oparl/meeting/' + params['slug'] + '/agendaitem' + generate_postfix(params)
-    data[0]['document'] = app.config['API_URL'] + '/oparl/meeting/' + params['slug'] + '/document' + generate_postfix(params)
+    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
+    data[0]['organization'] = generate_sublist_url(params=params, main_type='meeting', sublist_type='organization')
+    data[0]['agendaItem'] = generate_sublist_url(params=params, main_type='meeting', sublist_type='agendaItem')
+    data[0]['invitation'] = generate_sublist_url(params=params, main_type='meeting', sublist_type='invitation')
+    if 'resultsProtocol' in data[0]:
+      data[0]['resultsProtocol'] = generate_single_url(params=params, type='file', id=data[0]['resultsProtocol'].id)
+    if 'verbatimProtocol' in data[0]:
+      data[0]['verbatimProtocol'] = generate_single_url(params=params, type='file', id=data[0]['verbatimProtocol'].id)
+    data[0]['auxiliaryFile'] = generate_sublist_url(params=params, main_type='meeting', sublist_type='auxiliaryFile')
     data[0]['@type'] = 'OParlMeeting'
-    data[0]['@id'] = data[0]['identifier']
+    data[0]['@id'] = data[0]['_id']
     return data[0]
   elif len(data) == 0:
     abort(404)
-  # Should never happen because slug is unique
-  else:
-    abort(500)
 
-# meeting body list
-@app.route('/oparl/meeting/<string:meeting_slug>/body')
-def oparl_meeting_body(meeting_slug):
-  return oparl_basic(oparl_meeting_body_data, params={'meeting_slug':meeting_slug})
+# meeting organization list
+@app.route('/oparl/meeting/<string:meeting_id>/organization')
+def oparl_meeting_organization(meeting_id):
+  return oparl_basic(oparl_meeting_organization_data, params={'meeting_id': meeting_id})
 
-def oparl_meeting_body_data(params):
-  data = db.get_meeting(deref={'value': 'body', 'list_select': 'title'}, search_params={'slug':params['meeting_slug']}, add_prefix=app.config['API_URL']+'/oparl/body/', add_postfix=generate_postfix(params))
+def oparl_meeting_organization_data(params):
+  data = db.get_meeting(deref={'value': 'organization', 'list_select': '_id'},
+                        search_params={'_id': ObjectId(params['meeting_id'])},
+                        add_prefix = "%s/oparl/organization/" % config['api_url'],
+                        add_postfix = generate_postfix(params))
   return data
 
-# meeting agendaitem list
-@app.route('/oparl/meeting/<string:meeting_slug>/agendaitem')
-def oparl_meeting_agendaitem(meeting_slug):
-  return oparl_basic(oparl_meeting_agendaitem_data, params={'meeting_slug':meeting_slug})
+# meeting agendaItem list
+@app.route('/oparl/meeting/<string:meeting_id>/agendaItem')
+def oparl_meeting_agendaItem(meeting_id):
+  return oparl_basic(oparl_meeting_agendaItem_data, params={'meeting_id': meeting_id})
 
-def oparl_meeting_agendaitem_data(params):
-  data = db.get_meeting(deref={'value': 'agendaitem', 'list_select': 'slug'}, search_params={'slug':params['meeting_slug']}, add_prefix=app.config['API_URL']+'/oparl/agendaitem/', add_postfix=generate_postfix(params))
+def oparl_meeting_agendaItem_data(params):
+  data = db.get_meeting(deref={'value': 'agendaItem', 'list_select': '_id'},
+                        search_params={'_id': ObjectId(params['meeting_id'])},
+                        add_prefix = "%s/oparl/agendaItem/" % config['api_url'],
+                        add_postfix = generate_postfix(params))
   return data
 
-# meeting document list
-@app.route('/oparl/meeting/<string:meeting_slug>/document')
-def oparl_meeting_document(meeting_slug):
-  return oparl_basic(oparl_meeting_document_data, params={'meeting_slug':meeting_slug})
+# meeting invitation list
+@app.route('/oparl/meeting/<string:meeting_id>/invitation')
+def oparl_meeting_invitation(meeting_id):
+  return oparl_basic(oparl_meeting_invitation_data, params={'meeting_id': meeting_id})
 
-def oparl_meeting_document_data(params):
-  data = db.get_meeting(deref={'value': 'document', 'list_select': 'slug'}, search_params={'slug':params['meeting_slug']}, add_prefix=app.config['API_URL']+'/oparl/document/', add_postfix=generate_postfix(params))
+def oparl_meeting_invitation_data(params):
+  data = db.get_meeting(deref={'value': 'invitation', 'list_select': '_id'},
+                        search_params={'_id': ObjectId(params['meeting_id'])},
+                        add_prefix = "%s/oparl/file/" % config['api_url'],
+                        add_postfix = generate_postfix(params))
+  return data
+
+# meeting auxiliaryFile list
+@app.route('/oparl/meeting/<string:meeting_id>/auxiliaryFile')
+def oparl_meeting_auxiliaryFile(meeting_id):
+  return oparl_basic(oparl_meeting_auxiliaryFile_data, params={'meeting_id': meeting_id})
+
+def oparl_meeting_auxiliaryFile_data(params):
+  data = db.get_meeting(deref={'value': 'auxiliaryFile', 'list_select': '_id'},
+                        search_params={'_id': ObjectId(params['meeting_id'])},
+                        add_prefix = "%s/oparl/file/" % config['api_url'],
+                        add_postfix = generate_postfix(params))
   return data
 
 ####################################################
-# agendaitem
+# agendaItem
 ####################################################
 
-# agendaitem list
-@app.route('/oparl/agendaitems')
-def oparl_agendaitems():
-  return oparl_basic(oparl_agendaitems_data)
+# agendaItem list
+@app.route('/oparl/agendaitem')
+def oparl_agendaItems():
+  return oparl_basic(oparl_agendaItems_data)
 
-def oparl_agendaitems_data(params):
-  return db.get_meeting(agendaitem_list=True, add_prefix=app.config['API_URL']+'/oparl/agendaitem/', add_postfix=generate_postfix(params))
+def oparl_agendaItems_data(params):
+  return db.get_agendaItem(agendaItem_list = True,
+                           add_prefix = "%s/oparl/agendaitem/" % config['api_url'],
+                           add_postfix=generate_postfix(params))
 
-# single agendaitem
-@app.route('/oparl/agendaitem/<string:agendaitem_slug>')
-def oparl_agendaitem(agendaitem_slug):
-  return oparl_basic(oparl_agendaitem_data, params={'slug': agendaitem_slug})
+# single agendaItem
+@app.route('/oparl/agendaItem/<string:agendaItem_id>')
+def oparl_agendaItem(agendaItem_id):
+  return oparl_basic(oparl_agendaItem_data, params={'_id': agendaItem_id})
 
-def oparl_agendaitem_data(params):
-  data = db.get_agendaitem(search_params={'slug':params['slug']})
+def oparl_agendaItem_data(params):
+  data = db.get_agendaItem(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = app.config['API_URL'] + '/oparl/agendaitem/' + params['slug'] + '/body' + generate_postfix(params)
-    data[0]['meeting'] = app.config['API_URL'] + '/oparl/agendaitem/' + params['slug'] + '/meeting' + generate_postfix(params)
-    data[0]['paper'] = app.config['API_URL'] + '/oparl/agendaitem/' + params['slug'] + '/paper' + generate_postfix(params)
-    data[0]['@type'] = 'OParlAgendaitem'
-    data[0]['@id'] = data[0]['identifier']
+    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
+    data[0]['meeting'] = generate_single_backref_url(params=params, get='get_meeting', type='meeting', reverse_type='agendaItem', id=params['_id'])
+    data[0]['consultation'] = generate_single_url(params=params, type='consultation', id=data[0]['consultation'].id)
+    data[0]['@type'] = 'OParlAgendaItem'
+    data[0]['@id'] = data[0]['_id']
     return data[0]
   elif len(data) == 0:
     abort(404)
-  # Should never happen because slug is unique
-  else:
-    abort(500)
 
-# agendaitem body list
-@app.route('/oparl/agendaitem/<string:agendaitem_slug>/body')
-def oparl_agendaitem_body(agendaitem_slug):
-  return oparl_basic(oparl_agendaitem_body_data, params={'agendaitem_slug':agendaitem_slug})
+####################################################
+# consultation
+####################################################
 
-def oparl_agendaitem_body_data(params):
-  data = db.get_agendaitem(deref={'value': 'body', 'list_select': 'title'}, search_params={'slug':params['agendaitem_slug']}, add_prefix=app.config['API_URL']+'/oparl/body/', add_postfix=generate_postfix(params))
+# consultation list
+@app.route('/oparl/consultation')
+def oparl_consultations():
+  return oparl_basic(oparl_consultations_data)
+
+def oparl_consultations_data(params):
+  return db.get_consultation(consultation_list = True,
+                           add_prefix = "%s/oparl/consultation/" % config['api_url'],
+                           add_postfix=generate_postfix(params))
+
+# single consultation
+@app.route('/oparl/consultation/<string:consultation_id>')
+def oparl_consultation(consultation_id):
+  return oparl_basic(oparl_consultation_data, params={'_id': consultation_id})
+
+def oparl_consultation_data(params):
+  data = db.get_consultation(search_params={'_id': ObjectId(params['_id'])})
+  if len(data) == 1:
+    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
+    data[0]['agendaItem'] = generate_single_backref_url(params=params, get='get_agendaItem', type='agendaItem', reverse_type='consultation', id=params['_id'])
+    data[0]['paper'] = generate_single_url(params=params, type='paper', id=data[0]['paper'].id)
+    data[0]['organization'] = generate_sublist_url(params=params, main_type='consultation', sublist_type='organization')
+    data[0]['@type'] = 'OParlConsultation'
+    data[0]['@id'] = data[0]['_id']
+    return data[0]
+  elif len(data) == 0:
+    abort(404)
+
+# consultation organization list
+@app.route('/oparl/consultation/<string:consultation_id>/organization')
+def oparl_consultation_meeting(consultation_id):
+  return oparl_basic(oparl_consultation_organization_data, params={'consultation_id': consultation_id})
+
+def oparl_consultation_organization_data(params):
+  data = db.get_consultation(deref={'value': 'organization', 'list_select': '_id'},
+                             search_params={'_id': ObjectId(params['consultation_id'])},
+                             add_prefix = "%s/oparl/organization/" % config['api_url'],
+                             add_postfix = generate_postfix(params))
   return data
 
-# document meeting list
-@app.route('/oparl/agendaitem/<string:agendaitem_slug>/meeting')
-def oparl_agendaitem_meeting(agendaitem_slug):
-  return oparl_basic(oparl_agendaitem_meeting_data, params={'agendaitem_slug':agendaitem_slug})
-
-def oparl_agendaitem_meeting_data(params):
-  data = db.get_meeting(meeting_list=True, search_params={'agendaitem_slug':params['agendaitem_slug']}, add_prefix=app.config['API_URL']+'/oparl/meeting/', add_postfix=generate_postfix(params))
-  return data
-
-# agendaitem paper list
-@app.route('/oparl/agendaitem/<string:agendaitem_slug>/paper')
-def oparl_agendaitem_paper(agendaitem_slug):
-  return oparl_basic(oparl_agendaitem_paper_data, params={'agendaitem_slug':agendaitem_slug})
-
-def oparl_agendaitem_paper_data(params):
-  data = db.get_agendaitem(deref={'value': 'paper', 'list_select': 'slug'}, search_params={'slug':params['agendaitem_slug']}, add_prefix=app.config['API_URL']+'/oparl/paper/', add_postfix=generate_postfix(params))
-  return data
 
 ####################################################
 # paper
 ####################################################
 
 # paper list
-@app.route('/oparl/papers')
+@app.route('/oparl/paper')
 def oparl_papers():
-  return oparl_basic(oparl_paper_data)
+  return oparl_basic(oparl_papers_data)
 
 def oparl_papers_data(params):
-  return db.get_paper(agendaitem_list=True, add_prefix=app.config['API_URL']+'/oparl/agendaitem/', add_postfix=generate_postfix(params))
+  return db.get_paper(paper_list = True,
+                      add_prefix = "%s/oparl/paper/" % config['api_url'],
+                      add_postfix = generate_postfix(params))
 
 # single paper
-@app.route('/oparl/paper/<string:paper_slug>')
-def oparl_paper(paper_slug):
-  return oparl_basic(oparl_paper_data, params={'slug': paper_slug})
+@app.route('/oparl/paper/<string:paper_id>')
+def oparl_paper(paper_id):
+  return oparl_basic(oparl_paper_data, params={'_id': paper_id})
 
 def oparl_paper_data(params):
-  data = db.get_paper(search_params={'slug':params['slug']})
+  data = db.get_paper(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = app.config['API_URL'] + '/oparl/paper/' + params['slug'] + '/body' + generate_postfix(params)
-    data[0]['agendaitem'] = app.config['API_URL'] + '/oparl/paper/' + params['slug'] + '/agendaitem' + generate_postfix(params)
-    data[0]['paper'] = app.config['API_URL'] + '/oparl/paper/' + params['slug'] + '/paper' + generate_postfix(params) #TODO
-    data[0]['document'] = app.config['API_URL'] + '/oparl/paper/' + params['slug'] + '/document' + generate_postfix(params)
+    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
+    data[0]['relatedPaper'] = generate_sublist_url(params=params, main_type='paper', sublist_type='relatedPaper')
+    data[0]['superordinatedPaper'] = generate_sublist_url(params=params, main_type='paper', sublist_type='superordinatedPaper')
+    data[0]['subordinatedPaper'] = generate_sublist_url(params=params, main_type='paper', sublist_type='subordinatedPaper')
+    if 'mainFile' in data[0]:
+      data[0]['mainFile'] = generate_single_url(params=params, type='file', id=data[0]['mainFile'].id)
+    data[0]['auxiliaryFile'] = generate_sublist_url(params=params, main_type='paper', sublist_type='auxiliaryFile')
+    #data[0]['originator'] = generate_sublist_url(params=params, main_type='file', sublist_type='paper') #TODO: BAEH - mixed organization + people
+    data[0]['consultation'] = generate_sublist_url(params=params, main_type='paper', sublist_type='consultation')
+    data[0]['underDirectionOf'] = generate_sublist_url(params=params, main_type='paper', sublist_type='underDirectionOf')
     data[0]['@type'] = 'OParlPaper'
-    data[0]['@id'] = data[0]['identifier']
+    data[0]['@id'] = data[0]['_id']
     return data[0]
   elif len(data) == 0:
     abort(404)
-  # Should never happen because slug is unique
-  else:
-    abort(500)
 
-# paper body list
-@app.route('/oparl/paper/<string:paper_slug>/body')
-def oparl_paper_body(paper_slug):
-  return oparl_basic(oparl_paper_body_data, params={'paper_slug':paper_slug})
+# paper auxiliaryFile list
+@app.route('/oparl/paper/<string:paper_id>/auxiliaryFile')
+def oparl_paper_auxiliaryFile(paper_id):
+  return oparl_basic(oparl_paper_auxiliaryFile_data, params={'paper_id': paper_id})
 
-def oparl_paper_body_data(params):
-  data = db.get_paper(deref={'value': 'body', 'list_select': 'title'}, search_params={'slug':params['paper_slug']}, add_prefix=app.config['API_URL']+'/oparl/body/', add_postfix=generate_postfix(params))
+def oparl_paper_auxiliaryFile_data(params):
+  data = db.get_paper(deref={'value': 'auxiliaryFile', 'list_select': '_id'},
+                      search_params={'_id': ObjectId(params['paper_id'])},
+                      add_prefix = "%s/oparl/file/" % config['api_url'],
+                      add_postfix = generate_postfix(params))
   return data
 
-# paper agendaitem list
-@app.route('/oparl/paper/<string:paper_slug>/agendaitem')
-def oparl_paper_agendaitem(paper_slug):
-  return oparl_basic(oparl_paper_agendaitem_data, params={'paper_slug':paper_slug})
+# paper consultation list
+@app.route('/oparl/paper/<string:paper_id>/consultation')
+def oparl_paper_consultation(paper_id):
+  return oparl_basic(oparl_paper_consultation_data, params={'paper_id': paper_id})
 
-def oparl_paper_agendaitem_data(params):
-  data = db.get_agendaitem(agendaitem_list=True, search_params={'paper_slug':params['paper_slug']}, add_prefix=app.config['API_URL']+'/oparl/agendaitem/', add_postfix=generate_postfix(params))
+def oparl_paper_consultation_data(params):
+  data = db.get_consultation(consultation_list = True,
+                             search_params = {'paper': DBRef('paper', ObjectId(params['paper_id']))},
+                             add_prefix = "%s/oparl/consultation/" % config['api_url'],
+                             add_postfix = generate_postfix(params))
   return data
 
-# paper document list
-@app.route('/oparl/paper/<string:paper_slug>/document')
-def oparl_paper_document(paper_slug):
-  return oparl_basic(oparl_paper_document_data, params={'paper_slug':paper_slug})
+# paper relatedPaper list
+@app.route('/oparl/paper/<string:paper_id>/relatedPaper')
+def oparl_paper_relatedPaper(paper_id):
+  return oparl_basic(oparl_paper_relatedPaper_data, params={'paper_id': paper_id})
 
-def oparl_paper_document_data(params):
-  data = db.get_paper(deref={'value': 'document', 'list_select': 'slug'}, search_params={'slug':params['paper_slug']}, add_prefix=app.config['API_URL']+'/oparl/document/', add_postfix=generate_postfix(params))
+def oparl_paper_relatedPaper_data(params):
+  data_1 = db.get_paper(paper_list = True,
+                        search_params = {'relatedPaper': DBRef('paper', ObjectId(params['paper_id']))},
+                        add_prefix = "%s/oparl/paper/" % config['api_url'],
+                        add_postfix = generate_postfix(params))
+  data_2 = db.get_paper(deref={'value': 'relatedPaper', 'list_select': '_id'},
+                        search_params = {'_id': ObjectId(params['paper_id'])},
+                        add_prefix = "%s/oparl/paper/" % config['api_url'],
+                        add_postfix = generate_postfix(params))
+  data = data_1 + data_2
   return data
+
+# paper subordinatedPaper list
+@app.route('/oparl/paper/<string:paper_id>/subordinatedPaper')
+def oparl_paper_subordinatedPaper(paper_id):
+  return oparl_basic(oparl_paper_subordinatedPaper_data, params={'paper_id': paper_id})
+
+
+def oparl_paper_subordinatedPaper_data(params):
+  data_super = db.get_paper(paper_list = True,
+                            search_params = {'superordinatedPaper': DBRef('paper', ObjectId(params['paper_id']))},
+                            add_prefix = "%s/oparl/paper/" % config['api_url'],
+                            add_postfix = generate_postfix(params))
+  data_sub = db.get_paper(deref={'value': 'subordinatedPaper', 'list_select': '_id'},
+                        search_params = {'_id': ObjectId(params['paper_id'])},
+                        add_prefix = "%s/oparl/paper/" % config['api_url'],
+                        add_postfix = generate_postfix(params))
+  print data_super + data_sub
+  data = list(set(data_super + data_sub))
+  return data
+
+# paper superordinatedPaper list
+@app.route('/oparl/paper/<string:paper_id>/superordinatedPaper')
+def oparl_paper_superordinatedPaper(paper_id):
+  return oparl_basic(oparl_paper_superordinatedPaper_data, params={'paper_id': paper_id})
+
+
+def oparl_paper_superordinatedPaper_data(params):
+  data_sub = db.get_paper(paper_list = True,
+                            search_params = {'subordinatedPaper': DBRef('paper', ObjectId(params['paper_id']))},
+                            add_prefix = "%s/oparl/paper/" % config['api_url'],
+                            add_postfix = generate_postfix(params))
+  data_super = db.get_paper(deref={'value': 'superordinatedPaper', 'list_select': '_id'},
+                        search_params = {'_id': ObjectId(params['paper_id'])},
+                        add_prefix = "%s/oparl/paper/" % config['api_url'],
+                        add_postfix = generate_postfix(params))
+  data = list(set(data_super + data_sub))
+  return data
+
+# paper underDirectionOf list
+@app.route('/oparl/paper/<string:paper_id>/underDirectionOf')
+def oparl_paper_underDirectionOf(paper_id):
+  return oparl_basic(oparl_paper_underDirectionOf_data, params={'paper_id': paper_id})
+
+def oparl_paper_underDirectionOf_data(params):
+  data = db.get_paper(deref={'value': 'underDirectionOf', 'list_select': '_id'},
+                      search_params = {'_id': ObjectId(params['paper_id'])},
+                      add_prefix = "%s/oparl/consultation/" % config['api_url'],
+                      add_postfix = generate_postfix(params))
+  return data
+
 
 ####################################################
-# document
+# file
 ####################################################
 
-# document list
-@app.route('/oparl/documents')
-def oparl_documents():
-  return oparl_basic(oparl_documents_data)
+# file list
+@app.route('/oparl/file')
+def oparl_files():
+  return oparl_basic(oparl_files_data)
 
-def oparl_documents_data(params):
-  return db.get_document(document_list=True, add_prefix=app.config['API_URL']+'/oparl/document/', add_postfix=generate_postfix(params))
+def oparl_files_data(params):
+  return db.get_file(file_list = True,
+                     add_prefix = "%s/oparl/file/" % config['api_url'],
+                     add_postfix=generate_postfix(params))
 
-# single paper
-@app.route('/oparl/document/<string:document_slug>')
-def oparl_document(document_slug):
-  return oparl_basic(oparl_document_data, params={'slug': document_slug})
+# single file
+@app.route('/oparl/file/<string:file_id>')
+def oparl_document(file_id):
+  return oparl_basic(oparl_file_data, params={'_id': file_id})
 
-def oparl_document_data(params):
-  data = db.get_document(search_params={'slug':params['slug']})
+def oparl_file_data(params):
+  data = db.get_file(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = app.config['API_URL'] + '/oparl/document/' + params['slug'] + '/body' + generate_postfix(params)
-    data[0]['meeting'] = app.config['API_URL'] + '/oparl/document/' + params['slug'] + '/meeting' + generate_postfix(params)
-    data[0]['paper'] = app.config['API_URL'] + '/oparl/document/' + params['slug'] + '/paper' + generate_postfix(params)
-    data[0]['file'] = app.config['API_URL'] + '/oparl/document/' + params['slug'] + '/file'
+    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
+    data[0]['accessUrl'] = generate_sublist_url(params=params, main_type='file', sublist_type='accessUrl')
+    data[0]['downloadUrl'] = generate_sublist_url(params=params, main_type='file', sublist_type='downloadUrl')
+    data[0]['meeting'] = generate_sublist_url(params=params, main_type='file', sublist_type='meeting')
+    data[0]['paper'] = generate_sublist_url(params=params, main_type='file', sublist_type='paper')
+    if 'masterFile' in data[0]:
+      data[0]['masterFile'] = generate_single_url(params=params, type='file', id=data[0]['mainFile'].id)
+    data[0]['derivativeFile'] = generate_sublist_url(params=params, main_type='file', sublist_type='derivativeFile')
     data[0]['@type'] = 'OParlPaper'
-    data[0]['@id'] = data[0]['identifier']
+    data[0]['@id'] = data[0]['_id']
+    if 'file' in data[0]:
+      del data[0]['file']
     return data[0]
   elif len(data) == 0:
     abort(404)
-  # Should never happen because slug is unique
-  else:
-    abort(500)
 
-# document body list
-@app.route('/oparl/document/<string:document_slug>/body')
-def oparl_document_body(document_slug):
-  return oparl_basic(oparl_document_body_data, params={'document_slug':document_slug})
+# file meeting list
+@app.route('/oparl/file/<string:file_id>/meeting')
+def oparl_file_meeting(file_id):
+  return oparl_basic(oparl_file_meeting_data, params={'file_id': file_id})
 
-def oparl_document_body_data(params):
-  data = db.get_document(deref={'value': 'body', 'list_select': 'title'}, search_params={'slug':params['document_slug']}, add_prefix=app.config['API_URL']+'/oparl/body/', add_postfix=generate_postfix(params))
+def oparl_file_meeting_data(params):
+  invitation_data = db.get_meeting(meeting_list = True,
+                                   search_params = {'invitation': DBRef('file', ObjectId(params['file_id']))},
+                                   add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                                   add_postfix = generate_postfix(params))
+  auxiliaryFile_data = db.get_meeting(meeting_list = True,
+                                      search_params = {'auxiliaryFile': DBRef('file', ObjectId(params['file_id']))},
+                                      add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                                      add_postfix = generate_postfix(params))
+  resultsProtocol_data = db.get_meeting(meeting_list = True,
+                                        search_params = {'resultsProtocol': DBRef('file', ObjectId(params['file_id']))},
+                                        add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                                        add_postfix = generate_postfix(params))
+  verbatimProtocol_data = db.get_meeting(meeting_list = True,
+                                        search_params = {'verbatimProtocol': DBRef('file', ObjectId(params['file_id']))},
+                                        add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                                        add_postfix = generate_postfix(params))
+  data = invitation_data + auxiliaryFile_data + resultsProtocol_data + verbatimProtocol_data
   return data
 
-# document meeting list
-@app.route('/oparl/document/<string:document_slug>/meeting')
-def oparl_document_meeting(document_slug):
-  return oparl_basic(oparl_document_meeting_data, params={'document_slug':document_slug})
+# file paper list
+@app.route('/oparl/file/<string:file_id>/paper')
+def oparl_file_paper(file_id):
+  return oparl_basic(oparl_file_paper_data, params={'file_id': file_id})
 
-def oparl_document_meeting_data(params):
-  data = db.get_meeting(meeting_list=True, search_params={'document_slug':params['document_slug']}, add_prefix=app.config['API_URL']+'/oparl/meeting/', add_postfix=generate_postfix(params))
+def oparl_file_paper_data(params):
+  mainFile_data = db.get_paper(paper_list = True,
+                               search_params = {'mainFile': DBRef('file', ObjectId(params['file_id']))},
+                               add_prefix = "%s/oparl/paper/" % config['api_url'],
+                               add_postfix = generate_postfix(params))
+  auxiliaryFile_data = db.get_paper(paper_list = True,
+                                    search_params = {'auxiliaryFile': DBRef('file', ObjectId(params['file_id']))},
+                                    add_prefix = "%s/oparl/paper/" % config['api_url'],
+                                    add_postfix = generate_postfix(params))
+  data = mainFile_data + auxiliaryFile_data
   return data
 
-# document paper list
-@app.route('/oparl/document/<string:document_slug>/paper')
-def oparl_document_paper(document_slug):
-  return oparl_basic(oparl_document_paper_data, params={'document_slug':document_slug})
+# file accessUrl
+@app.route('/oparl/file/<string:file_id>/accessUrl')
+def oparl_file_accessUrl(file_id):
+  return oparl_basic(oparl_file_accessUrl_data, params={'file_id': file_id}, direct_output=True)
 
-def oparl_document_paper_data(params):
-  data = db.get_paper(paper_list=True, search_params={'document_slug':params['document_slug']}, add_prefix=app.config['API_URL']+'/oparl/paper/', add_postfix=generate_postfix(params))
-  return data
+def oparl_file_accessUrl_data(params):
+  file_data = db.get_file(deref={'value': 'file'},
+                              search_params={'_id': ObjectId(params['file_id'])})
 
-
-# document file
-@app.route('/oparl/document/<string:document_slug>/file')
-def oparl_document_file(document_slug):
-  return oparl_basic(oparl_document_file_data, params={'document_slug':document_slug}, direct_output=True)
-
-def oparl_document_file_data(params):
-  document_data = db.get_document(search_params={'slug':params['document_slug']}, deref={'value': 'file'})
-
-  if len(document_data) == 0:
+  if len(file_data) == 0:
     # TODO: Rendere informativere 404 Seite
     abort(404)
-  document_data = document_data[0]
+  file_data = file_data[0]
   # extension doesn't match file extension (avoiding arbitrary URLs)
   #proper_extension = attachment_info['filename'].split('.')[-1]
   #if proper_extension != extension:
   #    abort(404)
 
   # 'file' property is not set (e.g. due to depublication)
-  if 'file' not in document_data:
-    if 'depublication' in document_data:
+  if 'file' not in file_data:
+    if 'depublication' in file_data:
       abort(410)  # Gone
     else:
       # TODO: log this as unexplicable...
@@ -531,15 +765,48 @@ def oparl_document_file_data(params):
   #    print "Conditional GET: If-None-Match"
   # TODO: handle ETag in request
 
-  handler = db.get_file(document_data['file']['_id'])
+  handler = db.get_file_data(file_data['file']['_id'])
   response = make_response(handler.read(), 200)
-  response.mimetype = document_data['mimetype']
+  response.mimetype = file_data['mimetype']
   response.headers['X-Robots-Tag'] = 'noarchive'
-  response.headers['ETag'] = document_data['sha1_checksum']
-  response.headers['Last-modified'] = util.rfc1123date(document_data['file']['uploadDate'])
+  response.headers['ETag'] = file_data['sha1Checksum']
+  response.headers['Last-modified'] = util.rfc1123date(file_data['file']['uploadDate'])
   response.headers['Expires'] = util.expires_date(hours=(24 * 30))
   response.headers['Cache-Control'] = util.cache_max_age(hours=(24 * 30))
-  response.headers['Content-Disposition'] = 'attachment; filename=' + document_data['filename']
+  return response
+
+
+# file downloadUrl
+@app.route('/oparl/file/<string:file_id>/downloadUrl')
+def oparl_file_downloadUrl(file_id):
+  return oparl_basic(oparl_file_downloadUrl_data, params={'file_id': file_id}, direct_output=True)
+
+def oparl_file_downloadUrl_data(params):
+  file_data = db.get_file(deref={'value': 'file'},
+                          search_params={'_id': ObjectId(params['file_id'])})
+
+  if len(file_data) == 0:
+    # TODO: Rendere informativere 404 Seite
+    abort(404)
+  file_data = file_data[0]
+  
+  # 'file' property is not set (e.g. due to depublication)
+  if 'file' not in file_data:
+    if 'depublication' in file_data:
+      abort(410)  # Gone
+    else:
+      # TODO: log this as unexplicable...
+      abort(500)
+
+  handler = db.get_file_data(file_data['file']['_id'])
+  response = make_response(handler.read(), 200)
+  response.mimetype = file_data['mimetype']
+  response.headers['X-Robots-Tag'] = 'noarchive'
+  response.headers['ETag'] = file_data['sha1Checksum']
+  response.headers['Last-modified'] = util.rfc1123date(file_data['file']['uploadDate'])
+  response.headers['Expires'] = util.expires_date(hours=(24 * 30))
+  response.headers['Cache-Control'] = util.cache_max_age(hours=(24 * 30))
+  response.headers['Content-Disposition'] = 'attachment; filename=' + file_data['filename']
   return response
 
 ####################################################
@@ -558,18 +825,12 @@ def oparl_basic(content_fuction, params={}, direct_output=False):
   extended_info = extended_info == '1'
   if extended_info:
     request_info['i'] = 1
-  # Singular Mode
-  singular = request.args.get('s')
-  singular = singular == '1'
-  if singular:
-    request_info['i'] = 1
   page = request.args.get('p')
   try:
     page = int(page)
   except (ValueError, TypeError):
     page = 1
   request_info['p'] = page
-  
   ret = {
     'status': 0,
     'duration': int((time.time() - start_time) * 1000),
@@ -578,12 +839,6 @@ def oparl_basic(content_fuction, params={}, direct_output=False):
   }
   params.update(request_info)
   response = content_fuction(params)
-  if not singular:
-    convert_def = {'committee': 'committees', 'person': 'people', 'meeting': 'meetings', 'agendaitem': 'agendaitems', 'paper': 'papers', 'document': 'documents'}
-    for key, value in convert_def.iteritems():
-      if key in response:
-        response[value] = response[key]
-        del response[key]
   if direct_output:
     return response
   if extended_info:
@@ -600,6 +855,7 @@ def oparl_basic(content_fuction, params={}, direct_output=False):
     response.mimetype = 'application/json'
     response.headers['Expires'] = util.expires_date(hours=24)
     response.headers['Cache-Control'] = util.cache_max_age(hours=24)
+    response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
 
@@ -619,8 +875,19 @@ def generate_postfix(params):
   return(postfix)
   
 
+def generate_sublist_url(params={}, main_type='', main_id='_id', sublist_type=''):
+  return "%s/oparl/%s/%s/%s%s" % (config['api_url'], main_type, params[main_id], sublist_type, generate_postfix(params))
+
+def generate_single_url(params={}, type='', id=''):
+  return "%s/oparl/%s/%s%s" % (config['api_url'], type, id, generate_postfix(params))
+
+def generate_single_backref_url(params={}, get='', type='', reverse_type='', id=''):
+  get = getattr(db, get)
+  uid = str((get(search_params={reverse_type: DBRef(reverse_type, ObjectId(id))}, values={'_id':1}))[0]['_id'])
+  return "%s/oparl/%s/%s%s" % (config['api_url'], type, uid, generate_postfix(params))
 
 
+#"%s/oparl/body/%s/organization%s" % (config['api_url'], params['_id'], generate_postfix(params))
 
 
 

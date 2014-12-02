@@ -2,8 +2,6 @@
 *.pyc
 config.py
 venv/
-git-web/
-ris-web/
 temp/*
 *.komodoproject
 *.komodotools
