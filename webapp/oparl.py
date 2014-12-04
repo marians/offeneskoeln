@@ -46,7 +46,6 @@ from bson import ObjectId, DBRef
 import werkzeug
 
 from webapp import app
-config = app.conf
 
 ####################################################
 # system
@@ -57,18 +56,18 @@ def oparl_general():
   return oparl_basic(lambda params: {
     "@id": "de.openruhr",
     "@type": "OParlSystem",
-    "bodies": "%s/oparl/body%s" % (config['api_url'], generate_postfix(params)),
+    "bodies": "%s/oparl/body%s" % (app.config['api_url'], generate_postfix(params)),
     "contact": {
         "email": "info@openruhr.de",
         "name": "Initiative OpenRuhr"
     }, 
     "info_url": "http://openruhr.de/",
     "name": "OpenRuhr Oparl Service",
-    "new_objects": "%s/feeds/new" % config['api_url'],
+    "new_objects": "%s/feeds/new" % app.config['api_url'],
     "oparl_version": "http://oparl.org/spezifikation/1.0/",
     "product_url": "http://openruhr.de/",
-    "removed_objects": "%s/feeds/removed" % config['api_url'],
-    "updated_objects": "%s/feeds/updated" % config['api_url'],
+    "removed_objects": "%s/feeds/removed" % app.config['api_url'],
+    "updated_objects": "%s/feeds/updated" % app.config['api_url'],
     "vendor_url": "http://openruhr.de/"
   })
 
@@ -84,7 +83,7 @@ def oparl_bodies():
 
 def oparl_bodies_data(params):
   return db.get_body(body_list = True,
-                     add_prefix = "%s/oparl/body/" % config['api_url'],
+                     add_prefix = "%s/oparl/body/" % app.config['api_url'],
                      add_postfix=generate_postfix(params))
 
 # single body
@@ -104,7 +103,7 @@ def oparl_body_data(params):
     data[0]['paper'] = generate_sublist_url(params=params, main_type='body', sublist_type='paper')
     data[0]['consultation'] = generate_sublist_url(params=params, main_type='body', sublist_type='consultation')
     data[0]['file'] = generate_sublist_url(params=params, main_type='body', sublist_type='file')
-    data[0]['system'] = "%s/oparl%s" % (config['api_url'], generate_postfix(params))
+    data[0]['system'] = "%s/oparl%s" % (app.config['api_url'], generate_postfix(params))
     data[0]['@type'] = 'OParlBody'
     data[0]['@id'] = data[0]['_id']
     del data[0]['config']
@@ -121,7 +120,7 @@ def oparl_body_legislativeTerm(body_id):
 def oparl_body_legislativeTerm_data(params):
   data = db.get_legislativeTerm(legislativeTerm_list = True,
                              search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                             add_prefix = "%s/oparl/legislativeTerm/" % config['api_url'],
+                             add_prefix = "%s/oparl/legislativeTerm/" % app.config['api_url'],
                              add_postfix = generate_postfix(params))
   return data
 
@@ -134,7 +133,7 @@ def oparl_body_organization(body_id):
 def oparl_body_organization_data(params):
   data = db.get_organization(organization_list = True,
                              search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                             add_prefix = "%s/oparl/organization/" % config['api_url'],
+                             add_prefix = "%s/oparl/organization/" % app.config['api_url'],
                              add_postfix = generate_postfix(params))
   return data
 
@@ -147,7 +146,7 @@ def oparl_body_membership(body_id):
 def oparl_body_membership_data(params):
   data = db.get_membership(membership_list = True,
                        search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                       add_prefix = "%s/oparl/membership/" % config['api_url'],
+                       add_prefix = "%s/oparl/membership/" % app.config['api_url'],
                        add_postfix = generate_postfix(params))
   return data
 
@@ -160,7 +159,7 @@ def oparl_body_person(body_id):
 def oparl_body_person_data(params):
   data = db.get_person(person_list = True,
                        search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                       add_prefix = "%s/oparl/person/" % config['api_url'],
+                       add_prefix = "%s/oparl/person/" % app.config['api_url'],
                        add_postfix = generate_postfix(params))
   return data
 
@@ -173,7 +172,7 @@ def oparl_body_meeting(body_id):
 def oparl_body_meeting_data(params):
   data = db.get_meeting(meeting_list = True,
                         search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                        add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                        add_prefix = "%s/oparl/meeting/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   return data
 
@@ -186,7 +185,7 @@ def oparl_body_agendaItem(body_id):
 def oparl_body_agendaItem_data(params):
   data = db.get_agendaItem(agendaItem_list = True,
                         search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                        add_prefix = "%s/oparl/agendaItem/" % config['api_url'],
+                        add_prefix = "%s/oparl/agendaItem/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   return data
 
@@ -199,7 +198,7 @@ def oparl_body_consultation(body_id):
 def oparl_body_consultation_data(params):
   data = db.get_consultation(consultation_list = True,
                         search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                        add_prefix = "%s/oparl/consultation/" % config['api_url'],
+                        add_prefix = "%s/oparl/consultation/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   return data
 
@@ -212,7 +211,7 @@ def oparl_body_paper(body_id):
 def oparl_body_paper_data(params):
   data = db.get_paper(paper_list=True,
                       search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                      add_prefix =  "%s/oparl/paper/" % config['api_url'],
+                      add_prefix =  "%s/oparl/paper/" % app.config['api_url'],
                       add_postfix = generate_postfix(params))
   return data
 
@@ -225,7 +224,7 @@ def oparl_body_file(body_id):
 def oparl_body_file_data(params):
   data = db.get_file(file_list=True,
                      search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                     add_prefix = "%s/oparl/file/" % config['api_url'],
+                     add_prefix = "%s/oparl/file/" % app.config['api_url'],
                      add_postfix = generate_postfix(params))
   return data
 
@@ -240,7 +239,7 @@ def oparl_organizations():
 
 def oparl_organizations_data(params):
   return db.get_organization(organization_list=True,
-                             add_prefix = "%s/oparl/organization/" % config['api_url'],
+                             add_prefix = "%s/oparl/organization/" % app.config['api_url'],
                              add_postfix=generate_postfix(params))
 
 # single organization
@@ -251,7 +250,7 @@ def oparl_organization(organization_id):
 def oparl_organization_data(params):
   data = db.get_organization(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = "%s/oparl/body/%s%s" % (config['api_url'], data[0]['body'].id, generate_postfix(params))
+    data[0]['body'] = "%s/oparl/body/%s%s" % (app.config['api_url'], data[0]['body'].id, generate_postfix(params))
     data[0]['membership'] = generate_sublist_url(params=params, main_type='organization', sublist_type='membership')
     data[0]['meeting'] = generate_sublist_url(params=params, main_type='organization', sublist_type='meeting')
     data[0]['@type'] = 'OParlCommittee'
@@ -268,7 +267,7 @@ def oparl_rganization_membership(organization_id):
 def oparl_organization_membership_data(params):
   data = db.get_membership(membership_list = True,
                            search_params = {'organization': DBRef('organization', ObjectId(params['organization_id']))},
-                           add_prefix = "%s/oparl/membership/" % config['api_url'],
+                           add_prefix = "%s/oparl/membership/" % app.config['api_url'],
                            add_postfix = generate_postfix(params))
   return data
 
@@ -280,7 +279,7 @@ def oparl_organization_meeting(organization_id):
 def oparl_organization_meeting_data(params):
   data = db.get_meeting(meeting_list = True,
                         search_params = {'organization': DBRef('organization', ObjectId(params['organization_id']))},
-                        add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                        add_prefix = "%s/oparl/meeting/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   return data
 
@@ -295,7 +294,7 @@ def oparl_memberships():
 
 def oparl_memberships_data(params):
   return db.get_membership(membership_list=True,
-                           add_prefix = "%s/oparl/membership/" % config['api_url'],
+                           add_prefix = "%s/oparl/membership/" % app.config['api_url'],
                            add_postfix=generate_postfix(params))
 
 # single organization
@@ -326,7 +325,7 @@ def oparl_persons():
 
 def oparl_persons_data(params):
   return db.get_person(person_list=True,
-                       add_prefix = "%s/oparl/person/" % config['api_url'],
+                       add_prefix = "%s/oparl/person/" % app.config['api_url'],
                        add_postfix=generate_postfix(params))
 
 # single person
@@ -353,7 +352,7 @@ def oparl_person_membership(person_id):
 def oparl_person_membership_data(params):
   data = db.get_person(deref={'value': 'membership', 'list_select': '_id'},
                        search_params={'_id': ObjectId(params['person_id'])},
-                       add_prefix = "%s/oparl/membership/" % config['api_url'],
+                       add_prefix = "%s/oparl/membership/" % app.config['api_url'],
                        add_postfix = generate_postfix(params))
   return data
 
@@ -368,7 +367,7 @@ def oparl_meetings():
 
 def oparl_meetings_data(params):
   return db.get_meeting(meeting_list = True,
-                        add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                        add_prefix = "%s/oparl/meeting/" % app.config['api_url'],
                         add_postfix=generate_postfix(params))
 
 # single meeting
@@ -402,7 +401,7 @@ def oparl_meeting_organization(meeting_id):
 def oparl_meeting_organization_data(params):
   data = db.get_meeting(deref={'value': 'organization', 'list_select': '_id'},
                         search_params={'_id': ObjectId(params['meeting_id'])},
-                        add_prefix = "%s/oparl/organization/" % config['api_url'],
+                        add_prefix = "%s/oparl/organization/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   return data
 
@@ -414,7 +413,7 @@ def oparl_meeting_agendaItem(meeting_id):
 def oparl_meeting_agendaItem_data(params):
   data = db.get_meeting(deref={'value': 'agendaItem', 'list_select': '_id'},
                         search_params={'_id': ObjectId(params['meeting_id'])},
-                        add_prefix = "%s/oparl/agendaItem/" % config['api_url'],
+                        add_prefix = "%s/oparl/agendaItem/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   return data
 
@@ -426,7 +425,7 @@ def oparl_meeting_invitation(meeting_id):
 def oparl_meeting_invitation_data(params):
   data = db.get_meeting(deref={'value': 'invitation', 'list_select': '_id'},
                         search_params={'_id': ObjectId(params['meeting_id'])},
-                        add_prefix = "%s/oparl/file/" % config['api_url'],
+                        add_prefix = "%s/oparl/file/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   return data
 
@@ -438,7 +437,7 @@ def oparl_meeting_auxiliaryFile(meeting_id):
 def oparl_meeting_auxiliaryFile_data(params):
   data = db.get_meeting(deref={'value': 'auxiliaryFile', 'list_select': '_id'},
                         search_params={'_id': ObjectId(params['meeting_id'])},
-                        add_prefix = "%s/oparl/file/" % config['api_url'],
+                        add_prefix = "%s/oparl/file/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   return data
 
@@ -453,7 +452,7 @@ def oparl_agendaItems():
 
 def oparl_agendaItems_data(params):
   return db.get_agendaItem(agendaItem_list = True,
-                           add_prefix = "%s/oparl/agendaitem/" % config['api_url'],
+                           add_prefix = "%s/oparl/agendaitem/" % app.config['api_url'],
                            add_postfix=generate_postfix(params))
 
 # single agendaItem
@@ -484,7 +483,7 @@ def oparl_consultations():
 
 def oparl_consultations_data(params):
   return db.get_consultation(consultation_list = True,
-                           add_prefix = "%s/oparl/consultation/" % config['api_url'],
+                           add_prefix = "%s/oparl/consultation/" % app.config['api_url'],
                            add_postfix=generate_postfix(params))
 
 # single consultation
@@ -513,7 +512,7 @@ def oparl_consultation_meeting(consultation_id):
 def oparl_consultation_organization_data(params):
   data = db.get_consultation(deref={'value': 'organization', 'list_select': '_id'},
                              search_params={'_id': ObjectId(params['consultation_id'])},
-                             add_prefix = "%s/oparl/organization/" % config['api_url'],
+                             add_prefix = "%s/oparl/organization/" % app.config['api_url'],
                              add_postfix = generate_postfix(params))
   return data
 
@@ -529,7 +528,7 @@ def oparl_papers():
 
 def oparl_papers_data(params):
   return db.get_paper(paper_list = True,
-                      add_prefix = "%s/oparl/paper/" % config['api_url'],
+                      add_prefix = "%s/oparl/paper/" % app.config['api_url'],
                       add_postfix = generate_postfix(params))
 
 # single paper
@@ -564,7 +563,7 @@ def oparl_paper_auxiliaryFile(paper_id):
 def oparl_paper_auxiliaryFile_data(params):
   data = db.get_paper(deref={'value': 'auxiliaryFile', 'list_select': '_id'},
                       search_params={'_id': ObjectId(params['paper_id'])},
-                      add_prefix = "%s/oparl/file/" % config['api_url'],
+                      add_prefix = "%s/oparl/file/" % app.config['api_url'],
                       add_postfix = generate_postfix(params))
   return data
 
@@ -576,7 +575,7 @@ def oparl_paper_consultation(paper_id):
 def oparl_paper_consultation_data(params):
   data = db.get_consultation(consultation_list = True,
                              search_params = {'paper': DBRef('paper', ObjectId(params['paper_id']))},
-                             add_prefix = "%s/oparl/consultation/" % config['api_url'],
+                             add_prefix = "%s/oparl/consultation/" % app.config['api_url'],
                              add_postfix = generate_postfix(params))
   return data
 
@@ -588,11 +587,11 @@ def oparl_paper_relatedPaper(paper_id):
 def oparl_paper_relatedPaper_data(params):
   data_1 = db.get_paper(paper_list = True,
                         search_params = {'relatedPaper': DBRef('paper', ObjectId(params['paper_id']))},
-                        add_prefix = "%s/oparl/paper/" % config['api_url'],
+                        add_prefix = "%s/oparl/paper/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   data_2 = db.get_paper(deref={'value': 'relatedPaper', 'list_select': '_id'},
                         search_params = {'_id': ObjectId(params['paper_id'])},
-                        add_prefix = "%s/oparl/paper/" % config['api_url'],
+                        add_prefix = "%s/oparl/paper/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   data = data_1 + data_2
   return data
@@ -606,11 +605,11 @@ def oparl_paper_subordinatedPaper(paper_id):
 def oparl_paper_subordinatedPaper_data(params):
   data_super = db.get_paper(paper_list = True,
                             search_params = {'superordinatedPaper': DBRef('paper', ObjectId(params['paper_id']))},
-                            add_prefix = "%s/oparl/paper/" % config['api_url'],
+                            add_prefix = "%s/oparl/paper/" % app.config['api_url'],
                             add_postfix = generate_postfix(params))
   data_sub = db.get_paper(deref={'value': 'subordinatedPaper', 'list_select': '_id'},
                         search_params = {'_id': ObjectId(params['paper_id'])},
-                        add_prefix = "%s/oparl/paper/" % config['api_url'],
+                        add_prefix = "%s/oparl/paper/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   print data_super + data_sub
   data = list(set(data_super + data_sub))
@@ -625,11 +624,11 @@ def oparl_paper_superordinatedPaper(paper_id):
 def oparl_paper_superordinatedPaper_data(params):
   data_sub = db.get_paper(paper_list = True,
                             search_params = {'subordinatedPaper': DBRef('paper', ObjectId(params['paper_id']))},
-                            add_prefix = "%s/oparl/paper/" % config['api_url'],
+                            add_prefix = "%s/oparl/paper/" % app.config['api_url'],
                             add_postfix = generate_postfix(params))
   data_super = db.get_paper(deref={'value': 'superordinatedPaper', 'list_select': '_id'},
                         search_params = {'_id': ObjectId(params['paper_id'])},
-                        add_prefix = "%s/oparl/paper/" % config['api_url'],
+                        add_prefix = "%s/oparl/paper/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   data = list(set(data_super + data_sub))
   return data
@@ -642,7 +641,7 @@ def oparl_paper_underDirectionOf(paper_id):
 def oparl_paper_underDirectionOf_data(params):
   data = db.get_paper(deref={'value': 'underDirectionOf', 'list_select': '_id'},
                       search_params = {'_id': ObjectId(params['paper_id'])},
-                      add_prefix = "%s/oparl/consultation/" % config['api_url'],
+                      add_prefix = "%s/oparl/consultation/" % app.config['api_url'],
                       add_postfix = generate_postfix(params))
   return data
 
@@ -658,7 +657,7 @@ def oparl_files():
 
 def oparl_files_data(params):
   return db.get_file(file_list = True,
-                     add_prefix = "%s/oparl/file/" % config['api_url'],
+                     add_prefix = "%s/oparl/file/" % app.config['api_url'],
                      add_postfix=generate_postfix(params))
 
 # single file
@@ -693,19 +692,19 @@ def oparl_file_meeting(file_id):
 def oparl_file_meeting_data(params):
   invitation_data = db.get_meeting(meeting_list = True,
                                    search_params = {'invitation': DBRef('file', ObjectId(params['file_id']))},
-                                   add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                                   add_prefix = "%s/oparl/meeting/" % app.config['api_url'],
                                    add_postfix = generate_postfix(params))
   auxiliaryFile_data = db.get_meeting(meeting_list = True,
                                       search_params = {'auxiliaryFile': DBRef('file', ObjectId(params['file_id']))},
-                                      add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                                      add_prefix = "%s/oparl/meeting/" % app.config['api_url'],
                                       add_postfix = generate_postfix(params))
   resultsProtocol_data = db.get_meeting(meeting_list = True,
                                         search_params = {'resultsProtocol': DBRef('file', ObjectId(params['file_id']))},
-                                        add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                                        add_prefix = "%s/oparl/meeting/" % app.config['api_url'],
                                         add_postfix = generate_postfix(params))
   verbatimProtocol_data = db.get_meeting(meeting_list = True,
                                         search_params = {'verbatimProtocol': DBRef('file', ObjectId(params['file_id']))},
-                                        add_prefix = "%s/oparl/meeting/" % config['api_url'],
+                                        add_prefix = "%s/oparl/meeting/" % app.config['api_url'],
                                         add_postfix = generate_postfix(params))
   data = invitation_data + auxiliaryFile_data + resultsProtocol_data + verbatimProtocol_data
   return data
@@ -718,11 +717,11 @@ def oparl_file_paper(file_id):
 def oparl_file_paper_data(params):
   mainFile_data = db.get_paper(paper_list = True,
                                search_params = {'mainFile': DBRef('file', ObjectId(params['file_id']))},
-                               add_prefix = "%s/oparl/paper/" % config['api_url'],
+                               add_prefix = "%s/oparl/paper/" % app.config['api_url'],
                                add_postfix = generate_postfix(params))
   auxiliaryFile_data = db.get_paper(paper_list = True,
                                     search_params = {'auxiliaryFile': DBRef('file', ObjectId(params['file_id']))},
-                                    add_prefix = "%s/oparl/paper/" % config['api_url'],
+                                    add_prefix = "%s/oparl/paper/" % app.config['api_url'],
                                     add_postfix = generate_postfix(params))
   data = mainFile_data + auxiliaryFile_data
   return data
@@ -876,18 +875,18 @@ def generate_postfix(params):
   
 
 def generate_sublist_url(params={}, main_type='', main_id='_id', sublist_type=''):
-  return "%s/oparl/%s/%s/%s%s" % (config['api_url'], main_type, params[main_id], sublist_type, generate_postfix(params))
+  return "%s/oparl/%s/%s/%s%s" % (app.config['api_url'], main_type, params[main_id], sublist_type, generate_postfix(params))
 
 def generate_single_url(params={}, type='', id=''):
-  return "%s/oparl/%s/%s%s" % (config['api_url'], type, id, generate_postfix(params))
+  return "%s/oparl/%s/%s%s" % (app.config['api_url'], type, id, generate_postfix(params))
 
 def generate_single_backref_url(params={}, get='', type='', reverse_type='', id=''):
   get = getattr(db, get)
   uid = str((get(search_params={reverse_type: DBRef(reverse_type, ObjectId(id))}, values={'_id':1}))[0]['_id'])
-  return "%s/oparl/%s/%s%s" % (config['api_url'], type, uid, generate_postfix(params))
+  return "%s/oparl/%s/%s%s" % (app.config['api_url'], type, uid, generate_postfix(params))
 
 
-#"%s/oparl/body/%s/organization%s" % (config['api_url'], params['_id'], generate_postfix(params))
+#"%s/oparl/body/%s/organization%s" % (app.config['api_url'], params['_id'], generate_postfix(params))
 
 
 
@@ -1086,7 +1085,7 @@ def oparl_session():
       'lat': (session['lat'] if ('lat' in session) else None),
       'lon': (session['lon'] if ('lon' in session) else None),
       'region_id': (session['region_id'] if ('region_id' in session) else 'xxxxxxxxxxxx'),
-      'region': (app.config['RSMAP'][session['region_id']] if ('region_id' in session) else app.config['RSMAP']['xxxxxxxxxxxx'])
+      'region': (app.app.config['RSMAP'][session['region_id']] if ('region_id' in session) else app.app.config['RSMAP']['xxxxxxxxxxxx'])
     }
   }
   json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)

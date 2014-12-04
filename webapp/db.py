@@ -18,15 +18,15 @@ def get_config(body_uid=False):
   """
   Returns Config JSON
   """
-  config = mongo.db.config.find_one()
+  config = mongo.db.config.find_one({})
   if '_id' in config:
     del config['_id']
-  if body_uid:
-    local_config = mongo.db.body.find_one({'_id': ObjectId(body_uid)})
-    if 'config' in local_config:
-      config = merge_dict(config, local_config['config'])
-      del local_config['config']
-    config['city'] = local_config
+  #if body_uid:
+  #  local_config = mongo.db.body.find_one({'_id': ObjectId(body_uid)})
+  #  if 'config' in local_config:
+  #    config = merge_dict(config, local_config['config'])
+  #    del local_config['config']
+  #  config['city'] = local_config
   return config
 
 def merge_dict(self, x, y):

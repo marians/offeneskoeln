@@ -5,22 +5,21 @@
 
 {% block scripts %}
 {{ super() }}
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
-<script type="text/javascript" src="http://a.ok.mycdn.de/js/jquery.ajaxq.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/leaflet.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/ajaxq.js') }}"></script>
 <script>
 var CONF = {
-  mapTileUrlSchema: '{{ config.MAP_TILE_URL_SCHEMA|safe }}',
-  mapTileAttribution: '{{ config.MAP_TILE_ATTRIBUTION|safe }}',
-  mapTileMinZoom: {{ config.MAP_TILE_ZOOMLEVEL_MIN|safe }},
-  mapTileMaxZoom: {{ config.MAP_TILE_ZOOMLEVEL_MAX|safe }},
-  locationName: '{{ config.LOCATION_NAME|safe }}'
+  mapTileUrlSchema: "{{ config.map_tile_url_schema|safe }}",
+  mapTileAttribution: "{{ config.map_attribution|safe }}",
+  mapTileMinZoom: {{ config.map_zoomlevel_min|safe }},
+  mapTileMaxZoom: {{ config.map_zoomlevel_max|safe }}
 };
 </script>
-<script type="text/javascript" src="/static/js/region.js"></script>
-<script type="text/javascript" src="/static/js/map.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/region.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
 {% endblock %}
 
-{% block content %}
+{% block riscontent %}
 <div id="home">
 	<div id="position-form-container" class="content top">
 		<div id="region-prompt">

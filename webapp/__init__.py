@@ -8,7 +8,6 @@ from flask.ext.mongo_sessions import MongoDBSessionInterface
 
 app = Flask(__name__)
 app.debug = True
-# app.config = baseconf, app.conf = config from database
 app.config.from_pyfile('../config.py')
 
 # Cache
@@ -22,11 +21,13 @@ bootstrap = Bootstrap(app)
 basic_auth = BasicAuth(app)
 
 mongo = PyMongo(app)
+
+# Sessions and Configuration
+import db
 with app.app_context():
-    app.session_interface = MongoDBSessionInterface(app, mongo.db, 'flasksessions')
-    import db
-    app.conf = db.get_config()
-    
+  app.session_interface = MongoDBSessionInterface(app, mongo.db, 'flasksessions')
+  app.config.update(db.get_config())
+  
 import webapp.views
 import webapp.api
 import webapp.oparl

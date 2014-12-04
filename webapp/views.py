@@ -48,6 +48,7 @@ from forms import *
 
 @app.route("/")
 def index():
+  print app.config
   return render_template('index.html')
 
 

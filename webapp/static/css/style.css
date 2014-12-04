@@ -1208,7 +1208,13 @@ form .awesome {
 	font: 12px/1.4 "Helvetica Neue", Arial, Helvetica, sans-serif;
 	}
 
+body .leaflet-control-zoom-in {
+	background-image: url("/static/img/leaflet/zoom-in.png");
+}
 
+body .leaflet-control-zoom-out {
+	background-image: url("/static/img/leaflet/zoom-out.png");
+}
 
 /* End leaflet */
 
