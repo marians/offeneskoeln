@@ -607,7 +607,7 @@ def oparl_paper_subordinatedPaper_data(params):
                             search_params = {'superordinatedPaper': DBRef('paper', ObjectId(params['paper_id']))},
                             add_prefix = "%s/oparl/paper/" % app.config['api_url'],
                             add_postfix = generate_postfix(params))
-  data_sub = db.get_paper(deref={'value': 'subordinatedPaper', 'list_select': '_id'},
+  data_sub = db.get_paper(deref = {'value': 'subordinatedPaper', 'list_select': '_id'},
                         search_params = {'_id': ObjectId(params['paper_id'])},
                         add_prefix = "%s/oparl/paper/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
@@ -623,13 +623,13 @@ def oparl_paper_superordinatedPaper(paper_id):
 
 def oparl_paper_superordinatedPaper_data(params):
   data_sub = db.get_paper(paper_list = True,
-                            search_params = {'subordinatedPaper': DBRef('paper', ObjectId(params['paper_id']))},
+                          search_params = {'subordinatedPaper': DBRef('paper', ObjectId(params['paper_id']))},
+                          add_prefix = "%s/oparl/paper/" % app.config['api_url'],
+                          add_postfix = generate_postfix(params))
+  data_super = db.get_paper(deref = {'value': 'superordinatedPaper', 'list_select': '_id'},
+                            search_params = {'_id': ObjectId(params['paper_id'])},
                             add_prefix = "%s/oparl/paper/" % app.config['api_url'],
                             add_postfix = generate_postfix(params))
-  data_super = db.get_paper(deref={'value': 'superordinatedPaper', 'list_select': '_id'},
-                        search_params = {'_id': ObjectId(params['paper_id'])},
-                        add_prefix = "%s/oparl/paper/" % app.config['api_url'],
-                        add_postfix = generate_postfix(params))
   data = list(set(data_super + data_sub))
   return data
 
@@ -732,7 +732,7 @@ def oparl_file_accessUrl(file_id):
   return oparl_basic(oparl_file_accessUrl_data, params={'file_id': file_id}, direct_output=True)
 
 def oparl_file_accessUrl_data(params):
-  file_data = db.get_file(deref={'value': 'file'},
+  file_data = db.get_file(deref={'values': ['file']},
                               search_params={'_id': ObjectId(params['file_id'])})
 
   if len(file_data) == 0:
@@ -781,7 +781,7 @@ def oparl_file_downloadUrl(file_id):
   return oparl_basic(oparl_file_downloadUrl_data, params={'file_id': file_id}, direct_output=True)
 
 def oparl_file_downloadUrl_data(params):
-  file_data = db.get_file(deref={'value': 'file'},
+  file_data = db.get_file(deref={'values': ['file']},
                           search_params={'_id': ObjectId(params['file_id'])})
 
   if len(file_data) == 0:

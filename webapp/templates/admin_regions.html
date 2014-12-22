@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Admin: Konfiguration{{super()}}{% endblock %}
+
+{% block riscontent %}
+<div class="content" id="admin-config">
+	<h1>Admin: Regionen</h1>
+	<p><a href="/admin/region/new">Neue Region hinzufügen</a></p>
+	<table class="datatable">
+		<thead>
+			<tr>
+				<th>UID</th>
+				<th>Name</th>
+				<th>Funktionen</th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<th>UID</th>
+				<th>Name</th>
+				<th>Funktionen</th>
+			</tr>
+		</tfoot>
+		<tbody>
+			{% for region in regions %}
+			<tr>
+				<th>{{ region._id }}</th>
+				<td>{{ region.name }}</td>
+				<td><a href="/admin/region/edit?id={{ region._id }}">edit</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}

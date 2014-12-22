@@ -1,7 +1,8 @@
 # encoding: utf-8
 
 from webapp import mongo, app
-import pyes
+#import pyes
+from elasticsearch import Elasticsearch
 import util
 
 from bson import ObjectId, DBRef
@@ -21,12 +22,16 @@ def get_config(body_uid=False):
   config = mongo.db.config.find_one({})
   if '_id' in config:
     del config['_id']
-  #if body_uid:
-  #  local_config = mongo.db.body.find_one({'_id': ObjectId(body_uid)})
-  #  if 'config' in local_config:
-  #    config = merge_dict(config, local_config['config'])
-  #    del local_config['config']
-  #  config['city'] = local_config
+  regions = mongo.db.region.find({})
+  config['regions'] = {}
+  for region in regions:
+    bodies = []
+    for body in region['body']:
+      bodies.append(str(body.id))
+    region['body'] = bodies
+    region['id'] = str(region['_id'])
+    del region['_id']
+    config['regions'][region['id']] = region
   return config
 
 def merge_dict(self, x, y):
@@ -188,9 +193,10 @@ def get_file_data(file_id):
 def dereference_search_params(search_params, to_dereference):
   for key in to_dereference:
     if key['from'] in search_params:
-      print key['get_function']
-      search_params[key['to']] = key['get_function'](search_params={key['field']: ObjectId(search_params[key['from']]) if key['field'] == '_id' else search_params[key['from']]})
-      print search_params[key['to']]
+      if key['field'] == '_id':
+        search_params[key['to']] = key['get_function'](search_params={key['field']: ObjectId(search_params[key['from']])})
+      else:
+        search_params[key['to']] = key['get_function'](search_params={key['field']: search_params[key['from']]})
       if len(search_params[key['to']]) == 1:
         search_params[key['to']] = DBRef(key['to'], search_params[key['to']][0]['_id'])
         del search_params[key['from']]
@@ -200,39 +206,200 @@ def dereference_search_params(search_params, to_dereference):
         abort(500)
   return search_params
 
+
+# derefs is {'value': 'string', 'list_select': 'string'} or {'values': ['string1', 'string2']}
 def dereference_result_items(result, deref, add_prefix, add_postfix):
-  if deref:
-    if len(result) == 1:
-      if deref['value'] in result[0]:
-        # Single DBRef
-        if isinstance(result[0][deref['value']], DBRef):
-          if 'list_select' in deref:
-            if deref['list_select'] == '_id':
-              result[0][deref['value']] = "%s%s%s" % (add_prefix, result[0][deref['value']].id, add_postfix)
-            else:
-              result[0][deref['value']] = "%s%s%s" % (add_prefix, mongo.db.dereference(result[0][deref['value']])[deref['list_select']], add_postfix)
-          else:
-            result[0][deref['value']] = mongo.db.dereference(result[0][deref['value']])
-          return result
-        # DBRef List
+  # dereference value and select them
+  if 'list_select' in deref:
+    if deref['value'] in result[0]:
+      if isinstance(result[0][deref['value']], DBRef):
+        if deref['list_select'] == '_id':
+          result[0][deref['value']] = "%s%s%s" % (add_prefix, result[0][deref['value']].id, add_postfix)
         else:
-          for item_id in range(len(result[0][deref['value']])):
-            if 'list_select' in deref:
-              if deref['list_select'] == '_id':
-                result[0][deref['value']][item_id] = "%s%s%s" % (add_prefix, result[0][deref['value']][item_id].id, add_postfix)
-              else:
-                result[0][deref['value']][item_id] = "%s%s%s" % (add_prefix, mongo.db.dereference(result[0][deref['value']][item_id])[deref['list_select']], add_postfix)
-            else:
-              result[0][deref['value']][item_id] = mongo.db.dereference(result[0][deref['value']][item_id])
-          return result[0][deref['value']]
+          result[0][deref['value']] = "%s%s%s" % (add_prefix, mongo.db.dereference(result[0][deref['value']])[deref['list_select']], add_postfix)
       else:
-        return []
-    # makes no sense
+        for item_id in range(len(result[0][deref['value']])):
+          if deref['list_select'] == '_id':
+            result[0][deref['value']][item_id] = "%s%s%s" % (add_prefix, result[0][deref['value']][item_id].id, add_postfix)
+          else:
+            result[0][deref['value']][item_id] = "%s%s%s" % (add_prefix, mongo.db.dereference(result[0][deref['value']][item_id])[deref['list_select']], add_postfix)
+      return result[0][deref['value']]
     else:
-      abort(500)
+      return []
+  # dereference values in dict
+  elif 'values' in deref:
+    for value in deref['values']:
+      if value in result[0]:
+        if isinstance(result[0][value], DBRef):
+          result[0][value] = mongo.db.dereference(result[0][value])
+        else:
+          for item_id in range(len(result[0][value])):
+            result[0][value][item_id] = mongo.db.dereference(result[0][value][item_id])
+    return result
+  # do nothing
   else:
     return result
-  return result
+
+
+def query_paper(region=None, q='', fq=None, sort='score desc', start=0, papers_per_page=10, date=None, facets=None):
+  (sort_field, sort_order) = sort.split(':')
+  if sort_field == 'score':
+    sort_field = '_score'
+  sort = {sort_field: {'order': sort_order}}
+  rest = True
+  x = 0
+  result = []
+  while rest:
+    y = fq.find(":", x)
+    if y == -1:
+      break
+    temp = fq[x:y]
+    x = y + 1
+    if fq[x:x+5] == "&#34;":
+      y = fq.find("&#34;", x+5)
+      if y == -1:
+        break
+      result.append((temp, fq[x+5:y]))
+      x = y + 6
+      if x > len(fq):
+        break
+    else:
+      y = fq.find(";", x)
+      if y == -1:
+        result.append((temp, fq[x:len(fq)]))
+        break
+      else:
+        result.append((temp, fq[x:y]))
+        x = y + 1
+  facet_terms = []
+  for sfq in result:
+    if sfq[0] == 'publishedDate':
+      (year, month) = sfq[1].split('-')
+      date_start = datetime.datetime(int(year), int(month), 1)
+      date_end = date_start + dateutil.relativedelta.relativedelta(months=+1,seconds=-1)
+      facet_terms.append({
+        'range': {
+          'publishedDate': {
+            'gt': date_start.isoformat('T'),
+            'lt': date_end.isoformat('T')
+          }
+        }
+      })
+    else:
+      facet_terms.append({
+        'term': {
+          sfq[0]: sfq[1]
+        }
+      })
+  if region:
+    facet_terms.append({
+      'terms': {
+        'bodyId': app.config['regions'][region]['body'],
+        'minimum_should_match': 1
+      }
+    })
+  es = Elasticsearch([app.config['ES_HOST']+':'+str(app.config['ES_PORT'])])
+  es.indices.refresh(app.config['es_paper_index'] + '-latest')
+  query = {
+    'query': {
+      'bool': {
+        'must': [
+          {
+            'query_string': {
+              'fields': ['file.fulltext', 'file.name', 'name'],
+              'query': q
+            }
+          }
+        ] + facet_terms
+      }
+    },
+    'highlight': {
+      'pre_tags' : ['<strong>'],
+      'post_tags' : ['</strong>'],
+      'fields': {
+        'file.fulltext': {
+          'fragment_size': 200,
+          'number_of_fragments': 1
+        }
+      }
+    },
+    'aggs': {
+      'publishedDate': {
+        'date_histogram': {
+          'field': 'publishedDate',
+          'interval': 'month'
+        }
+      },
+      'paperType': {
+        'terms': {
+          'field': 'paperType'
+        }
+      },
+      'bodyName': {
+        'terms': {
+          'field': 'bodyName'
+        }
+      }
+    },
+  }
+  
+  result = es.search(
+    index = app.config['es_paper_index'] + '-latest',
+    doc_type = 'paper',
+    fields = 'name,paperType,publishedDate,bodyId,bodyName,externalId',
+    body = query,
+    from_ = start,
+    size = 10,
+    sort = sort_field + ':' + sort_order
+  )
+  ret = {
+    'numhits': result['hits']['total'],
+    'maxscore': result['hits']['max_score'],
+    'result': [],
+    'facets': {}
+  }
+  for r in result['hits']['hits']:
+    ret['result'].append({
+      'id': r['_id'],
+      'score': r['_score'],
+      'bodyId': r['fields']['bodyId'][0],
+      'bodyName': r['fields']['bodyName'][0],
+      'name': r['fields']['name'][0],
+      'paperType': r['fields']['paperType'][0],
+      'publishedDate': r['fields']['publishedDate'][0],
+      'fileFulltext': r['highlight']['file.fulltext'][0].strip() if 'highlight' in r else None
+    })
+  if result['hits']['max_score'] is not None:
+    ret['maxscore'] = result['hits']['max_score']
+  for key in result['aggregations']:
+    ret['facets'][key] = {}
+    if key == 'publishedDate':
+      for subval in result['aggregations'][key]['buckets']:
+        ret['facets'][key][datetime.datetime.fromtimestamp(int(subval['key'])/1000).strftime('%Y-%m')] = subval['doc_count']
+    if key in ['paperType', 'bodyName']:
+      for subval in result['aggregations'][key]['buckets']:
+        ret['facets'][key][subval['key']] = subval['doc_count']
+  return ret
+
+
+def query_paper_num(q):
+  es = Elasticsearch([app.config['ES_HOST']+':'+str(app.config['ES_PORT'])])
+  es.indices.refresh(app.config['es_paper_index'] + '-latest')
+  result = es.search(
+    index = app.config['es_paper_index'] + '-latest',
+    doc_type = 'paper',
+    body = {
+      'query': {
+        'query_string': {
+          'fields': ['file.fulltext', 'file.name', 'name'],
+          'query': q
+        }
+      }
+    },
+    search_type = 'count'
+  )
+  return result['hits']['total']
+
 
 
 def get_attachment(attachment_id, include_file_meta=True):
@@ -377,19 +544,19 @@ def query_submissions(rs=None, q='', fq=None, sort='score desc', start=0, docs=1
       else:
         result.append((temp, fq[x:y]))
         x = y + 1
-  for sfq in result:
-    if sfq[0] == 'date':
-      (year, month) = sfq[1].split('-')
-      date_start = datetime.datetime(int(year), int(month), 1)
-      date_end = date_start + dateutil.relativedelta.relativedelta(months=+1,seconds=-1)
-      query.add_must(pyes.RangeQuery(qrange=pyes.ESRange('date',date_start, date_end)))
-    else:
-      query.add_must(pyes.TermQuery(field=sfq[0], value=sfq[1]))
+  #for sfq in result:
+  #  if sfq[0] == 'date':
+  #    (year, month) = sfq[1].split('-')
+  #    date_start = datetime.datetime(int(year), int(month), 1)
+  #    date_end = date_start + dateutil.relativedelta.relativedelta(months=+1,seconds=-1)
+  #    query.add_must(pyes.RangeQuery(qrange=pyes.ESRange('date',date_start, date_end)))
+  #  else:
+  #    query.add_must(pyes.TermQuery(field=sfq[0], value=sfq[1]))
   search = pyes.query.Search(query=query, fields=[''], start=start, size=docs, sort=sort)
-  search.facet.add_term_facet('type')
-  search.facet.add_term_facet('rs')
-  search.facet.add_term_facet('committee')
-  search.facet.add_date_facet(field='date', name='date', interval='month')
+  #search.facet.add_term_facet('type')
+  #search.facet.add_term_facet('rs')
+  #search.facet.add_term_facet('committee')
+  #search.facet.add_date_facet(field='date', name='date', interval='month')
   es = pyes.ES(app.config['ES_HOST']+':'+str(app.config['ES_PORT']))
   es.default_indices = [app.config['ES_INDEX_NAME_PREFIX']+'-latest']
   es.refresh()
@@ -418,44 +585,18 @@ def query_submissions(rs=None, q='', fq=None, sort='score desc', start=0, docs=1
   return ret
 
 
-def get_all_submission_identifiers(rs=None):
-  """
-  Liefert Liste mit allen Submission-Identifiern zurück
-  """
-  search = mongo.db.submissions.find({"rs" : rs}, {'identifier': 1, 'urls': 1})
-  if search.count():
-    slist = []
-    for submission in search:
-      if 'urls' in submission and len(submission['urls']):
-        slist.append({'identifier': submission['identifier'], 'url': submission['urls'][0]})
-      else:
-        slist.append({'identifier': submission['identifier'], 'url': submission['identifier']})
-    return slist
-
-
-def valid_submission_identifier(identifier):
-  """
-  Testet, ob der Submission Identifier existiert.
-  """
-  s = mongo.db.submissions.find_one({'identifier': identifier}, {'_id': 1})
-  pprint.pprint(s)
-  if s is not None:
-    return True
-  return False
-
-
-def get_locations_by_name(rs, streetname):
+def get_locations_by_name(streetname):
   """
   Liefert Location-Einträge für einen Namen zurück.
   """
-  cursor = mongo.db.locations.find({'name': streetname, "rs" : app.config['RS']})
+  cursor = mongo.db.locations.find({'name': streetname})
   streets = []
   for street in cursor:
     streets.append(street)
   return streets
 
 
-def get_locations(rs, lon, lat, radius=1000):
+def get_locations(lon, lat, radius=1000):
   """
   Liefert Location-Einträge im Umkreis eines Punkts zurück
   """
@@ -466,14 +607,13 @@ def get_locations(rs, lon, lat, radius=1000):
   if type(radius) != int:
     radius = int(radius)
   earth_radius = 6371000.0
-  res = mongo.db.locations.aggregate([
-  {
+  res = mongo.db.locations.aggregate([{
     '$geoNear': {
-    'near': [lon, lat],
-    'distanceField': 'distance',
-    'distanceMultiplier': earth_radius,
-    'maxDistance': (float(radius) / earth_radius),
-    'spherical': True
+      'near': [lon, lat],
+      'distanceField': 'distance',
+      'distanceMultiplier': earth_radius,
+      'maxDistance': (float(radius) / earth_radius),
+      'spherical': True
     }
   }])
   streets = []

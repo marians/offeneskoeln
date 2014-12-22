@@ -40,7 +40,7 @@ from flask import redirect
 from flask import Response
 from flask import Markup
 from flask.ext.basicauth import BasicAuth
-from bson.objectid import ObjectId
+from bson import ObjectId, DBRef
 
 from webapp import app, mongo, basic_auth
 from forms import *
@@ -48,7 +48,6 @@ from forms import *
 
 @app.route("/")
 def index():
-  print app.config
   return render_template('index.html')
 
 
@@ -170,12 +169,15 @@ def suche():
   date: Datumsbereich als String
   """
   search_settings = {}
+  search_settings['r'] = request.form.get('r')
+  if not search_settings['r']:
+    search_settings['r'] = request.args.get('r', app.config['region_default'])
   search_settings['q'] = request.args.get('q', '')
   search_settings['fq'] = request.args.get('fq', '')
   search_settings['sort'] = request.args.get('sort', '')
   search_settings['start'] = int(request.args.get('start', '0'))
-  search_settings['num'] = int(request.args.get('num', '10'))
-  search_settings['num'] = min(search_settings['num'], 100)  # max 100 items
+  search_settings['ppp'] = int(request.args.get('ppp', '10'))
+  search_settings['ppp'] = min(search_settings['ppp'], 100)  # max 100 items
   search_settings['date'] = request.args.get('date', '')
   html = render_template('suche.html', search_settings=search_settings)
   response = make_response(html, 200)
@@ -183,30 +185,35 @@ def suche():
   response.headers['Cache-Control'] = util.cache_max_age(hours=24)
   return response
 
-
-#@app.route("/dokumente/")
-#def dokumente_liste():
-  """
-  Gibt eine sehr simple Liste aller Dokumente mit Links zur
-  Detailseite aus.
-  """
-#  documents = db.get_all_submission_identifiers()
-  #pprint.pprint(documents)
-#  return render_template('dokument_liste.html', documents=documents)
-
-
-@app.route("/dokumente/<path:identifier>/")
-def dokument(identifier):
+@app.route("/paper/<path:id>/")
+def view_paper(id):
   """
   Gibt Dokumenten-Detailseite aus
   """
-  result = db.get_submissions(references=[identifier],
-    get_attachments=True,
-    get_consultations=True,
-    get_thumbnails=True)
+  result = db.get_paper(search_params = {'_id': ObjectId(id)},
+                        deref = {'values': ['body', 'mainFile', 'auxiliaryFile', 'subordinatedPaper', 'superordinatedPaper']})
   if len(result) == 0:
     abort(404)
-  return render_template('dokument_detailseite.html', submission=result[0])
+  result = result[0]
+  result['numberOfFiles'] = 0
+  if 'mainFile' in result:
+    result['numberOfFiles'] += 1
+  if 'auxiliaryFile' in result:
+    result['numberOfFiles'] += len(result['auxiliaryFile'])
+  result['consultation'] = db.get_consultation(search_params = {'paper': DBRef('paper', ObjectId(id))})
+  for consultation_id in range(len(result['consultation'])):
+    #print result['consultation'][consultation_id]
+    agendaItem_result = db.get_agendaItem(search_params = {'consultation': DBRef('consultation', result['consultation'][consultation_id]['_id'])})
+    if len(agendaItem_result):
+      result['consultation'][consultation_id]['agendaItem'] = agendaItem_result[0]
+      meeting_result = db.get_meeting(search_params = {'agendaItem': DBRef('agendaItem', result['consultation'][consultation_id]['agendaItem']['_id'])})
+      if len(meeting_result):
+        result['consultation'][consultation_id]['agendaItem']['meeting'] = meeting_result[0]
+  """references=[identifier],
+    get_attachments=True,
+    get_consultations=True,
+    get_thumbnails=True)"""
+  return render_template('paper_details.html', paper=result)
 
 #@app.route("/admin")
 #@app.route("/admin/<string:funct>")
@@ -242,6 +249,72 @@ def admin_config():
     mongo.db.config.remove({})
     mongo.db.config.insert(config)
   return render_template('admin_config.html', config_form=config_form)
+
+@app.route('/admin/regions', methods=['GET', 'POST'])
+@basic_auth.required
+def admin_regions():
+  return render_template('admin_regions.html', regions=mongo.db.region.find())
+
+@app.route('/admin/region/new', methods=['GET', 'POST'])
+@basic_auth.required
+def admin_region_new():
+  if request.method == 'POST':
+    region_form = RegionForm(request.form)
+  else:
+    region_form = RegionForm()
+  if request.method == 'POST' and region_form.validate():
+    new_region_bodies = region_form.bodies.data.replace("\r", "").split("\n")
+    new_region_keywords = region_form.keywords.data.replace("\r", "").split("\n")
+    save_region_bodies = []
+    for current_body in new_region_bodies:
+      save_region_bodies.append(DBRef('body', current_body))
+    mongo.db.region.insert({'name': region_form.name.data,
+                            'type': region_form.type.data,
+                            'lat': region_form.lat.data,
+                            'lon': region_form.lon.data,
+                            'zoom': region_form.zoom.data,
+                            'body': save_region_bodies,
+                            'keyword': new_region_keywords})
+    return redirect('/admin/regions')
+  return render_template('admin_region_new.html', region_form=region_form)
+
+@app.route('/admin/region/edit', methods=['GET', 'POST'])
+@basic_auth.required
+def admin_region_edit():
+  if request.method == 'POST':
+    region_form = RegionForm(request.form)
+  else:
+    config = []
+    for value in mongo.db.region.find({'_id': ObjectId(request.args.get('id'))}):
+      config.append(value)
+    if len(config) == 1:
+      bodies = []
+      for body in config[0]['body']:
+        bodies.append(str(body.id))
+      region_form = RegionForm(name = config[0]['name'],
+                               type = int(config[0]['type']) if 'type' in config[0] else 0,
+                               lat = config[0]['lat'] if 'lat' in config[0] else 0.0,
+                               lon = config[0]['lon'] if 'lon' in config[0] else 0.0,
+                               zoom = config[0]['zoom'] if 'zoom' in config[0] else 0.0,
+                               bodies = "\n".join(bodies),
+                               keywords = "\n".join(config[0]['keyword']) if 'keyword' in config[0] else '')
+    else:
+      abort(500)
+  if request.method == 'POST' and region_form.validate():
+    region_bodies = region_form.bodies.data.replace("\r", "").split("\n")
+    save_region_keywords = region_form.keywords.data.replace("\r", "").split("\n")
+    save_region_bodies = []
+    for current_body in region_bodies:
+      save_region_bodies.append(DBRef('body', current_body))
+    mongo.db.region.update({'_id': ObjectId(request.args.get('id'))}, {'name': region_form.name.data,
+                                                                       'type': region_form.type.data,
+                                                                       'lat': region_form.lat.data,
+                                                                       'lon': region_form.lon.data,
+                                                                       'zoom': region_form.zoom.data,
+                                                                       'body': save_region_bodies,
+                                                                       'keyword': save_region_keywords})
+    return redirect('/admin/regions')
+  return render_template('admin_region_edit.html', region_form=region_form)
 
 @app.route('/admin/bodies', methods=['GET', 'POST'])
 @basic_auth.required
@@ -285,6 +358,7 @@ def admin_body_edit():
     if '_id' in updated_body:
       del updated_body['_id']
     mongo.db.body.update({'_id': ObjectId(request.args.get('id'))}, updated_body)
+    return redirect('/admin/bodies')
   return render_template('admin_body_edit.html', body_form=body_form)
 
 
@@ -301,3 +375,10 @@ def urlencode_filter(s):
 def debug_filter(s):
   pprint.pprint(s)
   return s
+
+
+def generate_file_thumbnail_url(body_id, file_id, resulution, number):
+    print file_id
+    return "%s/%s/%s/%s/%s/%s/%s.jpg" % (app.config["thumbs_url"], body_id, str(file_id)[-1:], str(file_id)[-2:-1], file_id, resulution, number)
+app.jinja_env.globals.update(generate_file_thumbnail_url=generate_file_thumbnail_url)
+

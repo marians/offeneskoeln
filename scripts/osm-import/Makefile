@@ -5,12 +5,13 @@
 # pip install git+git://github.com/werner2101/python-osm.git
 # das wiederum benötigt NumPy und Matplotlib.nxutils
 # pip install numpy
-# pip install matplotlib
+# pip install matplotlib==1.1.1
+# pip install imposm.parser
 
 # Aufruf mit Laden der Config: make `cat bochum.cfg`
 
 import: city-streets.osm
-	python osm-import.py city-streets.osm $(CITY)
+	python osm-import.py city-streets.osm $(CITYID)
 
 city-streets.osm: osmfilter city.osm
 	./osmfilter city.osm \
@@ -21,9 +22,9 @@ city.osm: city.poly city-regbez-latest.osm osmosis
 	bin/osmosis --read-xml file="city-regbez-latest.osm" --bounding-polygon file="city.poly" --write-xml file="city.osm"
 
 city-regbez-latest.osm:
-	wget -N http://download.geofabrik.de/europe/germany/$(FOLDER)$(FILE)-latest.osm.bz2
-	bunzip2 $(FILE)-latest.osm.bz2
-	mv $(FILE)-latest.osm city-regbez-latest.osm
+	wget -N http://download.geofabrik.de/europe/germany/$(FOLDER)/$(REGBEZ)-latest.osm.bz2
+	bunzip2 $(REGBEZ)-latest.osm.bz2
+	mv $(REGBEZ)-latest.osm city-regbez-latest.osm
 
 osmfilter: loadconf
 	wget -O - http://m.m.i24.cc/osmfilter.c |cc -x c - -O3 -o osmfilter

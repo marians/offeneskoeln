@@ -61,25 +61,28 @@ def submission_url(identifier):
   return url
 
 
-def geocode(location_string):
+def geocode(location_string, region):
   """
   Löst eine Straßen- und optional PLZ-Angabe zu einer Geo-Postion
   auf. Beispiel: "Straßenname (12345)"
   """
-  postal = None
-  street = location_string.encode('utf-8')
+  if region != app.config['region_default']:
+    location_string += ' ' + app.config['regions'][region]['name']
+  address = location_string.encode('utf-8')
+  
+  # Filter Postalcode in Brackets from Selection
   postalre = re.compile(r'(.+)\s+\(([0-9]{5})\)')
-  postal_matching = re.match(postalre, street)
+  postal_matching = re.match(postalre, address)
   postal = None
   if postal_matching is not None:
-    street = postal_matching.group(1)
+    address = postal_matching.group(1)
     postal = postal_matching.group(2)
   url = 'http://open.mapquestapi.com/nominatim/v1/search.php'
   params = {'format': 'json',  # json
-        'q': ' '.join([street, app.config['GEOCODING_DEFAULT_CITY']]),
+        'q': address,
         'addressdetails': 1,
         'accept-language': 'de_DE',
-        'countrycodes': app.config['GEOCODING_DEFAULT_COUNTRY']}
+        'countrycodes': 'DE'}
   request = urllib2.urlopen(url + '?' + urllib.urlencode(params))
   response = request.read()
   addresses = json.loads(response)
@@ -95,23 +98,16 @@ def geocode(location_string):
     # skip if not in correct county
     if 'county' not in addresses[n]['address']:
       continue
-    if addresses[n]['address']['county'] != app.config['GEOCODING_FILTER_COUNTY']:
-      continue
-    if postal is not None:
-      if 'postcode' in addresses[n]['address'] and addresses[n]['address']['postcode'] == postal:
-        addresses_out.append(addresses[n])
-    else:
-      addresses_out.append(addresses[n])
+    
+    # TODO: Filter for County
+    #if addresses[n]['address']['county'] != app.config['GEOCODING_FILTER_COUNTY']:
+    #  continue
+    #if postal is not None:
+    #  if 'postcode' in addresses[n]['address'] and addresses[n]['address']['postcode'] == postal:
+    #    addresses_out.append(addresses[n])
+    #else:
+    addresses_out.append(addresses[n])
   return addresses_out
-
-def get_rs():
-  rs = request.args.get('rs', None)
-  #TODO: legacy host compatibility
-  if rs not in app.config['RSMAP']:
-    return None
-  if not app.config['RSMAP'][rs]['active']:
-    return None
-  return rs
 
 
 class MyEncoder(json.JSONEncoder):

@@ -318,6 +318,7 @@ span.spinner {
 	padding: 3px 14px 3px 0px;
 	line-height: 140%;
 	color: #666;
+	font-size: 100%;
 }
 #docdetails .metadata td.value {
 	padding: 3px 3px 3px 0px;
@@ -411,12 +412,16 @@ li.resultitem .title em {
 	font-style: normal;
 	color: #58743d;
 }
-li.resultitem .snippet {
+li.resultitem .metainfo {
 	display: block;
 	color: #222;
 }
-li.resultitem a:hover .snippet {
+li.resultitem a:hover .metainfo {
 	color: #000;
+}
+li.resultitem .snippet {
+	margin: 0 0 5px 0;
+	font-style: italic;
 }
 #search .pager {
 	text-align: center;
@@ -425,7 +430,7 @@ li.resultitem a:hover .snippet {
 }
 #search .paging {
 	padding-top: 10px;
-	padding-bottom: 13px;
+	padding-bottom: 10px;
 }
 #search .next {
 	padding-right: 20px;
@@ -474,7 +479,7 @@ ul.facet {
 	border-radius: 3px;
 	color: #222;
 }
-.facet .current .del {
+.facet .current .facetdel {
 	margin-left: 4px;
 	margin-right: 4px;
 	font-size: 88%;
@@ -487,7 +492,7 @@ ul.facet {
 	color: #fff;
 	baseline-shift: 20%;
 }
-a:hover .del {
+a:hover .facetdel {
 	text-decoration: none;
 }
 
@@ -807,9 +812,6 @@ form .awesome {
   #home #qinput { width: 22em; }
   /*#home #submit { padding-left: 2em; padding-right: 2em;}*/
   .mobilerow { display: inline;  margin-top: 0; margin-bottom: 0; margin-left: 10px; margin-right: 10px;}
-  #position-prompt form, #location-prompt-resultchoice,  #position-prompt .error {
-	margin-top: 0.3em;
-  }
   /*input, select, textarea { width: 30em; } */
 }
 @media only screen and (min-width: 1000px) {

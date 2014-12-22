@@ -315,8 +315,8 @@ if __name__ == '__main__':
   parser.add_argument(dest='body_id', help=("e.g. 54626a479bcda406fb531236"))
   options = parser.parse_args()
   body_id = options.body_id
-  connection = MongoClient(config.DB_HOST, config.DB_PORT)
-  db = connection[config.DB_NAME]
+  connection = MongoClient(config.MONGO_HOST, config.MONGO_PORT)
+  db = connection[config.MONGO_DBNAME]
   fs = gridfs.GridFS(db)
   config = get_config(db, body_id)
   tempdir = tempfile.mkdtemp()

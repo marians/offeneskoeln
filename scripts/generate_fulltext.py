@@ -73,7 +73,7 @@ def merge_dict(x, y):
 def generate_fulltext(db, config, body_id):
   """Generiert Volltexte für die gesamte file-Collection"""
 
-  # Attachments mit veralteten Volltexten
+  # Files mit veralteten Volltexten
   query = {'fulltextGenerated': {'$exists': True}, 'depublication': {'$exists': False}, 'body': DBRef('body', ObjectId(body_id))}
   for single_file in db.file.find(query):
     # Dateiinfo abholen
@@ -83,7 +83,7 @@ def generate_fulltext(db, config, body_id):
       STATS['attachments_with_outdated_fulltext'] += 1
       generate_fulltext_for_file(db, config,file_data['_id'])
 
-  # Attachments ohne Volltext
+  # Files ohne Volltext
   query = {'fulltextGenerated': {'$exists': False}, 'body': DBRef('body', ObjectId(body_id))}
   for single_file in db.file.find(query):
     STATS['attachments_without_fulltext'] += 1
@@ -113,6 +113,7 @@ def generate_fulltext_for_file(db, config, file_id):
   if text is not None:
     text = text.strip()
     text = text.decode('utf-8')
+    text = text.replace(u"\u00a0", " ")
 
   # delete temp file
   os.unlink(path)
@@ -156,8 +157,8 @@ if __name__ == '__main__':
   parser.add_argument(dest='body_id', help=("e.g. 54626a479bcda406fb531236"))
   options = parser.parse_args()
   body_id = options.body_id
-  connection = MongoClient(config.DB_HOST, config.DB_PORT)
-  db = connection[config.DB_NAME]
+  connection = MongoClient(config.MONGO_HOST, config.MONGO_PORT)
+  db = connection[config.MONGO_DBNAME]
   fs = gridfs.GridFS(db)
   config = get_config(db, body_id)
   tempdir = tempfile.mkdtemp()

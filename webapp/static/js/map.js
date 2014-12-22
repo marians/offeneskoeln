@@ -15,7 +15,7 @@ $(document).ready(function(){
   
   var lastLocationEntry = ''; // die letzte vom User eingegebene Strasse
   
-  map.setView(new L.LatLng(51.165691, 10.451526), 6).addLayer(backgroundLayer);
+  map.setView(new L.LatLng(region_data['lat'], region_data['lon']), region_data['zoom']).addLayer(backgroundLayer);
   
   /*
   Alternative tile config. This tile-set should only be used for testing.
@@ -26,7 +26,7 @@ $(document).ready(function(){
   */
   
   // set to user position, if set and within cologne
-  OpenRIS.session({}, function(data){
+  /*OpenRIS.session({}, function(data){
     sessionData = data.response;
     //console.log("sessionData:", sessionData);
     if (typeof sessionData != 'undefined' &&
@@ -47,14 +47,20 @@ $(document).ready(function(){
         navigator.geolocation.getCurrentPosition(setGeoPositionFromNavigator, handleGeoPositionError);
       }
       */
-    }
-  });
+  //  }
+  //});
+  
+  // register post region change actions
+  OpenRIS.post_region_change = function() {
+    map.setView(new L.LatLng(region_data['lat'], region_data['lon']), region_data['zoom']).addLayer(backgroundLayer);
+  }
+  
   
   var locationPrompt = $('#position-prompt');
   if (locationPrompt.length > 0) {
-    $('#street').focus();
+    $('#address').focus();
   }
-    
+  
   // handle user data input
   $('#position-prompt-submit').click(function(evt){
     evt.preventDefault();
@@ -64,7 +70,7 @@ $(document).ready(function(){
     evt.preventDefault();
     handleLocationInput();
   });
-  $('#street').keydown(function(evt){
+  $('#address').keydown(function(evt){
     // Enter abfangen
     if (evt.keyCode == 13) {
       evt.preventDefault();
@@ -91,15 +97,15 @@ $(document).ready(function(){
     //console.log("#position-prompt-submit click", evt);
     $('#position-prompt .error').remove();
     $('#location-prompt-resultchoice').remove();
-    var street = $('#street').val();
+    var address = $('#address').val();
     // check if street is available
-    if (street !== '') {
+    if (address !== '') {
       data = {
-        street: street
+        address: address,
+        region: region_data['id']
       };
       $.getJSON('/api/proxy/geocode', data, function(places){
         $('#position-prompt .spinner').css({visibility: 'hidden'});
-        console.log('Geocoding response: ', places);
         if (places.result.length === 0) {
           handleLocationLookupError('NOT_FOUND');
         } else {
@@ -115,9 +121,17 @@ $(document).ready(function(){
             choice.append('<div><span>Bitte wähle einen der folgenden Orte:</span></div>');
             for (var n in places_filtered) {
               // Marker auf der Karte
-              //console.log(places_filtered[n].lat, places_filtered[n].lon);
+              var defaultMarker = new L.Icon({
+                iconUrl: '/static/img/leaflet/marker-icon.png',
+                shadowUrl: '/static/img/leaflet/marker-shadow.png',
+                iconSize:     [25, 41],
+                shadowSize:   [41, 41],
+                iconAnchor:   [13, 41],
+                shadowAnchor: [12, 41],
+                popupAnchor:  [0, 0]
+              });
               var markerLocation = new L.LatLng(parseFloat(places_filtered[n].lat), parseFloat(places_filtered[n].lon));
-              var marker = new L.Marker(markerLocation, {title: places_filtered[n].osm_id});
+              var marker = new L.Marker(markerLocation, {title: places_filtered[n].osm_id, icon: defaultMarker});
               marker.addEventListener("mouseover", function(evt){
                 // Achtung! ID des Highlight-Elements wird als title übergeben
                 $('#location-prompt-resultchoice a').removeClass('highlight');
@@ -139,8 +153,15 @@ $(document).ready(function(){
               } else {
                 choicetext = places_filtered[n].address.road;
               }
+              var pc_shown = false;
               if (places_filtered[n].address.postcode !== '') {
-                choicetext += ' (' + places_filtered[n].address.postcode + ')';
+                choicetext += ', ' + places_filtered[n].address.postcode;
+                pc_shown = true;
+              }
+              if (places_filtered[n].address.city !== '') {
+                if (!pc_shown)
+                  choicetext += ','
+                choicetext += ' ' + places_filtered[n].address.city
               }
               choicelink.text(choicetext);
               choicelink.attr('class', 'choicelink ' + places_filtered[n].osm_id);
@@ -159,7 +180,7 @@ $(document).ready(function(){
                 if (evt.data.resultObject.address.postcode !== '') {
                   entry_string += ' (' + evt.data.resultObject.address.postcode + ')';
                 }
-                $('#street').val(entry_string);
+                $('#address').val(entry_string);
                 lastLocationEntry = entry_string;
                 sessionParams = {
                   'location_entry': entry_string,
@@ -167,7 +188,7 @@ $(document).ready(function(){
                   'lon': evt.data.resultObject.lon
                 };
                 setUserPosition(parseFloat(evt.data.resultObject.lat), parseFloat(evt.data.resultObject.lon));
-                OpenRIS.session(sessionParams, handleSessionResponse);
+                //OpenRIS.session(sessionParams, handleSessionResponse);
               });
               choice.append(choicelink);
               choice.append(' ');
@@ -195,15 +216,15 @@ $(document).ready(function(){
   
   function resetMap() {
     clearMap();
-    map.setView(new L.LatLng(CONF.mapStartPoint[1], CONF.mapStartPoint[0]), 11);
+    map.setView(new L.LatLng(region_data['lat'], region_data['lon']), region_data['zoom']);
   }
   
   function handleChangePositionClick(evt) {
     evt.preventDefault();
     $('#map-claim').remove();
     $('#position-prompt').show();
-    $('#street').focus();
-    $('#street').select();
+    $('#address').focus();
+    $('#address').select();
     resetMap();
   }
   
@@ -221,7 +242,7 @@ $(document).ready(function(){
   
   function setUserPosition(lat, lon) {
     // Header-Element umbauen
-    var streetString = $('#street').val();
+    var streetString = $('#address').val();
     if (streetString === '') {
       streetString = sessionData.location_entry;
     }
@@ -260,36 +281,27 @@ $(document).ready(function(){
     // Strassen aus der Umgebung abrufen
     OpenRIS.streetsForPosition(lat, lon, radius, function(data){
       //console.log('streetsForPosition callback data: ', data);
-      
-      if (typeof data.response.streets !== 'undefined') {
-        // version 1 API response
-        var streetnames = [];
-        var streets = data.response.streets;
-        for (var i in data.response.streets) {
-          streetnames.push(data.response.streets[i][0]);
+      $.each(data.response, function(street_name, street) {
+        if (street.paper_count) {
+          var points = [];
+          $.each(street.nodes, function(node_id, node){
+            points.push(new L.LatLng(
+              node[1], node[0]
+            ));
+          });
+          var markerHtml = '<p><b><a href="/suche/?q=' + street_name + '">' + street_name + ': ' + street.paper_count + ' Treffer</a></b>';
+          // TODO: 
+          //if (search.response.documents[0].date && search.response.documents[0].date[0]) {
+          //  markerHtml += '<br/>Der jüngste vom ' + OpenRIS.formatIsoDate(search.response.documents[0].date);
+          //}
+          markerHtml += '</p>';
+          var polyline = L.polyline(points, {color: '#ff0909'});
+          polyline.bindPopup(markerHtml);
+          markerLayerGroup.addLayer(polyline);
         }
-        // get marker positions for the surrounding streets
-        OpenRIS.locationsForStreetsQueued(streetnames, function(data){
-          if (data.response.averages) {
-            $.getJSON('/api/documents', {'fq': 'street:"'+ data.request.street +'"', 'docs': 1, 'sort': 'date desc'}, function(search){
-              if (search.response.numhits > 0) {
-                //console.log(search, data.response.averages[0]);
-                var markerLocation = new L.LatLng(data.response.averages[0][0], data.response.averages[0][1]);
-                var marker = new L.Marker(markerLocation);
-                markerLayerGroup.addLayer(marker);
-                var markerHtml = '<p><b><a href="/suche/?q=' + data.request.street + '">' + data.request.street + ': ' + search.response.numhits + ' Treffer</a></b>';
-                if (search.response.documents[0].date && search.response.documents[0].date[0]) {
-                  markerHtml += '<br/>Neuster Treffer vom ' + OpenRIS.formatIsoDate(search.response.documents[0].date[0]);
-                } else {
-                  //console.log('Kein Datum: ', search.response.documents[0]);
-                }
-                markerHtml += '</p>';
-                marker.bindPopup(markerHtml);
-              }
-            });
-          }
-        });
-      } else {
+      });
+      
+      if (0) {
         // version 2 API response
         streets_by_name = {};
         var name;

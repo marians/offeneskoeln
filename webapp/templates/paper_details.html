@@ -1,0 +1,238 @@
+{% extends "layout.html" %}
+{% block title %}{{ paper.title }}{% endblock %}
+{% block ogtitle %}{{ paper.title }}{% endblock %}
+{% block meta_description %}Hier steht alles, was wir über einen Antrag oder ein sonstiges Dokument wissen.{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript">
+var ok_document_id = '{{ paper._id }}';
+var ok_document_url = '{{ paper._id }}';
+</script>
+{% if config.DISQUS_SHORTNAME %}
+<script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_title = '[{{ paper._id }}] - {{ paper.name }}';
+  var disqus_category_id = '{{ config.DISQUS_CAT_DOKUMENTE }}';
+  var disqus_shortname = '{{ config.DISQUS_SHORTNAME }}';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+{% endif %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/paper_details.js') }}"></script>
+{% endblock %}
+
+{% block riscontent %}
+<div id="docdetails">
+  <div class="content top">
+  <h1>{{ paper.name }}</h1>
+  <table class="metadata">
+    <tbody>
+    {% if paper.paperType %}
+    <tr>
+      <td class="label">Art des Dokuments:</td>
+      <td class="value">{{ paper.paperType }}</td>
+    </tr>
+    {% endif %}
+    {% if paper.publishedDate %}
+    <tr>
+      <td class="label">Erstellt am:</td>
+      <td class="value">{{ paper.publishedDate.strftime('%d.%m.%Y') }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+      <td class="label">Beraten in:</td>
+      <td class="value">
+      {% if paper.consultation|length ==  1 %}
+      1 Sitzung
+      {% else %}
+      {{ paper.consultation|length }} Sitzungen
+      {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Anlagen:</td>
+      <td class="value">
+      {% if paper.numberOfFiles == 1 %}
+      1 Anlage
+      {% else %}
+      {{ paper.numberOfFiles }} Anlagen
+      {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Quelle:</td>
+      <td class="value">
+      <a href="{{ paper.originalUrl }}" target="_blank">{{ paper.originalUrl }}</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="consultation content middle">
+    <h2>Beratungen in Gremien</h2>
+    <ol>
+      {% for consultation in paper.consultation %}
+      <li>
+      <b>{{ consultation.agendaItem.meeting.name }}</b>,
+      {% if consultation.agendaItem.meeting.start %}
+      {{ consultation.agendaItem.meeting.start.strftime('%d.%m.%Y') }}.
+      {% endif %}
+      {% if consultation.agendaItem.name != paper.name %}
+      <br/>Thema: {{ consultation.agendaItem.name }}
+      {% endif %}
+      {% if consultation.agendaItem.result %}
+      <br />Ergebnis: {{ consultation.agendaItem.result }}
+      {% endif %}
+      {% if consultation.agendaItem.resolution %}
+        &ndash; {{ consultation.agendaItem.resolution }}
+      {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+  
+  {% if paper.mainFile %}
+  {% if paper.mainFile.thumbnails %}
+  {% set twidth = (paper.mainFile.thumbnails['300']|sum(attribute='width') + (11 * paper.mainFile.thumbnails['300']|length)) %}
+  {% endif %}
+  <div class="attachment content middle" id="{{ paper.mainFile._id }}">
+    {% if paper.mainFile.thumbnails %}
+    {% set numpages = paper.mainFile.thumbnails['300']|length %}
+    {% endif %}
+    <h2>Primäre Anlage: {{ paper.mainFile.name|truncate(100) }}
+      {% if numpages %}
+      ({{ numpages }} Seiten)
+      {% endif %}
+    </h2>
+    {% if paper.mainFile.depublication %}
+    <div class="attachmentexclusion">
+      <p class="exclusionheader">Es tut uns leid, aber dieses Dokument wurde am {{ paper.mainFile.depublication.date.strftime('%d.%m.%Y') }} enfernt. Die Begründung:</p>
+      <p class="reasontext">
+        {{ paper.mainFile.depublication.comment }}
+      </p>
+    </div>
+    {% else %}
+    {% if paper.mainFile.thumbnails %}
+    <div class="thumbs">
+      <div class="thumbsinner" style="width: {{ twidth }}px; height: 310px;">
+        {% for thumbnail in paper.mainFile.thumbnails['300'] %}
+        <img class="thumb" src="{{ generate_file_thumbnail_url(paper.body._id, paper.mainFile._id, 300, loop.index) }}" alt="Vorschau zu {{ paper.mainFile.name }} zum Thema {{ paper.name }}"{% if paper.mainFile.thumbnails['800'][loop.index - 1] %} onload="$(this).data('width800', {{ paper.mainFile.thumbnails['800'][loop.index - 1]['width'] }} );" {% endif %}/>
+        {% endfor %}
+      </div>
+    </div>
+		{% else %}
+		<div class="nothumbs"><div class="smallnote">Zu diesem Anhang liegen keine Vorschaubilder vor.</div></div>
+		{% endif %}
+		{% if paper.mainFile.fulltext %}
+		<div class="fulltext">
+			<div class="complete">
+				<div class="text">{{ paper.mainFile.fulltext|trim }}</div>
+			</div>
+		</div>
+		{% else %}
+		<div class="nofulltext">
+			<div class="smallnote">Zu diesem Anhang kann leider kein Text angezeigt und durchsucht werden. Evtl. handelt es sich um den Scan einer Papiervorlage.</div>
+		</div>
+    {% endif %}
+    <table class="metadata, hidden_debug">
+      <tbody>
+        <tr>
+        <td class="label">ID: </td>
+        <td class="value">{{ paper.mainFile._id }}</td>
+        </tr>
+        <tr>
+        <td class="label">Orginal-Dateiname: </td>
+        <td class="value">{{ paper.mainFile.filename }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% if paper.mainFile.file %}
+    <div class="actions">
+			<a target="_blank" href="/oparl/file/{{ paper.mainFile._id }}/downloadUrl" class="awesome">Anhang öffnen</a>
+			<span class="typesize">{{ (paper.mainFile.size / 1024)|round(0)|int }} KB PDF<!-- | <span id="file_{{ paper.mainFile._id }}" class="warn response">Anhang melden</span-->
+    </div>
+    {% endif %}
+  {% endif%}
+  </div>
+  {% endif%}
+  
+
+  {% for file in paper.auxiliaryFile %}
+  {% if file.thumbnails %}
+  {% set twidth = (file.thumbnails['300']|sum(attribute='width') + (11 * file.thumbnails['300']|length)) %}
+  {% endif %}
+  <div class="attachment content middle" id="{{ file._id }}">
+    {% if file.thumbnails %}
+    {% set numpages = file.thumbnails['300']|length %}
+    {% endif %}
+    <h2>Weitere Anlagen: {{ file.name|truncate(100) }}
+      {% if numpages %}
+      ({{ numpages }} Seiten)
+      {% endif %}
+    </h2>
+    {% if file.depublication %}
+    <div class="attachmentexclusion">
+      <p class="exclusionheader">Es tut uns leid, aber dieses Dokument wurde am {{ file.depublication.date.strftime('%d.%m.%Y') }} enfernt. Die Begründung:</p>
+      <p class="reasontext">
+        {{ file.depublication.comment }}
+      </p>
+    </div>
+    {% else %}
+    {% if file.thumbnails %}
+    <div class="thumbs">
+      <div class="thumbsinner" style="width: {{ twidth }}px; height: 310px;">
+        {% for thumbnail in file.thumbnails['300'] %}
+        <img class="thumb" src="{{ generate_file_thumbnail_url(paper.body._id, file._id, 300, loop.index) }}" alt="Vorschau zu {{ file.name }} zum Thema {{ paper.name }}"{% if file.thumbnails['800'][loop.index - 1] %} onload="$(this).data('width800', {{ file.thumbnails['800'][loop.index - 1]['width'] }} );" {% endif %}/>
+        {% endfor %}
+      </div>
+    </div>
+		{% else %}
+		<div class="nothumbs"><div class="smallnote">Zu diesem Anhang liegen keine Vorschaubilder vor.</div></div>
+		{% endif %}
+		{% if file.fulltext %}
+		<div class="fulltext">
+			<div class="complete">
+				<div class="text">{{ file.fulltext|trim }}</div>
+			</div>
+		</div>
+		{% else %}
+		<div class="nofulltext">
+			<div class="smallnote">Zu diesem Anhang kann leider kein Text angezeigt und durchsucht werden. Evtl. handelt es sich um den Scan einer Papiervorlage.</div>
+		</div>
+    {% endif %}
+    <table class="metadata, hidden_debug">
+      <tbody>
+        <tr>
+        <td class="label">ID: </td>
+        <td class="value">{{ file._id }}</td>
+        </tr>
+        <tr>
+        <td class="label">Orginal-Dateiname: </td>
+        <td class="value">{{ file.filename }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% if file.file %}
+    <div class="actions">
+			<a target="_blank" href="/oparl/file/{{ file._id }}/downloadUrl" class="awesome">Anhang öffnen</a>
+			<span class="typesize">{{ (file.size / 1024)|round(0)|int }} KB PDF<!-- | <span id="file_{{ file._id }}" class="warn response">Anhang melden</span-->
+    </div>
+    {% endif %}
+  {% endif%}
+  </div>
+  {% endfor %}
+
+  <div class="content bottom">
+  <div class="comments">
+    <h2>Kommentare, Fragen, Ergänzungen</h2>
+    <div id="disqus_thread"></div>
+  </div>
+  </div>
+</div>
+{% endblock %}

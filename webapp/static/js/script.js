@@ -58,13 +58,13 @@ var OpenRIS = {
   },
   
   /**
-   * Fetch details for a dicument
+   * Fetch details for a document
    */
-  documentDetails: function(id, callback) {
+  paperDetails: function(id, callback) {
     options = {
       reference: id,
-      output: 'consultations,attachments,thumbnails'}
-    $.getJSON('/api/documents', options, callback);
+      output: 'meetings,files,thumbnails'}
+    $.getJSON('/api/paper', options, callback);
   },
   
   /**
@@ -107,6 +107,7 @@ var OpenRIS = {
    * Takes an object of standard search parameters and deletes those which are default or null
    */
   processSearchParams: function(params){
+    params['r'] = region_data['id']
     if (typeof params['q'] === 'undefined'
       || params['q'] == null
       || params['q'] === ''
@@ -158,12 +159,14 @@ var OpenRIS = {
   
   search: function(params, callback){
     var cleanParams = OpenRIS.processSearchParams(params);
-    $.getJSON('/api/documents', cleanParams, callback);
+    $.getJSON('/api/papers', cleanParams, callback);
   },
   
+  /* Sinn?
   session: function(params, callback){
     $.getJSON('/api/session', params, callback);
   },
+  */
   
   /**
    * Verarbeitet das Placefinder Suchergebnis und sortiert
@@ -262,7 +265,7 @@ var OpenRIS = {
    * returns true if the string ends with given suffix
    */
   endsWith: function(str, suffix) {
-      return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
   },
   
   send_response: function(id) {
@@ -342,3 +345,5 @@ function generateResponseContent(id) {
   return(html);
 }
 */
+
+

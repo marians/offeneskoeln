@@ -35,17 +35,9 @@ import inspect
 from imposm.parser import OSMParser
 from pymongo import MongoClient
 from bson.son import SON
+from bson import ObjectId, DBRef
 
 import pprint
-
-cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../../")))
-if cmd_subfolder not in sys.path:
-    sys.path.insert(0, cmd_subfolder)
-
-cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../../city")))
-if cmd_subfolder not in sys.path:
-    sys.path.insert(0, cmd_subfolder)
-
 import config
 
 
@@ -55,90 +47,90 @@ nodes = {}
 
 
 class NodeCollector(object):
-    def coords(self, coords):
-        for osmid, lon, lat in coords:
-            if osmid not in nodes:
-                nodes[osmid] = {
-                    'osmid': osmid,
-                    'location': [lon, lat]
-                }
-            nodes[osmid]['lat'] = lat
-            nodes[osmid]['lon'] = lat
-    #def nodes(self, n):
-    #    for osmid, tags, coords in n:
-    #        nodes[osmid] = {
-    #            'osmid': osmid,
-    #            'location': [coords[0], coords[1]],
-    #            'tags': tags
-    #        }
+  def coords(self, coords):
+    for osmid, lon, lat in coords:
+      if osmid not in nodes:
+        nodes[osmid] = {
+          'osmid': osmid,
+          'location': [lon, lat]
+        }
+      nodes[osmid]['lat'] = lat
+      nodes[osmid]['lon'] = lat
+  #def nodes(self, n):
+  #  for osmid, tags, coords in n:
+  #    nodes[osmid] = {
+  #      'osmid': osmid,
+  #      'location': [coords[0], coords[1]],
+  #      'tags': tags
+  #    }
 
 
 class StreetCollector(object):
-    wanted_nodes = {}
-    streets = []
-    #street_to_node = []
+  wanted_nodes = {}
+  streets = []
+  #street_to_node = []
 
-    def ways(self, ways):
-        #global nodes
-        for osmid, tags, refs in ways:
-            if 'highway' not in tags or 'name' not in tags:
-                # Wenn der way keinen "highway" tag hat oder keinen
-                # Namen, ist er für uns nicht interessant.
-                continue
-            street = {
-                'osmid': osmid,
-                'name': tags['name'],
-                'nodes': []
-            }
-            for ref in refs:
-                if ref not in nodes:
-                    continue
-                self.wanted_nodes[ref] = True
-                #self.street_to_node.append((osmid, ref))
-                street['nodes'].append(ref)
-            self.streets.append(street)
+  def ways(self, ways):
+    #global nodes
+    for osmid, tags, refs in ways:
+      if 'highway' not in tags or 'name' not in tags:
+        # Wenn der way keinen "highway" tag hat oder keinen
+        # Namen, ist er für uns nicht interessant.
+        continue
+      street = {
+        'osmid': osmid,
+        'name': tags['name'],
+        'nodes': []
+      }
+      for ref in refs:
+        if ref not in nodes:
+          continue
+        self.wanted_nodes[ref] = True
+        #self.street_to_node.append((osmid, ref))
+        street['nodes'].append(ref)
+      self.streets.append(street)
 
 if __name__ == '__main__':
-    cityconfig = __import__(sys.argv[2])
-    
-    connection = MongoClient(config.DB_HOST, config.DB_PORT)
-    db = connection[config.DB_NAME]
-    db.locations.remove({'rs': cityconfig.RS})
-    db.locations.ensure_index('osmid')#, unique=True)
-    db.locations.ensure_index('name')
-    db.locations.ensure_index([('nodes.location', '2dsphere')])
+  city_id = sys.argv[2]
+  
+  connection = MongoClient(config.MONGO_HOST, config.MONGO_PORT)
+  db = connection[config.MONGO_DBNAME]
+  db.locations.remove({'body': DBRef('body', ObjectId(city_id))})
+  db.locations.ensure_index('osmid')
+  db.locations.ensure_index('name')
+  db.locations.ensure_index([('nodes.location', '2dsphere')])
 
-    print "Sammle nodes..."
-    nodecollector = NodeCollector()
-    p = OSMParser(concurrency=2, coords_callback=nodecollector.coords)
-    p.parse(sys.argv[1])
+  print "Sammle nodes..."
+  nodecollector = NodeCollector()
+  p = OSMParser(concurrency=2, coords_callback=nodecollector.coords)
+  p.parse(sys.argv[1])
 
-    print "Sammle Straßen..."
-    streetcollector = StreetCollector()
-    p = OSMParser(concurrency=2, ways_callback=streetcollector.ways)
-    p.parse(sys.argv[1])
+  print "Sammle Straßen..."
+  streetcollector = StreetCollector()
+  p = OSMParser(concurrency=2, ways_callback=streetcollector.ways)
+  p.parse(sys.argv[1])
 
-    # Iteriere über alle gesammelten nodes und finde die,
-    # welche von anderen Objekten referenziert werden.
-    wanted_nodes = {}
-    non_existing_nodes = 0
-    for ref in streetcollector.wanted_nodes.keys():
-        if ref in nodes:
-            wanted_nodes[ref] = nodes[ref]
-        else:
-            non_existing_nodes += 1
+  # Iteriere über alle gesammelten nodes und finde die,
+  # welche von anderen Objekten referenziert werden.
+  wanted_nodes = {}
+  non_existing_nodes = 0
+  for ref in streetcollector.wanted_nodes.keys():
+    if ref in nodes:
+      wanted_nodes[ref] = nodes[ref]
+    else:
+      non_existing_nodes += 1
 
-    # reduziere das nodes dict auf das wesentliche
-    wanted_nodes.values()
+  # reduziere das nodes dict auf das wesentliche
+  wanted_nodes.values()
 
-    for street in streetcollector.streets:
-        for n in range(len(street['nodes'])):
-            street['nodes'][n] = {
-                'osmid': street['nodes'][n],
-                'location': SON([
-                    ('type', 'Point'),
-                    ('coordinates', wanted_nodes[street['nodes'][n]]['location'])
-                ])
-            }
-        street['rs'] = cityconfig.RS
-        db.locations.save(street)
+  for street in streetcollector.streets:
+    for n in range(len(street['nodes'])):
+      street['nodes'][n] = {
+        'osmid': street['nodes'][n],
+        'location': SON([
+          ('type', 'Point'),
+          ('coordinates', wanted_nodes[street['nodes'][n]]['location'])
+        ])
+      }
+    street['body'] = DBRef('body', ObjectId(city_id))
+    db.locations.save(street)
