@@ -7,13 +7,16 @@
 {{ super() }}
 <script type="text/javascript" src="{{ url_for('static', filename='js/leaflet.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/ajaxq.js') }}"></script>
+{% if session['region_id'] %}{% set region_id = session['region_id'] %}{% else %}{% set region_id = config['region_default'] %}{% endif %}
 <script>
 var region_data = {
-	'id': '{{ config['region_default'] }}',
-	'name': '{{ config['regions'][config['region_default']]['name'] }}',
-	'lat': {{ config['regions'][config['region_default']]['lat'] }},
-	'lon': {{ config['regions'][config['region_default']]['lon'] }},
-	'zoom': {{ config['regions'][config['region_default']]['zoom'] }}
+	'id': '{{ region_id }}',
+	'name': '{{ config['regions'][region_id]['name'] }}',
+	'type': {{ config['regions'][region_id]['type'] }},
+	'lat': {{ config['regions'][region_id]['lat'] }},
+	'lon': {{ config['regions'][region_id]['lon'] }},
+	'zoom': {{ config['regions'][region_id]['zoom'] }},
+	'keyword': [{% for keyword in config['regions'][region_id]['keyword'] %}'{{ keyword }}', {% endfor %}]
 }
 var CONF = {
   mapTileUrlSchema: "{{ config.map_tile_url_schema|safe }}",
@@ -22,7 +25,6 @@ var CONF = {
   mapTileMaxZoom: {{ config.map_zoomlevel_max|safe }}
 };
 </script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/region.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
 {% endblock %}
 

@@ -67,6 +67,72 @@ var OpenRIS = {
     $.getJSON('/api/paper', options, callback);
   },
   
+  
+  regionLoad: function() {
+    OpenRIS.updateRegion();
+    // region click
+    $('#change-region').click(function(){
+      $.getJSON('/api/regions', function(data) {
+        $.each(data, function(region_id, region){
+          $('#region-question').css({'display': 'none'});
+          $('<span/>')
+            .text(region['name'])
+            .attr({'class': 'awesome extrawide'})
+            .click(
+              {'region': region},
+              function(event) {
+                region_data = {
+                  'id': event.data.region.id,
+                  'name': event.data.region.name,
+                  'lat': event.data.region.lat,
+                  'lon': event.data.region.lon,
+                  'zoom': event.data.region.zoom,
+                  'type': event.data.region.type,
+                  'keyword': event.data.region.keyword
+                }
+                //OpenRIS.region = event.data.region;
+                $('#region-choice').html('');
+                $('#region-question').css({'display': 'block'});
+                OpenRIS.updateRegion();
+                sessionParams = {
+                  'region_id': region_data['id']
+                };
+                //setUserPosition(parseFloat(evt.data.resultObject.lat), parseFloat(evt.data.resultObject.lon));
+                OpenRIS.session(sessionParams, function() {});
+                if (typeof(OpenRIS.post_region_change) == 'function') {
+                  OpenRIS.post_region_change();
+                }
+              }
+            )
+            .appendTo('#region-choice');
+        });
+      });
+    });
+  },
+
+  updateRegion: function() {
+    // update region name
+    $('#region-current').text(region_data.name);
+    // update street description
+    if (region_data.type == 1)
+      $('#address-label').text('Straße:');
+    else
+      $('#address-label').text('Straße und Stadt:');
+    // update search examples
+    if ($('#search-examples')) {
+      $('#search-examples').html('');
+      $('#search-examples').append(document.createTextNode('Beispiele: '));
+      $.each(region_data.keyword, function(id, keyword){
+        $('<a/>')
+          .text(keyword)
+          .attr({'href': '/suche/?q=' + encodeURI(keyword)})
+          .appendTo('#search-examples');
+        if (region_data.keyword.length > id + 1)
+          $('#search-examples').append(document.createTextNode(', '));
+      });
+    }
+  },
+  
   /**
    * Formatiert ein ISO-Datum zum gebräuchlichen deutschen Format DD.MM.YYYY
    * @param   String   ISO-Datum (YYYY-MM-DD)
@@ -162,11 +228,9 @@ var OpenRIS = {
     $.getJSON('/api/papers', cleanParams, callback);
   },
   
-  /* Sinn?
   session: function(params, callback){
     $.getJSON('/api/session', params, callback);
   },
-  */
   
   /**
    * Verarbeitet das Placefinder Suchergebnis und sortiert

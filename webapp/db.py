@@ -388,17 +388,28 @@ def query_paper_num(q):
   result = es.search(
     index = app.config['es_paper_index'] + '-latest',
     doc_type = 'paper',
+    fields = 'name,publishedDate',
     body = {
       'query': {
         'query_string': {
           'fields': ['file.fulltext', 'file.name', 'name'],
-          'query': q
+          'query': q.replace(' ', "\\ ")
         }
       }
     },
-    search_type = 'count'
+    size = 1,
+    sort = 'publishedDate:DESC'
   )
-  return result['hits']['total']
+  if result['hits']['total']:
+    return {
+      'num': result['hits']['total'],
+      'name': result['hits']['hits'][0]['fields']['name'][0],
+      'publishedDate': result['hits']['hits'][0]['fields']['publishedDate'][0]
+    }
+  else:
+    return {
+      'num': result['hits']['total']
+    }
 
 
 

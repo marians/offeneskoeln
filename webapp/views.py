@@ -39,6 +39,7 @@ from flask import request
 from flask import redirect
 from flask import Response
 from flask import Markup
+from flask import session
 from flask.ext.basicauth import BasicAuth
 from bson import ObjectId, DBRef
 
@@ -48,7 +49,7 @@ from forms import *
 
 @app.route("/")
 def index():
-  return render_template('index.html')
+  return render_template('index.html', session=session)
 
 
 @app.route("/api/")

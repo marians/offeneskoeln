@@ -238,13 +238,18 @@ def api_streets():
     for point in street['nodes']:
       nodes.append(point['location']['coordinates'])
     if street['name'] in result:
-      result[street['name']]['nodes'] += nodes
+      result[street['name']]['nodes'].append(nodes)
     else:
+      search_result = db.query_paper_num(street['name'])
       result[street['name']] = {
         'name': street['name'],
-        'nodes': nodes,
-        'paper_count': db.query_paper_num(street['name'])
+        'nodes': [ nodes ],
+        'paper_count': search_result['num']
       }
+      if 'name' in search_result:
+        result[street['name']]['paper_name'] = search_result['name']
+      if 'name' in search_result:
+        result[street['name']]['paper_publishedDate'] = search_result['publishedDate']
   ret = {
     'status': 0,
     'duration': round((time.time() - start_time) * 1000),
@@ -310,28 +315,33 @@ def api_regions():
   response.mimetype = 'application/json'
   return response
   
-""" DO WE NEED THIS?
+
 @app.route("/api/session")
 def api_session():
   jsonp_callback = request.args.get('callback', None)
   location_entry = request.args.get('location_entry', '')
   lat = request.args.get('lat', '')
   lon = request.args.get('lon', '')
+  osm_id = request.args.get('osm_id', '')
   region_id = request.args.get('region_id', '')
-  if region_id != '':
-    session['region_id'] = region_id
+  
   if location_entry != '':
     session['location_entry'] = location_entry.encode('utf-8')
   if lat != '':
     session['lat'] = lat
   if lon != '':
-    session['lon'] = request.args.get('lon', '')
+    session['lon'] = lon
+  if osm_id != '':
+    session['osm_id'] = osm_id
+  if region_id != '':
+    session['region_id'] = region_id
   ret = {
     'status': 0,
     'response': {
       'location_entry': (session['location_entry'] if ('location_entry' in session) else None),
       'lat': (session['lat'] if ('lat' in session) else None),
       'lon': (session['lon'] if ('lon' in session) else None),
+      'osm_id': (session['osm_id'] if ('osm_id' in session) else None),
       'region_id': (session['region_id'] if ('region_id' in session) else None)
     }
   }
@@ -341,7 +351,7 @@ def api_session():
   response = make_response(json_output, 200)
   response.mimetype = 'application/json'
   return response
-"""
+
 """ TODO: make new
 @app.route("/api/response", methods=['POST'])
 def api_response():

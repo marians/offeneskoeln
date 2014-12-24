@@ -1,4 +1,6 @@
 $(document).ready(function() {
+  OpenRIS.regionLoad();
+  
   if (typeof openris_search_settings != undefined) {
     $('#search .result').empty();
     $('#search .result').append('<div class="loading big outer"><div class="loading big inner">Suche...</div></div>');

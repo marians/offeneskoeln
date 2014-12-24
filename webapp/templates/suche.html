@@ -5,10 +5,16 @@
 
 {% block scripts %}
 {{ super() }}
-<script type="text/javascript">
+{% if session['region_id'] %}{% set region_id = session['region_id'] %}{% else %}{% set region_id = config['region_default'] %}{% endif %}
+<script>
 var region_data = {
-	'id': '{{ search_settings.r }}',
-	'name': '{{ config['regions'][search_settings.r]['name'] }}'
+	'id': '{{ region_id }}',
+	'name': '{{ config['regions'][region_id]['name'] }}',
+	'type': {{ config['regions'][region_id]['type'] }},
+	'lat': {{ config['regions'][region_id]['lat'] }},
+	'lon': {{ config['regions'][region_id]['lon'] }},
+	'zoom': {{ config['regions'][region_id]['zoom'] }},
+	'keyword': [{% for keyword in config['regions'][region_id]['keyword'] %}'{{ keyword }}', {% endfor %}]
 }
 var openris_search_settings = {
 	r: '{{ search_settings.r }}',
@@ -20,7 +26,6 @@ var openris_search_settings = {
 	date: "{{ search_settings.date }}"// date range
 };
 </script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/region.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/search.js') }}"></script>
 {% endblock %}
 

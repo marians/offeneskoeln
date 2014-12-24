@@ -1,5 +1,8 @@
 
 $(document).ready(function(){
+  
+  OpenRIS.regionLoad()
+  
   var map = new L.Map('map', {/*scrollWheelZoom: false*/});
   //var maplayers = [];
   var markerLayerGroup = new L.LayerGroup();
@@ -185,10 +188,11 @@ $(document).ready(function(){
                 sessionParams = {
                   'location_entry': entry_string,
                   'lat': evt.data.resultObject.lat,
-                  'lon': evt.data.resultObject.lon
+                  'lon': evt.data.resultObject.lon,
+                  'osm_id': evt.data.resultObject.osm_id
                 };
                 setUserPosition(parseFloat(evt.data.resultObject.lat), parseFloat(evt.data.resultObject.lon));
-                //OpenRIS.session(sessionParams, handleSessionResponse);
+                OpenRIS.session(sessionParams, handleSessionResponse);
               });
               choice.append(choicelink);
               choice.append(' ');
@@ -283,65 +287,23 @@ $(document).ready(function(){
       //console.log('streetsForPosition callback data: ', data);
       $.each(data.response, function(street_name, street) {
         if (street.paper_count) {
-          var points = [];
-          $.each(street.nodes, function(node_id, node){
-            points.push(new L.LatLng(
-              node[1], node[0]
-            ));
+          $.each(street.nodes, function(nodes_id, nodes){
+            var points = [];
+            $.each(nodes, function(node_id, node){
+              points.push(new L.LatLng(
+                node[1], node[0]
+              ));
+            });
+            var markerHtml = '<p><b><a href="/suche/?q=' + street_name + '">' + street_name + ': ' + street.paper_count + ' Treffer</a></b>';
+            if (street.paper_publishedDate && street.paper_name)
+              markerHtml += '<br/>Der jüngste vom ' + OpenRIS.formatIsoDate(street.paper_publishedDate) + ' (' + street.paper_name + ')';
+            markerHtml += '</p>';
+            var polyline = L.polyline(points, {color: '#ff0909'});
+            polyline.bindPopup(markerHtml);
+            markerLayerGroup.addLayer(polyline);
           });
-          var markerHtml = '<p><b><a href="/suche/?q=' + street_name + '">' + street_name + ': ' + street.paper_count + ' Treffer</a></b>';
-          // TODO: 
-          //if (search.response.documents[0].date && search.response.documents[0].date[0]) {
-          //  markerHtml += '<br/>Der jüngste vom ' + OpenRIS.formatIsoDate(search.response.documents[0].date);
-          //}
-          markerHtml += '</p>';
-          var polyline = L.polyline(points, {color: '#ff0909'});
-          polyline.bindPopup(markerHtml);
-          markerLayerGroup.addLayer(polyline);
         }
       });
-      
-      if (0) {
-        // version 2 API response
-        streets_by_name = {};
-        var name;
-        // collect streets by name
-        for (var j in data.response) {
-          name = data.response[j].name;
-          if (typeof streets_by_name[name] === 'undefined') {
-            streets_by_name[name] = [];
-          }
-          streets_by_name[name].push(data.response[j]);
-        }
-        // do search by name
-        $.each(streets_by_name, function(name, street) {
-          //console.log(name, streets_by_name[name].length);
-          $.getJSON('/api/documents', {'q': name, 'docs': 1, 'sort': 'date desc'}, function(search){
-            if (search.response.numhits > 0) {
-              //console.log("Search result for", name, search);
-              //console.log("Street object", name, streets_by_name[name]);
-              // draw path for street (experimental)
-              $.each(streets_by_name[name], function(n, streetpart){
-                var points = [];
-                //console.log(streetpart);
-                $.each(streetpart.nodes, function(n, node){
-                  points.push(new L.LatLng(
-                    node.location.coordinates[1], node.location.coordinates[0]
-                  ));
-                });
-                var markerHtml = '<p><b><a href="/suche/?q=' + name + '">' + name + ': ' + search.response.numhits + ' Treffer</a></b>';
-                if (search.response.documents[0].date && search.response.documents[0].date[0]) {
-                  markerHtml += '<br/>Der jüngste vom ' + OpenRIS.formatIsoDate(search.response.documents[0].date);
-                }
-                markerHtml += '</p>';
-                var polyline = L.polyline(points, {color: '#ff0909'});
-                polyline.bindPopup(markerHtml);
-                markerLayerGroup.addLayer(polyline);
-              });
-            }
-          });
-        });
-      }
     });
   }
   
