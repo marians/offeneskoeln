@@ -19,4 +19,4 @@ elasticsearch
 numpy
 matplotlib==1.1.1
 imposm.parser
-
+python-memcached

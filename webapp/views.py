@@ -31,6 +31,7 @@ import datetime
 import time
 import urllib
 import sys
+import re
 
 from flask import abort
 from flask import render_template
@@ -306,7 +307,7 @@ def admin_region_edit():
     save_region_keywords = region_form.keywords.data.replace("\r", "").split("\n")
     save_region_bodies = []
     for current_body in region_bodies:
-      save_region_bodies.append(DBRef('body', current_body))
+      save_region_bodies.append(DBRef('body', re.sub('\s+', '', current_body)))
     mongo.db.region.update({'_id': ObjectId(request.args.get('id'))}, {'name': region_form.name.data,
                                                                        'type': region_form.type.data,
                                                                        'lat': region_form.lat.data,
