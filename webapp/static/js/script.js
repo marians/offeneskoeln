@@ -27,8 +27,8 @@ var OpenRIS = {
    * returns a list of streets for a given position
    * which are in a given rdius
    */
-  streetsForPosition: function(lat, lon, radius, callback) {
-    $.getJSON('/api/streets', {'lat': lat, 'lon': lon, 'radius': radius}, callback);
+  streetsForPosition: function(region_id, lat, lon, radius, callback) {
+    $.getJSON('/api/streets', {'region': region_id, 'lat': lat, 'lon': lon, 'radius': radius}, callback);
   },
   /**
    * returns a list of position coordinates for a street name,

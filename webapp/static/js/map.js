@@ -173,7 +173,6 @@ $(document).ready(function(){
                 map.setView(new L.LatLng(parseFloat(evt.data.resultObject.lat), parseFloat(evt.data.resultObject.lon)), 12);
               });
               choicelink.click({resultObject:places_filtered[n]}, function(evt){
-                //console.log(evt);
                 evt.preventDefault();
                 
                 $('#location-prompt-resultchoice').slideUp('fast', function(){
@@ -283,7 +282,7 @@ $(document).ready(function(){
     markerLayerGroup.addLayer(innerDot);
     var streets = [];
     // Strassen aus der Umgebung abrufen
-    OpenRIS.streetsForPosition(lat, lon, radius, function(data){
+    OpenRIS.streetsForPosition(region_data['id'], lat, lon, radius, function(data){
       //console.log('streetsForPosition callback data: ', data);
       $.each(data.response, function(street_name, street) {
         if (street.paper_count) {
