@@ -203,7 +203,7 @@ $(document).ready(function(){
             // exakt ein Treffer
             setUserPosition(parseFloat(places.result[0].lat), parseFloat(places.result[0].lon));
             sessionParams = {
-              'location_entry': street,
+              'location_entry': address,
               'lat': places.result[0].lat,
               'lon': places.result[0].lon
             };
@@ -296,7 +296,7 @@ $(document).ready(function(){
             });
             var markerHtml = '<p><b><a href="/suche/?q=' + street_name + '">' + street_name + ': ' + street.paper_count + ' Treffer</a></b>';
             if (street.paper_publishedDate && street.paper_name)
-              markerHtml += '<br/>Der jüngste vom ' + OpenRIS.formatIsoDate(street.paper_publishedDate) + ' (' + street.paper_name + ')';
+              markerHtml += '<br/>Der jüngste Treffer vom ' + OpenRIS.formatIsoDate(street.paper_publishedDate) + ' (' + street.paper_name + ')';
             markerHtml += '</p>';
             var polyline = L.polyline(points, {color: '#ff0909'});
             polyline.bindPopup(markerHtml);

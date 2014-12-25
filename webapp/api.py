@@ -222,7 +222,7 @@ def api_streets():
   jsonp_callback = request.args.get('callback', None)
   lon = request.args.get('lon', '')
   lat = request.args.get('lat', '')
-  region = request.args.get('region', '')
+  region = request.args.get('region', app.config['region_default'])
   radius = request.args.get('radius', '1000')
   if lat == '' or lon == '':
     abort(400)
@@ -240,7 +240,7 @@ def api_streets():
     if street['name'] in result:
       result[street['name']]['nodes'].append(nodes)
     else:
-      search_result = db.query_paper_num(street['name'])
+      search_result = db.query_paper_num(region, street['name'])
       result[street['name']] = {
         'name': street['name'],
         'nodes': [ nodes ],

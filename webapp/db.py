@@ -382,7 +382,7 @@ def query_paper(region=None, q='', fq=None, sort='score desc', start=0, papers_p
   return ret
 
 
-def query_paper_num(q):
+def query_paper_num(region_id, q):
   es = Elasticsearch([app.config['ES_HOST']+':'+str(app.config['ES_PORT'])])
   es.indices.refresh(app.config['es_paper_index'] + '-latest')
   result = es.search(
@@ -391,9 +391,21 @@ def query_paper_num(q):
     fields = 'name,publishedDate',
     body = {
       'query': {
-        'query_string': {
-          'fields': ['file.fulltext', 'file.name', 'name'],
-          'query': q.replace(' ', "\\ ")
+        'bool': {
+          'must': [
+            {
+              'query_string': {
+                'fields': ['file.fulltext', 'file.name', 'name'],
+                'query': q
+              }
+            },
+            {
+              'terms': {
+                'bodyId': app.config['regions'][region_id]['body'],
+                'minimum_should_match': 1
+              }
+            }
+          ]
         }
       }
     },
