@@ -247,6 +247,13 @@ $(document).ready(function(){
     $('#position-prompt').show();
     $('#address').focus();
     $('#address').select();
+    search_data['address'] = null;
+    sessionParams = {
+      'address': null,
+      'lat': null,
+      'lon': null
+    };
+    OpenRIS.session(sessionParams, handleSessionResponse);
     resetMap();
   }
   

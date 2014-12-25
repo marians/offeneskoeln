@@ -324,21 +324,21 @@ def api_regions():
 @app.route("/api/session")
 def api_session():
   jsonp_callback = request.args.get('callback', None)
-  address = request.args.get('address', '')
-  lat = request.args.get('lat', '')
-  lon = request.args.get('lon', '')
-  osm_id = request.args.get('osm_id', '')
-  region_id = request.args.get('region_id', '')
+  address = request.args.get('address', None)
+  lat = request.args.get('lat', None)
+  lon = request.args.get('lon', None)
+  osm_id = request.args.get('osm_id', None)
+  region_id = request.args.get('region_id', None)
   
-  if address != '':
+  if address != None:
     session['address'] = address
-  if lat != '':
+  if lat != None:
     session['lat'] = lat
-  if lon != '':
+  if lon != None:
     session['lon'] = lon
-  if osm_id != '':
+  if osm_id != None:
     session['osm_id'] = osm_id
-  if region_id != '':
+  if region_id != None:
     session['region_id'] = region_id
   ret = {
     'status': 0,
