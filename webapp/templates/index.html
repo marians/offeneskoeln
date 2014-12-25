@@ -18,6 +18,12 @@ var region_data = {
 	'zoom': {{ config['regions'][region_id]['zoom'] }},
 	'keyword': [{% for keyword in config['regions'][region_id]['keyword'] %}'{{ keyword }}', {% endfor %}]
 }
+
+var search_data = {
+	'address': {% if session['address'] %}'{{ session['address'] }}'{% else %}null{% endif %},
+	'osm_id': {% if session['osm_id'] %}{{ session['osm_id'] }}{% else %}null{% endif %}
+}
+
 var CONF = {
   mapTileUrlSchema: "{{ config.map_tile_url_schema|safe }}",
   mapTileAttribution: "{{ config.map_attribution|safe }}",

@@ -256,7 +256,8 @@ def api_streets():
     'request': {
       'lon': lon,
       'lat': lat,
-      'radius': radius
+      'radius': radius,
+      'region': region
     },
     'response': result
   }
@@ -283,7 +284,11 @@ def api_geocode():
   if address == '':
     abort(400)
   obj = {
-    'result': util.geocode(address, region)
+    'result': util.geocode(address, region),
+    'request': {
+      'address': address,
+      'region': region
+    }
   }
   obj['duration'] = int((time.time() - start) * 1000)
   json_output = json.dumps(obj, sort_keys=True)
@@ -319,14 +324,14 @@ def api_regions():
 @app.route("/api/session")
 def api_session():
   jsonp_callback = request.args.get('callback', None)
-  location_entry = request.args.get('location_entry', '')
+  address = request.args.get('address', '')
   lat = request.args.get('lat', '')
   lon = request.args.get('lon', '')
   osm_id = request.args.get('osm_id', '')
   region_id = request.args.get('region_id', '')
   
-  if location_entry != '':
-    session['location_entry'] = location_entry.encode('utf-8')
+  if address != '':
+    session['address'] = address
   if lat != '':
     session['lat'] = lat
   if lon != '':
@@ -338,7 +343,7 @@ def api_session():
   ret = {
     'status': 0,
     'response': {
-      'location_entry': (session['location_entry'] if ('location_entry' in session) else None),
+      'address': (session['address'] if ('address' in session) else None),
       'lat': (session['lat'] if ('lat' in session) else None),
       'lon': (session['lon'] if ('lon' in session) else None),
       'osm_id': (session['osm_id'] if ('osm_id' in session) else None),

@@ -20,6 +20,11 @@ $(document).ready(function(){
   
   map.setView(new L.LatLng(region_data['lat'], region_data['lon']), region_data['zoom']).addLayer(backgroundLayer);
   
+  if (search_data.address) {
+    $('#address').val(search_data.address);
+    handleLocationInput();
+  }
+  
   /*
   Alternative tile config. This tile-set should only be used for testing.
   // OSM Copyright Notice
@@ -90,14 +95,12 @@ $(document).ready(function(){
   // die Karte nicht neu
   function handleSessionResponse(data){
     sessionData = data.response;
-    //console.log("sessionData after handleSessionResponse:", sessionData);
   }
   
   function handleLocationInput() {
     resetMap();
     $('#position-prompt-submit');
     $('#position-prompt .spinner').css({visibility: 'visible'});
-    //console.log("#position-prompt-submit click", evt);
     $('#position-prompt .error').remove();
     $('#location-prompt-resultchoice').remove();
     var address = $('#address').val();
@@ -151,20 +154,30 @@ $(document).ready(function(){
               // Auswahllinks
               var choicelink = $(document.createElement('a')).attr('href', '#');
               var choicetext = '';
-              if (places_filtered[n].address.suburb !== '') {
+              if (places_filtered[n].address.suburb) {
                 choicetext = places_filtered[n].address.suburb;
               } else {
                 choicetext = places_filtered[n].address.road;
               }
               var pc_shown = false;
-              if (places_filtered[n].address.postcode !== '') {
+              if (places_filtered[n].address.postcode) {
                 choicetext += ', ' + places_filtered[n].address.postcode;
                 pc_shown = true;
               }
-              if (places_filtered[n].address.city !== '') {
+              if (places_filtered[n].address.city) {
                 if (!pc_shown)
                   choicetext += ','
                 choicetext += ' ' + places_filtered[n].address.city
+              }
+              else if (places_filtered[n].address.town) {
+                if (!pc_shown)
+                  choicetext += ','
+                choicetext += ' ' + places_filtered[n].address.town
+              }
+              else if (places_filtered[n].address.village) {
+                if (!pc_shown)
+                  choicetext += ','
+                choicetext += ' ' + places_filtered[n].address.village
               }
               choicelink.text(choicetext);
               choicelink.attr('class', 'choicelink ' + places_filtered[n].osm_id);
@@ -174,18 +187,24 @@ $(document).ready(function(){
               });
               choicelink.click({resultObject:places_filtered[n]}, function(evt){
                 evt.preventDefault();
-                
                 $('#location-prompt-resultchoice').slideUp('fast', function(){
                   $('#location-prompt-resultchoice').remove();
                 });
                 var entry_string = evt.data.resultObject.address.road;
-                if (evt.data.resultObject.address.postcode !== '') {
-                  entry_string += ' (' + evt.data.resultObject.address.postcode + ')';
+                pc_shown = false;
+                if (evt.data.resultObject.address.postcode) {
+                  pc_shown = true;
+                  entry_string += ', ' + evt.data.resultObject.address.postcode;
+                }
+                if (evt.data.resultObject.address.city) {
+                  if (!pc_shown)
+                    entry_string += ','
+                  entry_string += ' ' + evt.data.resultObject.address.city;
                 }
                 $('#address').val(entry_string);
                 lastLocationEntry = entry_string;
                 sessionParams = {
-                  'location_entry': entry_string,
+                  'address': entry_string,
                   'lat': evt.data.resultObject.lat,
                   'lon': evt.data.resultObject.lon,
                   'osm_id': evt.data.resultObject.osm_id
@@ -202,7 +221,7 @@ $(document).ready(function(){
             // exakt ein Treffer
             setUserPosition(parseFloat(places.result[0].lat), parseFloat(places.result[0].lon));
             sessionParams = {
-              'location_entry': address,
+              'address': address,
               'lat': places.result[0].lat,
               'lon': places.result[0].lon
             };
@@ -236,7 +255,7 @@ $(document).ready(function(){
     if (reason == 'NEED_DETAILS') {
       msg.append('Bitte gib den Ort genauer an, z.B. durch Angabe einer Hausnummer oder PLZ.');
     } else if (reason == 'NOT_FOUND') {
-      msg.append('Der angegebene Ort wurde nicht gefunden. Bist Du sicher, dass er in '+ 'TODO' +' liegt?');
+      msg.append('Der angegebene Ort wurde nicht gefunden. Vielleicht hast Du ihn falsch geschrieben?');
     } else {
       msg.append('Bei der Ortssuche ist ein unbekannter Fehler ausgetreten. Bitte versuche es noch einmal.');
     }
@@ -267,8 +286,8 @@ $(document).ready(function(){
     var outerCircle = new L.Circle(userLocation, radius, circleOptions);
     var innerDot = new L.Circle(userLocation, 20, {fillOpacity: 0.9, fillColor: '#97c66b', stroke: false, draggable: true});
     var positionPopup = L.popup()
-        .setLatLng(userLocation)
-        .setContent('<p>Dies ist der Suchmittelpunkt für die Umkreissuche.</p>');
+      .setLatLng(userLocation)
+      .setContent('<p>Dies ist der Suchmittelpunkt für die Umkreissuche.</p>');
     outerCircle.on('click', function(e){
       map.openPopup(positionPopup);
     });
@@ -283,7 +302,6 @@ $(document).ready(function(){
     var streets = [];
     // Strassen aus der Umgebung abrufen
     OpenRIS.streetsForPosition(region_data['id'], lat, lon, radius, function(data){
-      //console.log('streetsForPosition callback data: ', data);
       $.each(data.response, function(street_name, street) {
         if (street.paper_count) {
           $.each(street.nodes, function(nodes_id, nodes){
@@ -293,7 +311,7 @@ $(document).ready(function(){
                 node[1], node[0]
               ));
             });
-            var markerHtml = '<p><b><a href="/suche/?q=' + street_name + '">' + street_name + ': ' + street.paper_count + ' Treffer</a></b>';
+            var markerHtml = '<p><b><a href="/suche/?r=' + region_data['id'] + '&q=' + street_name + '">' + street_name + ': ' + street.paper_count + ' Treffer</a></b>';
             if (street.paper_publishedDate && street.paper_name)
               markerHtml += '<br/>Der jüngste Treffer vom ' + OpenRIS.formatIsoDate(street.paper_publishedDate) + ' (' + street.paper_name + ')';
             markerHtml += '</p>';

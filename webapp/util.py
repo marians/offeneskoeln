@@ -71,11 +71,10 @@ def geocode(location_string, region):
   address = location_string.encode('utf-8')
   
   # Filter Postalcode in Brackets from Selection
-  postalre = re.compile(r'(.+)\s+\(([0-9]{5})\)')
+  postalre = re.compile(r'(.+), ([0-9]{5}) (.+)')
   postal_matching = re.match(postalre, address)
   postal = None
   if postal_matching is not None:
-    address = postal_matching.group(1)
     postal = postal_matching.group(2)
   url = 'http://open.mapquestapi.com/nominatim/v1/search.php'
   params = {'format': 'json',  # json
@@ -102,11 +101,11 @@ def geocode(location_string, region):
     # TODO: Filter for County
     #if addresses[n]['address']['county'] != app.config['GEOCODING_FILTER_COUNTY']:
     #  continue
-    #if postal is not None:
-    #  if 'postcode' in addresses[n]['address'] and addresses[n]['address']['postcode'] == postal:
-    #    addresses_out.append(addresses[n])
-    #else:
-    addresses_out.append(addresses[n])
+    if postal is not None:
+      if 'postcode' in addresses[n]['address'] and addresses[n]['address']['postcode'] == postal:
+        addresses_out.append(addresses[n])
+    else:
+      addresses_out.append(addresses[n])
   return addresses_out
 
 
