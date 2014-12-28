@@ -8,7 +8,6 @@ import bson
 import re
 import urllib
 import urllib2
-import pprint
 import sys
 from flask import request
 from collections import OrderedDict
@@ -120,14 +119,7 @@ class MyEncoder(json.JSONEncoder):
         'collection': obj.collection,
         '_id': obj.id
       }
-    #if hasattr(obj, 'ObjectId') != 0:
     return obj.__dict__
-    #else:
-      #print >> sys.stderr, "FATAL ERROR: Encoding erring while encoding JSON data"
-      #print >> sys.stderr, str(obj)
-      #print >> sys.stderr, dir(obj)
-      #print >> sys.stderr, type(obj)
-      #return str(obj)
 
 
 # Some simple Jinja2 Functions

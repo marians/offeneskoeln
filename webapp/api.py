@@ -23,7 +23,6 @@ im Zusammenhang mit der Software oder sonstiger Verwendung der Software
 entstanden.
 """
 
-import pprint
 import os
 import json
 import util

@@ -212,7 +212,6 @@ def view_paper(id):
     result['numberOfFiles'] += len(result['auxiliaryFile'])
   result['consultation'] = db.get_consultation(search_params = {'paper': DBRef('paper', ObjectId(id))})
   for consultation_id in range(len(result['consultation'])):
-    #print result['consultation'][consultation_id]
     agendaItem_result = db.get_agendaItem(search_params = {'consultation': DBRef('consultation', result['consultation'][consultation_id]['_id'])})
     if len(agendaItem_result):
       result['consultation'][consultation_id]['agendaItem'] = agendaItem_result[0]
@@ -383,12 +382,10 @@ def urlencode_filter(s):
 
 @app.template_filter('debug')
 def debug_filter(s):
-  pprint.pprint(s)
   return s
 
 
 def generate_file_thumbnail_url(body_id, file_id, resulution, number):
-    print file_id
     return "%s/%s/%s/%s/%s/%s/%s.jpg" % (app.config["thumbs_url"], body_id, str(file_id)[-1:], str(file_id)[-2:-1], file_id, resulution, number)
 app.jinja_env.globals.update(generate_file_thumbnail_url=generate_file_thumbnail_url)
 
