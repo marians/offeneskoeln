@@ -10,6 +10,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 <meta name="description" content="{% block meta_description %}{% endblock %}" />
 <meta name="publisher" content="{{ config['meta_publisher'] }}" />
+
+<meta property="og:title" content="Offenes Ratsinformationssystem" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="{{ config['base_url'] }}" />
+<meta property="og:image" content="{{ config['base_url'] }}/static/img/og.jpg" />
+<meta property="og:description" content="Das offene Ratsinformationssystem hilft Dir, Informationen zur Politik vor Ort zu erfahren und mitreden zu können." />
+
 {% if config['google_site_verification'] %}
 <meta name="google-site-verification" content="{{ config['google_site_verification'] }}" />
 {% endif %}
