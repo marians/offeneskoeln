@@ -241,7 +241,7 @@ def dereference_result_items(result, deref, add_prefix, add_postfix):
     return result
 
 
-def query_paper(region=None, q='', fq=None, sort='score desc', start=0, papers_per_page=10, date=None, facets=None):
+def query_paper(region=None, q='', fq=None, sort='score desc', start=0, papers_per_page=10, facets=None):
   (sort_field, sort_order) = sort.split(':')
   if sort_field == 'score':
     sort_field = '_score'
@@ -364,9 +364,9 @@ def query_paper(region=None, q='', fq=None, sort='score desc', start=0, papers_p
       'score': r['_score'],
       'bodyId': r['fields']['bodyId'][0],
       'bodyName': r['fields']['bodyName'][0],
-      'name': r['fields']['name'][0],
-      'paperType': r['fields']['paperType'][0],
-      'publishedDate': r['fields']['publishedDate'][0],
+      'name': r['fields']['name'][0] if 'name' in r['fields'] else '',
+      'paperType': r['fields']['paperType'][0] if 'paperType' in r['fields'] else '',
+      'publishedDate': r['fields']['publishedDate'][0] if 'publishedDate' in r['fields'] else '',
       'fileFulltext': r['highlight']['file.fulltext'][0].strip() if 'highlight' in r else None
     })
   if result['hits']['max_score'] is not None:

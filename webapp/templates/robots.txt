@@ -5,14 +5,14 @@
 # Wenn Du an strukturierten Daten interessiert bist, schau Dir
 # bitte
 #
-#    http://offeneskoeln.de/daten/
-#    http://offeneskoeln.de/api/
+#    http://offeneskoeln.de/oparl/
 #
 # an! Das koennte Dir Zeit und uns Server-Ressourcen sparen. :)
 
-Sitemap: /static/sitemap/{{config.RS}}.xml
+Sitemap: /static/sitemap/sitemap.xml
 
-# Suche und API sind Tabu für Robots!
 User-agent: *
 Disallow: /suche/
 Disallow: /api/
+Disallow: /admin/
+Disallow: /oparl/

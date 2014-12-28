@@ -49,18 +49,11 @@ from webapp import app, mongo
 @app.route("/api/papers")
 def api_papers():
   """
-  API-Methode zur Suche von Dokumenten bzw. zum Abruf eines einzelnen
-  Dokuments anhand einer Kennung (reference).
-  Ist der URL-Parameter "reference" angegeben, handelt es sich um eine
-  Dokumentenabfrage anhand der Kennung(en). Ansonsten ist es eine Suche.
+  API-Methode zur Suche von Paper
   """
   start_time = time.time()
   jsonp_callback = request.args.get('callback', None)
   ref = request.args.get('reference', '')
-  references = ref.split(',')
-  if references == ['']:
-    references = None
-  output = request.args.get('output', '').split(',')
   q = request.args.get('q', '*:*')
   fq = request.args.get('fq', '')
   sort = request.args.get('sort', 'score:desc')
@@ -68,112 +61,20 @@ def api_papers():
   papers_per_page = int(request.args.get('ppp', '10'))
   date_param = request.args.get('date', '')
   region = request.args.get('r', '')
-  #get_consultations = 'consultations' in output
+  output = request.args.get('output', '').split(',')
   get_facets = 'facets' in output
-  #get_relations = 'relations' in output
   request_info = {}  # Info über die Anfrage
-  query = False
-  #docs = False
-  paper_ids = []
   
   # Suche wird durchgeführt
-  # (References-Liste via Suchmaschine füllen)
   query = db.query_paper(region=region, q=q, fq=fq, sort=sort, start=start,
-             papers_per_page=papers_per_page, date=date_param, facets=get_facets)
-  request_info['output'] = output
-
+             papers_per_page=papers_per_page, facets=get_facets)
+  
   ret = {
     'status': 0,
     'duration': int((time.time() - start_time) * 1000),
     'request': request_info,
     'response': query
   }
-  
-  #ret['response']['numhits'] = query['numhits']
-  #ret['response']['data']
-  #if get_facets and 'facets' in query:
-  #  ret['response']['facets'] = query['facets']
-    
-  
-  ret['response']['start'] = start
-  ret['request']['sort'] = sort
-  ret['request']['fq'] = fq
-
-  json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
-  if jsonp_callback is not None:
-    json_output = jsonp_callback + '(' + json_output + ')'
-  response = make_response(json_output, 200)
-  response.mimetype = 'application/json'
-  response.headers['Expires'] = util.expires_date(hours=24)
-  response.headers['Cache-Control'] = util.cache_max_age(hours=24)
-  return response
-
-
-@app.route("/api/paper")
-def api_paper():
-  """
-  API-Methode zur Suche von Dokumenten bzw. zum Abruf eines einzelnen
-  Dokuments anhand einer Kennung (reference).
-  Ist der URL-Parameter "reference" angegeben, handelt es sich um eine
-  Dokumentenabfrage anhand der Kennung(en). Ansonsten ist es eine Suche.
-  """
-  start_time = time.time()
-  jsonp_callback = request.args.get('callback', None)
-  ref = request.args.get('reference', '')
-  references = ref.split(',')
-  if references == ['']:
-    references = None
-  output = request.args.get('output', '').split(',')
-  q = request.args.get('q', '*:*')
-  fq = request.args.get('fq', '')
-  sort = request.args.get('sort', 'score desc')
-  start = int(request.args.get('start', '0'))
-  papers_per_page = int(request.args.get('ppp', '10'))
-  date_param = request.args.get('date', '')
-  region = request.args.get('r', '')
-  #get_attachments = 'attachments' in output
-  #get_thumbnails = 'thumbnails' in output and get_attachments
-  #get_consultations = 'consultations' in output
-  get_facets = 'facets' in output
-  #get_relations = 'relations' in output
-  request_info = {}  # Info über die Anfrage
-  query = False
-  #docs = False
-  paper_ids = []
-  # TODO: entscheiden, was mit get_relations passiert
-  """
-  Anhand der übergebenen Parameter wird entschieden, ob eine ES-Suche
-  durchgeführt wird, oder ob die Abfrage direkt anhand von Kennungen
-  (references) erfolgen kann.
-  """
-  
-  if references is None:
-    # Suche wird durchgeführt
-    # (References-Liste via Suchmaschine füllen)
-    query = db.query_paper(region=region, q=q, fq=fq, sort=sort, start=start,
-               papers_per_page=papers_per_page, date=date_param, facets=get_facets)
-    if query['numhits'] > 0:
-      paper_ids = [x['_id'] for x in query['result']]
-    else:
-      paper_ids = []
-  else:
-    # Direkte Abfrage
-    request_info = {
-      'references': references
-    }
-  request_info['output'] = output
-
-  ret = {
-    'status': 0,
-    'duration': int((time.time() - start_time) * 1000),
-    'request': request_info,
-    'response': {}
-  }
-  
-  if query:
-    ret['response']['numhits'] = query['numhits']
-    if get_facets and 'facets' in query:
-      ret['response']['facets'] = query['facets']
   
   ret['response']['start'] = start
   ret['request']['sort'] = sort

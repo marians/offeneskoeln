@@ -7,7 +7,9 @@
 # pip install numpy
 # pip install matplotlib==1.1.1
 # pip install imposm.parser
-
+#
+# OSM Relations: http://wiki.openstreetmap.org/wiki/WikiProject_Germany/Grenzen/Nordrhein-Westfalen
+# 
 # Aufruf mit Laden der Config: make `cat bochum.cfg`
 
 import: city-streets.osm

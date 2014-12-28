@@ -31,6 +31,9 @@ import datetime
 import time
 import urllib
 import sys
+from bson import ObjectId, DBRef
+from lxml import etree
+import dateutil.parser
 
 from flask import abort
 from flask import render_template
@@ -41,10 +44,10 @@ from flask import Response
 from flask import Markup
 from flask import session
 from flask.ext.basicauth import BasicAuth
-from bson import ObjectId, DBRef
 
 from webapp import app, mongo, basic_auth
 from forms import *
+from oparl import oparl_file_accessUrl
 
 
 @app.route("/")
@@ -99,63 +102,17 @@ def disclaimer():
 def favicon():
   return ""
 
-@app.route("/data/<filename>")
-def data_download(filename):
-  return ""
-
-
 @app.route("/robots.txt")
 def robots_txt():
   return render_template('robots.txt')
 
 
-@app.route("/anhang/<string:attachment_id>.<string:extension>")
-def attachment_download(attachment_id, extension):
+@app.route("/anhang/<string:file_id>")
+def file_download(file_id):
   """
   Download eines Attachments
   """
-  attachment_info = db.get_attachment(attachment_id)
-  #pprint.pprint(attachment_info)
-  if attachment_info is None:
-    # TODO: Rendere informativere 404 Seite
-    abort(404)
-  # extension doesn't match file extension (avoiding arbitrary URLs)
-  proper_extension = attachment_info['filename'].split('.')[-1]
-  if proper_extension != extension:
-    abort(404)
-
-  # 'file' property is not set (e.g. due to depublication)
-  if 'file' not in attachment_info:
-    if 'depublication' in attachment_info:
-      abort(410)  # Gone
-    else:
-      # TODO: log this as unexplicable...
-      abort(500)
-
-  # handle conditional GET
-  if 'If-Modified-Since' in request.headers:
-    file_date = attachment_info['file']['uploadDate'].replace(tzinfo=None)
-    request_date = util.parse_rfc1123date(request.headers['If-Modified-Since'])
-    difference = file_date - request_date
-    if difference < datetime.timedelta(0, 1):  # 1 second
-      return Response(status=304)
-
-  #if 'if-none-match' in request.headers:
-  #  print "Conditional GET: If-None-Match"
-  # TODO: handle ETag in request
-
-  handler = db.get_file(attachment_info['file']['_id'])
-  response = make_response(handler.read(), 200)
-  response.mimetype = attachment_info['mimetype']
-  response.headers['X-Robots-Tag'] = 'noarchive'
-  response.headers['ETag'] = attachment_info['sha1']
-  response.headers['Last-modified'] = util.rfc1123date(
-      attachment_info['file']['uploadDate'])
-  response.headers['Expires'] = util.expires_date(
-          hours=(24 * 30))
-  response.headers['Cache-Control'] = util.cache_max_age(
-            hours=(24 * 30))
-  return response
+  return oparl_file_accessUrl(file_id)
 
 
 @app.route("/suche/")
@@ -182,6 +139,58 @@ def suche():
   search_settings['date'] = request.args.get('date', '')
   html = render_template('suche.html', search_settings=search_settings)
   response = make_response(html, 200)
+  response.headers['Expires'] = util.expires_date(hours=24)
+  response.headers['Cache-Control'] = util.cache_max_age(hours=24)
+  return response
+
+@app.route("/suche/feed/")
+def suche_feed():
+  start_time = time.time()
+  jsonp_callback = request.args.get('callback', None)
+  q = request.args.get('q', '*:*')
+  fq = request.args.get('fq', '')
+  date_param = request.args.get('date', '')
+  region = request.args.get('r', app.config['region_default'])
+  
+  # Suche wird durchgeführt
+  query = db.query_paper(region=region, q=q, fq=fq, sort='publishedDate:desc', start=0,
+             papers_per_page=50, facets=False)
+  
+  # Generate Root and Metainfos
+  search_url = "%s/suche/?r=%s&q=%s&fq=%s" % (app.config['base_url'], region, q, fq)
+  feed_url = "%s/suche/feed/?r=%s&q=%s&fq=%s" % (app.config['base_url'], region, q, fq)
+  root = etree.Element("rss", version="2.0", nsmap={'atom': 'http://www.w3.org/2005/Atom'})
+  channel = etree.SubElement(root, "channel")
+  etree.SubElement(channel, "title").text = 'Offenes Ratsinformationssystem: Paper-Feed'
+  etree.SubElement(channel, "link").text = search_url
+  etree.SubElement(channel, "language").text = 'de-de'
+  description = u"Neue oder geänderte Dokumente mit dem Suchbegriff %s in %s" % (q, app.config['regions'][region]['name'])
+  # TODO: Einschränkungen mit in die Description
+  if fq:
+    description += ''
+  etree.SubElement(channel, "description").text = description
+  etree.SubElement(channel, '{http://www.w3.org/2005/Atom}link', href=feed_url, rel="self", type="application/rss+xml")
+  
+  # Generate Result Items
+  for paper in query['result']:
+    item = etree.SubElement(channel, "item")
+    paper_link = "%s/paper/%s" % (app.config['base_url'], paper['id'])
+    description = 'Link: ' + paper_link + '</br>'
+    if 'paperType' in paper:
+      description = 'Art des Papers: ' + paper['paperType'] + '<br />'
+    if 'publishedDate' in paper:
+      description += u"Erstellt am: %s<br />" % dateutil.parser.parse(paper['publishedDate']).strftime('%d.%m.%Y')
+    if 'lastModified' in paper:
+      description += u"Zuletzt geändert am: %s<br />" % dateutil.parser.parse(paper['lastModified']).strftime('%d.%m.%Y')
+    
+    etree.SubElement(item, "pubDate").text = util.rfc1123date(paper['lastModified'] if 'lastModified' in paper else datetime.datetime.now())
+    etree.SubElement(item, "title").text = paper['name'] if 'name' in paper else 'Kein Titel'
+    etree.SubElement(item, "description").text = description
+    etree.SubElement(item, "link").text = paper_link
+    etree.SubElement(item, "guid").text = paper_link
+  
+  response = make_response(etree.tostring(root, pretty_print=True), 200)
+  response.mimetype = 'application/rss+xml'
   response.headers['Expires'] = util.expires_date(hours=24)
   response.headers['Cache-Control'] = util.cache_max_age(hours=24)
   return response

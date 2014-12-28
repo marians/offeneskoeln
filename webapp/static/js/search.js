@@ -221,9 +221,11 @@ $(document).ready(function() {
       var metainfo = $(document.createElement('span')).attr('class','metainfo');
       metainfo.text(createMetaInfoText(data.response.result[i]));
       link.append(metainfo);
-      var snippet = $(document.createElement('p')).attr('class','snippet');
-      snippet.html(createSnippet(data.response.result[i]));
-      item.append(snippet);
+      if (data.response.result[i]['fileFulltext']) {
+        var snippet = $(document.createElement('p')).attr('class','snippet');
+        snippet.html(createSnippet(data.response.result[i]));
+        item.append(snippet);
+      }
     }
   }
   
@@ -237,7 +239,8 @@ $(document).ready(function() {
         return paper.highlighting.title;
       }
       return paper.name;
-    } else {
+    }
+    else {
       return 'Dokument ohne Name';
     }
   }

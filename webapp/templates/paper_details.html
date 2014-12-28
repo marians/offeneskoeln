@@ -58,10 +58,10 @@ var ok_document_url = '{{ paper._id }}';
     <tr>
       <td class="label">Anlagen:</td>
       <td class="value">
-      {% if paper.numberOfFiles == 1 %}
+      {% if paper.auxiliaryFile|length == 0 %}
       1 Anlage
       {% else %}
-      {{ paper.numberOfFiles }} Anlagen
+      {{ paper.auxiliaryFile|length + 1 }} Anlagen
       {% endif %}
       </td>
     </tr>
@@ -154,7 +154,7 @@ var ok_document_url = '{{ paper._id }}';
     </table>
     {% if paper.mainFile.file %}
     <div class="actions">
-			<a target="_blank" href="/oparl/file/{{ paper.mainFile._id }}/downloadUrl" class="awesome">Anhang öffnen</a>
+			<a target="_blank" href="/anhang/{{ paper.mainFile._id }}" class="awesome">Anhang öffnen</a>
 			<span class="typesize">{{ (paper.mainFile.size / 1024)|round(0)|int }} KB PDF<!-- | <span id="file_{{ paper.mainFile._id }}" class="warn response">Anhang melden</span-->
     </div>
     {% endif %}
@@ -209,18 +209,18 @@ var ok_document_url = '{{ paper._id }}';
     <table class="metadata, hidden_debug">
       <tbody>
         <tr>
-        <td class="label">ID: </td>
-        <td class="value">{{ file._id }}</td>
+					<td class="label">ID: </td>
+					<td class="value">{{ file._id }}</td>
         </tr>
-        <tr>
-        <td class="label">Orginal-Dateiname: </td>
-        <td class="value">{{ file.filename }}</td>
+				<tr>
+					<td class="label">Orginal-Dateiname: </td>
+					<td class="value">{{ file.filename }}</td>
         </tr>
       </tbody>
     </table>
     {% if file.file %}
     <div class="actions">
-			<a target="_blank" href="/oparl/file/{{ file._id }}/downloadUrl" class="awesome">Anhang öffnen</a>
+			<a target="_blank" href="/anhang/{{ file._id }}" class="awesome">Anhang öffnen</a>
 			<span class="typesize">{{ (file.size / 1024)|round(0)|int }} KB PDF<!-- | <span id="file_{{ file._id }}" class="warn response">Anhang melden</span-->
     </div>
     {% endif %}

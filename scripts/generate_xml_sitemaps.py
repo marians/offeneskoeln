@@ -2,11 +2,11 @@
 # encoding: utf-8
 
 """
-Generiert XML Sitemaps fuer attachments
+Generiert XML Sitemaps fuer files
 """
 
 """
-Copyright (c) 2012 Marian Steinbach
+Copyright (c) 2012 Marian Steinbach, Ernesto Ruge
 
 Hiermit wird unentgeltlich jeder Person, die eine Kopie der Software und
 der zugehörigen Dokumentationen (die "Software") erhält, die Erlaubnis
@@ -39,119 +39,125 @@ import datetime
 import subprocess
 from pymongo import MongoClient
 import urllib
+import config
+from bson import DBRef
 
-cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../city")))
-if cmd_subfolder not in sys.path:
-    sys.path.insert(0, cmd_subfolder)
+
+def get_config(db):
+  """
+  Returns Config JSON
+  """
+  config = db.config.find_one()
+  if '_id' in config:
+    del config['_id']
+  return config
+
+def merge_dict(x, y):
+  merged = dict(x,**y)
+  xkeys = x.keys()
+  for key in xkeys:
+    if type(x[key]) is types.DictType and y.has_key(key):
+      merged[key] = merge_dict(x[key],y[key])
+  return merged
 
 def execute(cmd):
-    output, error = subprocess.Popen(
-        cmd.split(' '), stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE).communicate()
-    if error is not None and error.strip() != '':
-        print >> sys.stderr, "Command: " + cmd
-        print >> sys.stderr, "Error: " + error
+  output, error = subprocess.Popen(
+    cmd.split(' '), stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE).communicate()
+  if error is not None and error.strip() != '':
+    print >> sys.stderr, "Command: " + cmd
+    print >> sys.stderr, "Error: " + error
 
-
-def attachment_url(attachment_id, filename=None, extension=None):
-    if filename is not None:
-        extension = filename.split('.')[-1]
-    return cityconfig.ATTACHMENT_DOWNLOAD_URL % (attachment_id, extension)
-
-
-def submission_url(identifier):
-    url = cityconfig.BASE_URL
-    url += 'dokumente/' + urllib.quote_plus(identifier) + '/'
-    return url
-
-
-def generate_sitemaps():
-    limit = 50000
-    sitemaps = []
-    urls = []
-    # gather attachment URLs
-    for attachment in db.attachments.find({"rs" : cityconfig.RS, 'depublication': {'$exists': False}}):
-        fileentry = db.fs.files.find_one(attachment['file'].id)
-        thisfile = {
-            'path': attachment_url(attachment['_id'], filename=attachment['filename']),
-            'lastmod': fileentry['uploadDate']
-        }
-        #print thisfile
-        urls.append(thisfile)
+def generate_sitemaps(config):
+  limit = 50000
+  sitemaps = []
+  urls = []
+  bodies = []
+  
+  # tidy up
+  cmd = "rm -f %s/*.gz" % config['sitemap_folder']
+  execute(cmd)
+  
+  # gather bodies
+  for body in db.body.find({}):
+    bodies.append(body['_id'])
+  print bodies
+  
+    # gather file URLs
+  for body in bodies:
+    for file in db.file.find({'body': DBRef('body', body), 'depublication': {'$exists': False}}):
+      fileentry = db.fs.files.find_one(file['file'].id)
+      thisfile = {
+        'path': "%s/oparl/file/%s/downloadUrl" % (config['base_url'], file['_id']),
+        'lastmod': fileentry['uploadDate']
+      }
+      urls.append(thisfile)
 
     # create sitemap(s) with individual attachment URLs
     sitemap_count = 1
     while len(urls) > 0:
-        shortlist = []
-        # TODO: this could probably be done with slice
-        while len(shortlist) < limit and len(urls) > 0:
-            shortlist.append(urls.pop(0))
-        sitemap_name = 'attachments_%d' % sitemap_count
-        generate_sitemap(shortlist, sitemap_name)
-        sitemaps.append(sitemap_name)
-        sitemap_count += 1
+      shortlist = []
+      while len(shortlist) < limit and len(urls) > 0:
+        shortlist.append(urls.pop(0))
+      sitemap_name = 'files_%s_%d' % (body, sitemap_count)
+      generate_sitemap(shortlist, sitemap_name)
+      sitemaps.append(sitemap_name)
+      sitemap_count += 1
 
-    urls = []
+  urls = []
+  for body in bodies:
     # gather submission URLs
-    for submission in db.submissions.find():
-        thisfile = {
-            'path': submission_url(submission['identifier']),
-            'lastmod': submission['last_modified']
-        }
-        #print thisfile
-        urls.append(thisfile)
+    for paper in db.paper.find({'body': DBRef('body', body)}):
+      thisfile = {
+        'path': "%s/paper/%s" % (config['base_url'], paper['_id']),
+        'lastmod': paper['lastModified']
+      }
+      urls.append(thisfile)
 
     # create sitemap(s) with individual attachment URLs
     sitemap_count = 1
     while len(urls) > 0:
-        shortlist = []
-        # TODO: this could probably be done with slice
-        while len(shortlist) < limit and len(urls) > 0:
-            shortlist.append(urls.pop(0))
-        sitemap_name = 'submissions_%d' % sitemap_count
-        generate_sitemap(shortlist, sitemap_name)
-        sitemaps.append(sitemap_name)
-        sitemap_count += 1
+      shortlist = []
+      while len(shortlist) < limit and len(urls) > 0:
+        shortlist.append(urls.pop(0))
+      sitemap_name = 'papers_%s_%d' % (body, sitemap_count)
+      print sitemap_name
+      generate_sitemap(shortlist, sitemap_name)
+      sitemaps.append(sitemap_name)
+      sitemap_count += 1
 
 
-    # Create meta-sitemap
-    meta_sitemap_path = config.SITEMAP_FOLDER + os.sep + cityconfig.RS + '.xml'
-    f = open(meta_sitemap_path, 'w')
-    f.write("""<?xml version="1.0" encoding="UTF-8"?>
-        <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
-    for sitemap_name in sitemaps:
-        f.write("""\n   <sitemap>
-            <loc>%ssitemap/%s_%s.xml.gz</loc>
-        </sitemap>\n""" % (cityconfig.STATIC_URL, cityconfig.RS, sitemap_name))
-    f.write("</sitemapindex>\n")
-    f.close()
+  # Create meta-sitemap
+  meta_sitemap_path = config['sitemap_folder'] + os.sep + 'sitemap.xml'
+  f = open(meta_sitemap_path, 'w')
+  f.write("""<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
+  for sitemap_name in sitemaps:
+    f.write("""\n  <sitemap>
+      <loc>%s_%s.xml.gz</loc>
+  </sitemap>""" % (config['sitemap_folder'], sitemap_name))
+  f.write("\n</sitemapindex>\n")
+  f.close()
 
 
 def generate_sitemap(files, name):
-    sitemap_path = (config.SITEMAP_FOLDER + os.sep + cityconfig.RS + '_' + name + '.xml')
-    f = open(sitemap_path, 'w')
-    f.write("""<?xml version="1.0" encoding="UTF-8"?>
-        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
-    for entry in files:
-        f.write("""\n<url>
-            <loc>%s</loc>
-            <lastmod>%s</lastmod>
-        </url>""" % (entry['path'], entry['lastmod'].strftime('%Y-%m-%d')))
-    f.write("</urlset>\n")
-    f.close()
-    cmd = "rm %s.gz" % sitemap_path
-    execute(cmd)
-    cmd = "gzip %s" % sitemap_path
-    execute(cmd)
+  sitemap_path = (config['sitemap_folder'] + os.sep + name + '.xml')
+  f = open(sitemap_path, 'w')
+  f.write("""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
+  for entry in files:
+    f.write("""\n  <url>
+    <loc>%s</loc>
+    <lastmod>%s</lastmod>
+  </url>""" % (entry['path'], entry['lastmod'].strftime('%Y-%m-%d')))
+  f.write("</urlset>\n")
+  f.close()
+  cmd = "gzip %s" % sitemap_path
+  execute(cmd)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Generate Fulltext for given City Conf File')
-    parser.add_argument(dest='city', help=("e.g. bochum"))
-    options = parser.parse_args()
-    city = options.city
-    cityconfig = __import__(city)
-    connection = MongoClient(config.DB_HOST, config.DB_PORT)
-    db = connection[config.DB_NAME]
-    generate_sitemaps()
+  connection = MongoClient(config.MONGO_HOST, config.MONGO_PORT)
+  db = connection[config.MONGO_DBNAME]
+  config = get_config(db)
+  generate_sitemaps(config)

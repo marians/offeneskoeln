@@ -3,6 +3,11 @@
 {% block ogtitle %}Suche{% endblock %}
 {% block meta_description %}Hier findest Du alle amtlichen Dokumente im Bestand{% endblock %}
 
+{% block head %}
+{{ super() }}
+<link rel="alternate" type="application/rss+xml" title="RSS Feed neuer Dokumente in dieser Suche" href="/suche/feed/?r={{ search_settings.r }}&q={{ search_settings.q }}&fq={{ search_settings.fq }}" />
+{% endblock %}
+
 {% block scripts %}
 {{ super() }}
 {% if session['region_id'] %}{% set region_id = session['region_id'] %}{% else %}{% set region_id = config['region_default'] %}{% endif %}

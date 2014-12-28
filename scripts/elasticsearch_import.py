@@ -70,7 +70,6 @@ class MyEncoder(json.JSONEncoder):
     return obj.__dict__
 
 
-
 def index_papers(config, index):
   """
   Import alle Einträge aus paper in den Index mit dem gegebenen Namen.
@@ -101,6 +100,8 @@ def index_paper(config, index, paper_id):
   }
   if 'publishedDate' in paper:
     result['publishedDate'] = paper['publishedDate']
+  if 'lastModified' in paper:
+    result['lastModified'] = paper['lastModified']
   if 'originalId' in paper:
     result['originalId'] = paper['originalId']
   if 'reference' in paper:
