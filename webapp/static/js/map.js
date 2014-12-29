@@ -282,7 +282,6 @@ $(document).ready(function(){
       article = 'die';
     }
     var mapClaim = '<div id="map-claim"><span>Das passiert rund um ' + article + ' </span></div>';
-    mapClaim = "<a href='http://wee.com/weee&quot;weee&quot;weee'>meeh!</a>";
     $('#position-prompt').slideUp().after(mapClaim);
     $('#map-claim').append(changeLocationLink).append(newSearchLink);
     // Karte umbauen
