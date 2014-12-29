@@ -402,7 +402,6 @@ def query_paper(region=None, q='', fq=None, sort='score desc', start=0, papers_p
 def query_paper_num(region_id, q):
   es = Elasticsearch([app.config['ES_HOST']+':'+str(app.config['ES_PORT'])])
   es.indices.refresh(app.config['es_paper_index'] + '-latest')
-  print q
   result = es.search(
     index = app.config['es_paper_index'] + '-latest',
     doc_type = 'paper',
