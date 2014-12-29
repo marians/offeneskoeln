@@ -282,6 +282,7 @@ $(document).ready(function(){
       article = 'die';
     }
     var mapClaim = '<div id="map-claim"><span>Das passiert rund um ' + article + ' </span></div>';
+    mapClaim = "<a href='http://wee.com/weee&quot;weee&quot;weee'>meeh!</a>";
     $('#position-prompt').slideUp().after(mapClaim);
     $('#map-claim').append(changeLocationLink).append(newSearchLink);
     // Karte umbauen
@@ -318,7 +319,7 @@ $(document).ready(function(){
                 node[1], node[0]
               ));
             });
-            var markerHtml = '';//'<p><b><a href=\'/suche/?r=' + region_data['id'] + '&q="' + street_name + '"\'>' + street_name + ': ' + street.paper_count + ' Treffer</a></b>';
+            var markerHtml = '<p><b><a href="/suche/?r=' + region_data['id'] + '&q=&auot;' + street_name + '&auot;">' + street_name + ': ' + street.paper_count + ' Treffer</a></b>';
             if (street.paper_publishedDate && street.paper_name)
               markerHtml += '<br/>Der jüngste Treffer vom ' + OpenRIS.formatIsoDate(street.paper_publishedDate) + ' (' + street.paper_name + ')';
             markerHtml += '</p>';
