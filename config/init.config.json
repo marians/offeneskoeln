@@ -1,0 +1,152 @@
+{
+  "api_url": "http://your-server", 
+  "base_url": "http://your-server", 
+  "es_paper_index": "paper", 
+  "file_extensions": [
+    [
+      "application/pdf", 
+      "pdf"
+    ], 
+    [
+      "image/tiff", 
+      "tif"
+    ], 
+    [
+      "image/jpeg", 
+      "jpg"
+    ], 
+    [
+      "application/vnd.ms-powerpoint", 
+      "pptx"
+    ], 
+    [
+      "application/msword", 
+      "doc"
+    ], 
+    [
+      "application/zip", 
+      "zip"
+    ]
+  ], 
+  "file_folder": "/srv/www/ris-web/webapp/static/files/", 
+  "gs_cmd": "/usr/bin/gs", 
+  "map_attribution": "Map Data © <a href='http://www.openstreetmap.org'>OpenStreetMap</a> contributors, Tiles courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a>.", 
+  "map_tile_url_schema": "http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg", 
+  "map_zoomlevel_max": 18, 
+  "map_zoomlevel_min": "4", 
+  "pdf_to_text_cmd": "/usr/bin/pdftotext", 
+  "region_default": "5482ec449bcda40691218ef1", 
+  "scraper": {
+    "log_base_dir": ".", 
+    "log_level": "DEBUG", 
+    "sessionnet-asp": {
+      "urls": {
+        "AGENDAITEM_DETAIL_PARSE_PATTERN": "to0050.asp?__ktonr={agendaitem_id:d}", 
+        "AGENDAITEM_DETAIL_PRINT_PATTERN": "%sto0050.asp?__ktonr=%d", 
+        "CALENDAR_MONTH_PARSE_PATTERN": "si0040.asp?__cjahr={year:d}&__cmonat={month:d}", 
+        "CALENDAR_MONTH_PRINT_PATTERN": "%ssi0040.asp?__cjahr=%d&__cmonat=%d", 
+        "FILE_DOWNLOAD_TARGET": [
+          "ydocstart.asp", 
+          "getfile.asp"
+        ], 
+        "MEETING_DETAIL_PARSE_PATTERN": "to0040.asp?__ksinr={meeting_id:d}", 
+        "MEETING_DETAIL_PRINT_PATTERN": "%sto0040.asp?__ksinr=%d", 
+        "ORGANIZATION_DETAIL_PARSE_PATTERN": "kp0040.asp?__kgrnr={committee_id:d}", 
+        "ORGANIZATION_DETAIL_PARSE_PATTERN_FULL": "kp0040.asp?__cwp=1&__kgrnr={committee_id:d}", 
+        "ORGANIZATION_DETAIL_PRINT_PATTERN": "%skp0040.asp?__kgrnr=%d", 
+        "ORGANIZATION_DETAIL_PRINT_PATTERN_FULL": "%skp0040.asp?__cwpall=1&__kgrnr=%d", 
+        "PAPER_DETAIL_PARSE_PATTERN": "vo0050.asp?__kvonr={paper_id:d}", 
+        "PAPER_DETAIL_PRINT_PATTERN": "%svo0050.asp?__kvonr=%d", 
+        "PERSON_DETAIL_PARSE_PATTERN": "kp0051.asp?__kpenr={person_id:d}", 
+        "PERSON_DETAIL_PARSE_PATTERN_ALT": "kp0050.asp?__kpenr={person_id:d}&grnr=0", 
+        "PERSON_DETAIL_PRINT_PATTERN": "%skp0051.asp?__kpenr=%d", 
+        "PERSON_DETAIL_PRINT_PATTERN_ALT": "%skp0050.asp?__kpenr=%d&grnr=0", 
+        "PERSON_ORGANIZATION_PARSE_PATTERN": "kp0050.asp?__cwpall=1&__kpenr={person_id:d}", 
+        "PERSON_ORGANIZATION_PRINT_PATTERN": "%skp0050.asp?__cwpall=1&__kpenr=%d", 
+        "PERSON_OVERVIEW_PARSE_PATTERN": "kp0041.asp?__cwpall=1", 
+        "PERSON_OVERVIEW_PRINT_PATTERN": "%skp0041.asp?__cwpall=1"
+      }, 
+      "xpath": {
+        "MEETING_DETAIL_AGENDAITEM_ROWS": "//*[@class='smccontenttable smc_page_to0040_contenttable']/tbody/tr", 
+        "MEETING_DETAIL_AGENDAITEM_ROWS_PAPER_LINK": ".//a", 
+        "MEETING_DETAIL_FILES": "//*[@id='smccontent']//table", 
+        "MEETING_DETAIL_FILES_CONTAINER_CLASSNAME": "smcdocbox", 
+        "MEETING_DETAIL_IDENTIFIER_TD": "//*[@id=\"smctablevorgang\"]/tbody//td", 
+        "MEETING_DETAIL_ORGANIZATION_LINK": "//li[@class='smcmenucontext_fct_gremium']/a", 
+        "MEETING_DETAIL_TITLE": "//h1", 
+        "PAPER_DETAIL_AGENDA_ROWS": "//*[@class='smccontenttable smc_page_vo0050_contenttable']/tbody/tr", 
+        "PAPER_DETAIL_FILES": "//*[@id='smccontent']//table", 
+        "PAPER_DETAIL_FILES_CONTAINER_CLASSNAME": "smcdocbox", 
+        "PAPER_DETAIL_IDENTIFIER_TD": "//*[@id='smctablevorgang']/tbody//td", 
+        "PAPER_DETAIL_TITLE": "//h1", 
+        "PERSONLIST_LINES": "//table[@id='smc_page_kp0041_contenttable1']//tr", 
+        "PERSON_ORGANIZATION_LINES": "//table[@id='smc_page_kp0050_contenttable1']//tr"
+      }
+    }, 
+    "sessionnet-php": {
+      "urls": {
+        "AGENDAITEM_DETAIL_PARSE_PATTERN": "to0050.php?__ktonr={agendaitem_id:d}", 
+        "AGENDAITEM_DETAIL_PRINT_PATTERN": "%sto0050.php?__ktonr=%d", 
+        "CALENDAR_MONTH_PARSE_PATTERN": "si0040.php?__cjahr={year:d}&__cmonat={month:d}", 
+        "CALENDAR_MONTH_PRINT_PATTERN": "%ssi0040.php?__cjahr=%d&__cmonat=%d", 
+        "FILE_DOWNLOAD_TARGET": [
+          "ydocstart.php", 
+          "getfile.php"
+        ], 
+        "MEETING_DETAIL_PARSE_PATTERN": "to0040.php?__ksinr={meeting_id:d}", 
+        "MEETING_DETAIL_PRINT_PATTERN": "%sto0040.php?__ksinr=%d", 
+        "ORGANIZATION_DETAIL_PARSE_PATTERN": "kp0040.php?__kgrnr={committee_id:d}", 
+        "ORGANIZATION_DETAIL_PARSE_PATTERN_FULL": "kp0040.php?__cwp=1&__kgrnr={committee_id:d}", 
+        "ORGANIZATION_DETAIL_PRINT_PATTERN": "%skp0040.php?__kgrnr=%d", 
+        "ORGANIZATION_DETAIL_PRINT_PATTERN_FULL": "%skp0040.php?__cwpall=1&__kgrnr=%d", 
+        "PAPER_DETAIL_PARSE_PATTERN": "vo0050.php?__kvonr={paper_id:d}", 
+        "PAPER_DETAIL_PRINT_PATTERN": "%svo0050.php?__kvonr=%d", 
+        "PERSON_DETAIL_PARSE_PATTERN": "kp0051.php?__kpenr={person_id:d}", 
+        "PERSON_DETAIL_PARSE_PATTERN_ALT": "kp0050.php?__kpenr={person_id:d}&grnr=0", 
+        "PERSON_DETAIL_PRINT_PATTERN": "%skp0051.php?__kpenr=%d", 
+        "PERSON_DETAIL_PRINT_PATTERN_ALT": "%skp0050.php?__kpenr=%d&grnr=0", 
+        "PERSON_ORGANIZATION_PARSE_PATTERN": "kp0050.php?__cwpall=1&__kpenr={person_id:d}", 
+        "PERSON_ORGANIZATION_PRINT_PATTERN": "%skp0050.php?__cwpall=1&__kpenr=%d", 
+        "PERSON_OVERVIEW_PARSE_PATTERN": "kp0041.php?__cwpall=1", 
+        "PERSON_OVERVIEW_PRINT_PATTERN": "%skp0041.php?__cwpall=1"
+      }, 
+      "xpath": {
+        "MEETING_DETAIL_AGENDAITEM_ROWS": "//*[@class='smccontenttable smc_page_to0040_contenttable']/tbody/tr", 
+        "MEETING_DETAIL_AGENDAITEM_ROWS_PAPER_LINK": ".//a", 
+        "MEETING_DETAIL_FILES": "//*[@id='smccontent']//table", 
+        "MEETING_DETAIL_FILES_CONTAINER_CLASSNAME": "smcdocbox", 
+        "MEETING_DETAIL_IDENTIFIER_TD": "//*[@id=\"smctablevorgang\"]/tbody//td", 
+        "MEETING_DETAIL_ORGANIZATION_LINK": "//li[@class='smcmenucontext_fct_gremium']/a", 
+        "MEETING_DETAIL_TITLE": "//h1", 
+        "PAPER_DETAIL_AGENDA_ROWS": "//*[@class='smccontenttable smc_page_vo0050_contenttable']/tbody/tr", 
+        "PAPER_DETAIL_FILES": "//*[@id='smccontent']//table", 
+        "PAPER_DETAIL_FILES_CONTAINER_CLASSNAME": "smcdocbox", 
+        "PAPER_DETAIL_IDENTIFIER_TD": "//*[@id='smctablevorgang']/tbody//td", 
+        "PAPER_DETAIL_TITLE": "//h1", 
+        "PERSONLIST_LINES": "//table[@id='smc_page_kp0041_contenttable1']//tr", 
+        "PERSON_ORGANIZATION_LINES": "//table[@id='smc_page_kp0050_contenttable1']//tr"
+      }
+    }, 
+    "user_agent_name": "OParl Scraper 0,1", 
+    "wait_time": 0.2
+  }, 
+  "sitemap_folder": "/srv/www/ris-web/webapp/static/sitemap", 
+  "stopwords_path": "/srv/www/ris-web/config/synonyms_global.txt", 
+  "synonyms_path": "/srv/www/ris-web/config/stopwords_de_global.txt", 
+  "thumbs_path": "/srv/www/ris-web/webapp/static/thumbs/", 
+  "thumbs_sizes": [
+    800, 
+    300, 
+    150
+  ], 
+  "thumbs_suffix": "jpg", 
+  "thumbs_url": "/static/thumbs", 
+  "thumbs_valid_types": [
+    "jpg", 
+    "pdf", 
+    "tif", 
+    "bmp", 
+    "png", 
+    "gif"
+  ]
+}

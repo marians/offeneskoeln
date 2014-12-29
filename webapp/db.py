@@ -305,14 +305,16 @@ def query_paper(region=None, q='', fq=None, sort='score desc', start=0, papers_p
   matches = re.findall("&#34;(.*?)&#34;", q, re.DOTALL)
   match_query = []
   for match in matches:
-    match_query.append({
-      'multi_match': {
-        'fields': ['file.fulltext', 'file.name', 'name'],
-        'type': 'phrase',
-        'query': match
-      }
-    })
-    q = q.replace("&#34;" + match + "&#34;", "").strip()
+    if match.strip():
+      match_query.append({
+        'multi_match': {
+          'fields': ['file.fulltext', 'file.name', 'name'],
+          'type': 'phrase',
+          'query': match.strip()
+        }
+      })
+    q = q.replace("&#34;" + match + "&#34;", "")
+  q = q.replace("&#34;", "").strip()
   if q:
     simple_query = [{
       'query_string': {

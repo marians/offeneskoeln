@@ -6,12 +6,9 @@ temp/*
 *.komodoproject
 *.komodotools
 webapp/static/thumbs
-webapp/static/tiles
-webapp/static/*.xml*
-webapp/static/attachments/*
-webapp/static/database/*
+webapp/static/dateien/*
+webapp/static/daten/*
 webapp/static/sitemap/*
-webapp/static/rss/*.xml
 scripts/osm-import/bin
 scripts/osm-import/lib
 scripts/osm-import/config

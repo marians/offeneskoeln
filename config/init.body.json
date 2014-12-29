@@ -1,0 +1,27 @@
+{
+  "config": {
+    "county": "KREIS NAME", 
+    "scraper": {
+      "base_url": "ORIGINAL RIS URL", 
+      "paper_type_strings": [], 
+      "party_alias": [
+        [
+          "FROM", 
+          "TO"
+        ]
+      ], 
+      "result_strings": [
+        [
+          "FROM", 
+          "TO"
+        ]
+      ], 
+      "type": "sessionnet-php"
+    }, 
+    "search_ignore_files": [
+      "STRING"
+    ]
+  }, 
+  "name": "CITY NAME", 
+  "rgs": "059110000000"
+}
