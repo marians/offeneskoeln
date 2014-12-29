@@ -7,6 +7,7 @@ import util
 
 from bson import ObjectId, DBRef
 import gridfs
+import re
 
 import urllib2
 import datetime
@@ -299,17 +300,34 @@ def query_paper(region=None, q='', fq=None, sort='score desc', start=0, papers_p
     })
   es = Elasticsearch([app.config['ES_HOST']+':'+str(app.config['ES_PORT'])])
   es.indices.refresh(app.config['es_paper_index'] + '-latest')
+  
+  # Let's see if there are some " "s in our search string
+  matches = re.findall("&#34;(.*?)&#34;", q, re.DOTALL)
+  match_query = []
+  for match in matches:
+    match_query.append({
+      'multi_match': {
+        'fields': ['file.fulltext', 'file.name', 'name'],
+        'type': 'phrase',
+        'query': match
+      }
+    })
+    q = q.replace("&#34;" + match + "&#34;", "").strip()
+  if q:
+    simple_query = [{
+      'query_string': {
+        'fields': ['file.fulltext', 'file.name', 'name'],
+        'query': q,
+        'default_operator': 'and'
+      }
+    }]
+  else:
+    simple_query = []
+  
   query = {
     'query': {
       'bool': {
-        'must': [
-          {
-            'query_string': {
-              'fields': ['file.fulltext', 'file.name', 'name'],
-              'query': q
-            }
-          }
-        ] + facet_terms
+        'must': simple_query + match_query + facet_terms
       }
     },
     'highlight': {
@@ -384,6 +402,7 @@ def query_paper(region=None, q='', fq=None, sort='score desc', start=0, papers_p
 def query_paper_num(region_id, q):
   es = Elasticsearch([app.config['ES_HOST']+':'+str(app.config['ES_PORT'])])
   es.indices.refresh(app.config['es_paper_index'] + '-latest')
+  print q
   result = es.search(
     index = app.config['es_paper_index'] + '-latest',
     doc_type = 'paper',
@@ -393,8 +412,9 @@ def query_paper_num(region_id, q):
         'bool': {
           'must': [
             {
-              'query_string': {
+              'multi_match': {
                 'fields': ['file.fulltext', 'file.name', 'name'],
+                'type': 'phrase',
                 'query': q
               }
             },

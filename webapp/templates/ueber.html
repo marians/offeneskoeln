@@ -6,21 +6,17 @@
 {% block riscontent %}
 
 <div class="content top">
-	<h1>{{config.APP_NAME}}</h1>
-  
-	<blockquote class="nice">Ziel von {{config.APP_NAME}} ist es, Informationen, Dokumente und Daten aus der {{config.CITY_NAME_ER}} Lokalpolitik für jedermann offen zugänglich zu machen.</blockquote>
-	
-	<p>Dazu werden auf {{ config.BASE_HOST }} Dokumente und Daten, die im <a href="{{ config.RIS_ORIGINAL_URL }}" target="_blank">Ratsinformationssystem (<abbr title="Ratsinformationssystem">RIS</abbr>) der Stadt {{ config.CITY_NAME }}</a> veröffentlicht werden, gesammelt, aufbereitet und in einer nutzerfreundlichen Art und Weise dargestellt.</p>
+	<h1>Offenes Ratsinformationssystem</h1>
+	<blockquote class="nice">Ziel des offenen Ratsinformationssystems ist es, Informationen, Dokumente und Daten aus der Lokalpolitik deutschlandweit für jedermann offen zugänglich zu machen.</blockquote>
+	<p>Dazu werden auf Dokumente und Daten, die in den jeweiligen Ratsinformationssystemen (<abbr title="Ratsinformationssystem">RIS</abbr>) vor Ort veröffentlicht werden, gesammelt, aufbereitet und in einer nutzerfreundlichen Art und Weise dargestellt.</p>
 </div>
-
 <div class="content middle" id="origin">
 	<h2 class="top-nomargin">Verwendete Software</h2>
 	<div style="text-align: center; margin: 3em 5em;">
-		<p>{{ config.APP_NAME }} basiert auf der von Marian Steinbach entwickelten Software für <a href="http://offeneskoeln.de/">Offenes Köln</a>. Er hat die Software als FOSS-Software unter der GPL-Lizenz veröffentlicht, auch die verwendeten Komponenten (Flask, MongoDB, Elastic Search) sind OpenSource Software. An dieser Stelle ein herzliches Dankeschön nach Köln, ohne seine Initiative wäre diese Plattform kaum denkbar gewesen.</p>
+		<p>Das offene Ratsinformationssystem basiert auf OpenSource Software. Im Einzelnen bedeutet das vor allem eine Verbindung aus Flask, MongoDB, ElasticSearch, Memcached, Gunicorn und Nginx.</p>
 		<p>Wenn Du das System für Deine Stadt einrichten möchtest, schau gerne auf <a href="https://github.com/openruhr/ris-web/">unserer Github-Seite</a> vorbei.</p>
 	</div>
 </div>
-
 <div class="content middle" id="feedback">
 	<h2 class="top-nomargin">Wünsche äußern</h2>
 	<div style="text-align: center; margin: 3em 5em;">
@@ -29,11 +25,8 @@
 		<p><a class="awesome large" href="http://offeneskoeln.uservoice.com/" target="_blank">Ideen ansehen und hinzufügen &nbsp; &rarr;</a></p>
 	</div>
 </div>
-
 <div class="content middle" id="mitmischen">
-
 	<h2 class="top-nomargin">Mitlesen und Mitmischen</h2>
-
 	<div style="text-align: center; margin-top: 3em; margin-bottom: 2em">
 		<div style="overflow: auto; width: 750px; margin: 0px auto;">
 			<div style="float: left; width: 160px; margin: 0 3em;">
@@ -51,11 +44,9 @@
 		</div>
 	</div>
 </div>
-
 <div class="content middle" id="team">
 	<h2 class="top-nomargin">Das Team hinter Offenes Köln</h2>
 	<div style="text-align: center; margin-top: 3em; margin-bottom: 2em">
-
 		<div style="overflow: auto; width: 750px; margin: 2em auto; text-align: left;">
 			<div style="width: 200px; float: left;">
 				<img src="/static/img/team/marian.jpg" width="150" height="150" alt="Marian" style="border: 0"/>
@@ -65,7 +56,6 @@
 				Marians <a href="http://www.sendung.de/" target="_blank">Blog</a> und <a href="https://twitter.com/#!/MarianSteinbach" target="_blank">Twitter Account</a>.
 			</div>
 		</div>
-
 		<div style="overflow: auto; width: 750px; margin: 2em auto; text-align: left;">
 			<div style="width: 200px; float: left;">
 				<img src="/static/img/team/ernesto.jpg" width="150" height="150" alt="Ernesto" style="border: 0"/>
@@ -75,7 +65,6 @@
 				Ernestos <a href="http://sectio-aurea.org/" target="_blank">Blog</a> und <a href="https://twitter.com/the_infinity" target="_blank">Twitter Account</a>.
 			</div>
 		</div>
-
 		<div style="overflow: auto; width: 750px; margin: 2em auto; text-align: left;">
 			<div style="width: 200px; float: left;">
 				<img src="/static/img/team/du.jpg" width="150" height="150" alt="Elmar" style="border: 0"/>
@@ -85,7 +74,6 @@
 				Elmars <a href="http://blog.elmarburke.de/" target="_blank">Blog</a> und <a href="https://twitter.com/elmarburke" target="_blank">Twitter Account</a>.
 			</div>
 		</div>
-
 		<div style="overflow: auto; width: 750px; margin: 0px auto; text-align: left;">
 			<div style="width: 200px; float: left;">
 				<img src="/static/img/team/du.jpg" width="150" height="150" alt="Du" style="border: 0"/>
@@ -94,23 +82,20 @@
 				Hier könnte <strong>Dein Name</strong> stehen. Wenn Du an {{ config.APP_NAME }} mitwirken möchtest, melde Dich auf einem der vielen Wege möglichen Wege!
 			</div>
 		</div>
-
 	</div>
 </div>
-
-<div class="content bottum" id="sponsoring">
-	<h2 class="top-nomargin">Sponsoren</h2>
+<div class="content bottom" id="history">
+	<h2 class="top-nomargin">Geschichte</h2>
 	<div style="text-align: center;">
-
+		<p>Jedes Projekt hat eine Geschichte. Hier werden all jene Akteure aufgelistet, welche den Weg zum offenen Ratsinformationssystem unterstützt haben.</p>
 		<div style="overflow: auto; width: 800px; margin: 2em auto; text-align: left;">
 			<div style="width: 260px; float: left;">
 				<img src="/static/img/sponsoring/linuxhotel.png" alt="Linuxhotel" style="border: 0"/>
 			</div>
 			<div style="width: 450px; float: left; padding: 10px 0px 0px 50px;">
-				Das <a href="http://linuxhotel.de/">Linuxhotel</a> Villa Vogelsang bietet Schulungen uns Kurse überwiegend aus dem Bereich freier Software an. Neben technischem Komfort wie ein vollständig vernetztes Haus incl. Park gibt es auch Freizeitangebote wie ein Fitness- und Saunabereich. Es unterstützt das auf freier Software basierende OpenRuhr durch die Finanzierung unseres Servers.
+				Das <a href="http://linuxhotel.de/">Linuxhotel</a> Villa Vogelsang bietet Schulungen uns Kurse überwiegend aus dem Bereich freier Software an. Neben technischem Komfort wie ein vollständig vernetztes Haus incl. Park gibt es auch Freizeitangebote wie ein Fitness- und Saunabereich. Es unterstützte das offene Ratsinformationssystem, indem es in der Anfangszeit für ein Jahr die Server für die Initiative OpenRuhr sponsorte.
 			</div>
 		</div>
-
 	</div>
 </div>
 
