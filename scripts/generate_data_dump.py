@@ -79,10 +79,11 @@ def create_dump(extconfig, folder, body_id):
 
 def compress_folder(extconfig, folder, body_id):
   filename = str(body_id) + '.tar.bz2'
+  execute('rm -f ' + extconfig['data_dump_folder'] + os.sep + filename)
   cmd = ('tar -cjf ' + extconfig['data_dump_folder'] + os.sep + filename + ' -C ' + folder +
       os.sep + config.MONGO_DBNAME + os.sep + ' .')
   execute(cmd)
-  shutil.rmtree(folder)
+  execute('rm -rf %s' % folder)
 
 
 if __name__ == '__main__':

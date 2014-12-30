@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block title %}Daten{% endblock %}
 {% block ogtitle %}Daten{% endblock %}
-{% block meta_description %}Hier kannst Du die Daten hinter offeneskoeln.de herunter laden. Open Data First!.{% endblock %}
+{% block meta_description %}Hier kannst Du die Daten hinter dem offenen Ratsinformationssystem herunter laden. Open Data First!{% endblock %}
 
-{% block content %}
+{% block riscontent %}
 <div class="content top">
 
 	<h1>Daten</h1>
@@ -21,14 +21,13 @@
 	<div class="text">
 		<h2>Lizenz</h2>
 	
-		<p>Die Daten stehen mehrheitlich unter der folgenden Lizenz:</p>
-		
-		<p><b>Open Data Commons Open Database License (ODbL)</b><br />
-		<a href="http://opendatacommons.org/licenses/odbl/">http://opendatacommons.org/licenses/odbl/</a></p>
+		<p>Alle selbst erstellten Daten stehen unter der <a href="http://opendatacommons.org/licenses/odbl/">Open Data Commons Open Database License (ODbL)</a>.</p>
 		
 		<p>Die enthaltenen <strong>Geodaten</strong> sind Auszüge aus dem Datenbestand von <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>. Urheber sind hier "OpenStreetMap und Mitwirkende".</p>
 
-		<p>Die <strong>Anhänge</strong> zu Dokumenten (PDF-Dateien etc.) stehen nicht unter der genannten Lizenz, bei etwaiger Weiterverwendung muss die Lizenz mit der Stadt {{ config.LOCATION_NAME }} geklärt werden.</p>
+		<p>Die <strong>Anhänge</strong> zu Dokumenten (PDF-Dateien etc.) stehen nicht unter der genannten Lizenz, bei etwaiger Weiterverwendung muss die Lizenz mit der jeweiligen Stadt geklärt werden.</p>
+		
+		<p>Eine Ausnahme dazu ist die Stadt Moers, alle seit dem 1.7.2013 erstellten Daten unterliegen der <a href="http://creativecommons.org/licenses/by/3.0/de/">Creative Commons Namensnennung 3.0 Deutschland (CC BY 3.0 DE)</a>.</p>
 	</div>
 </div>
 <div class="content middle">
@@ -41,8 +40,27 @@
 		<p>Die Datei-Anhänge (PDF-Dateien etc.) sowie die Vorschaubilder zu diesen Dateien sind <strong>nicht im Export enthalten</strong> (siehe dazu der Abschnitt weiter unten). Weiterhin nicht enthalten sind Session-Daten, die zum Betrieb der Webapplikation benötigt werden und die nutzerbezogene Informationen enthalten.</p>
 
 		<p>Die Exporte geben die Inhalte der <strong>MongoDB</strong> Datenbank wieder und sind zur Verwendung mit den entsprechenden MongoDB-Werkzeugen (<a href="http://docs.mongodb.org/manual/reference/mongorestore/" target="_blank">mongorestore oder mongoimport</a>) gedacht.</p>
-				
-		<p>Die Datenbank kann <a href="/static/database/{{config.RS}}.tar.bz2">als komprimierter Datenbank-Dump ({{databasefilesize}} MB) gedownloaded werden</a>.</p>
+		
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Stadt</th>
+					<th>Größe</th>
+					<th>Download</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in data_list %}
+				<tr>
+					<td>{{ loop.index }}</td>
+					<td>{{ item['name'] }}</td>
+					<td>{{ item['size'] }} MB</td>
+					<td><a href="/static/daten/{{ item['id'] }}.tar.bz2">download</a></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
 	</div>
 </div>
 <div class="content bottom">
@@ -51,7 +69,26 @@
 		
 		<p>Die digitalen Anträge, Anfragen, Mitteilungen etc. liegen ebenfalls als Archiv vor. Zum größten Teil sind dies PDF-Dokumente, aber auch JPEG- und TIF-Bilder sowie andere Formate.</p>
 		
-		<p>Die Anhänge können <a href="/static/attachments/{{config.RS}}.tar.bz2">als komprimiertes Archiv ({{attachmentsfilesize}} GB) gedownloaded werden</a>.</p>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Stadt</th>
+					<th>Größe</th>
+					<th>Download</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in file_list %}
+				<tr>
+					<td>{{ loop.index }}</td>
+					<td>{{ item['name'] }}</td>
+					<td>{{ item['size'] }} GB</td>
+					<td><a href="/static/dateien/{{ item['id'] }}.tar.bz2">download</a></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
 	</div>
 </div>
 {% endblock %}

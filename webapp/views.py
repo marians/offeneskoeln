@@ -78,19 +78,29 @@ def daten():
   Anzeige der /daten Seite mit Auflistung der
   Download-Dateien
   """
-  path = app.config['DB_DUMP_FOLDER'] + os.sep + app.config['RS'] + '.tar.bz2'
-  if os.path.isfile(path):
-    stat = os.lstat(path)
-    databasefilesize = "%d" % (stat.st_size / 1024.0 / 1024.0)
-  else:
-    databasefilesize = 0
-  path = app.config['ATTACHMENT_FOLDER'] + os.sep + app.config['RS'] + '.tar.bz2'
-  if os.path.isfile(path):
-    stat = os.lstat(path)
-    attachmentsfilesize = "%d" % (stat.st_size / 1024.0 / 1024.0 / 1024.0)
-  else:
-    attachmentsfilesize = 0
-  return render_template('daten.html', databasefilesize=databasefilesize, attachmentsfilesize=attachmentsfilesize)
+  body_list = db.get_body()
+  body_dict = {}
+  for body in body_list:
+    body_dict[str(body['_id'])] = body['name']
+  data_list = []
+  for file in os.listdir(app.config['data_dump_folder']):
+    if file.endswith(".tar.bz2"):
+      stat = os.lstat(app.config['data_dump_folder'] + os.sep + file)
+      data_list.append({
+        'id': file.split('.')[0],
+        'name': body_dict[file.split('.')[0]],
+        'size': "%d" % (stat.st_size / 1024.0 / 1024.0)
+      })
+  file_list = []
+  for file in os.listdir(app.config['files_dump_folder']):
+    if file.endswith(".tar.bz2"):
+      stat = os.lstat(app.config['files_dump_folder'] + os.sep + file)
+      file_list.append({
+        'id': file.split('.')[0],
+        'name': body_dict[file.split('.')[0]],
+        'size': "%d" % (stat.st_size / 1024.0 / 1024.0 / 1024.0)
+      })
+  return render_template('daten.html', data_list=data_list, file_list=file_list)
 
 
 @app.route("/disclaimer/")
@@ -110,7 +120,7 @@ def robots_txt():
 @app.route("/anhang/<string:file_id>")
 def file_download(file_id):
   """
-  Download eines Attachments
+  Download eines Files
   """
   return oparl_file_accessUrl(file_id)
 
